@@ -55,12 +55,11 @@
   * @{
   */
 
+
 typedef struct
 {
-  __IO uint16_t LCD_REG_R; /* Read Register */
-  __IO uint16_t LCD_RAM_R; /* Read RAM */
-  __IO uint16_t LCD_REG_W; /* Write Register */
-  __IO uint16_t LCD_RAM_W; /* Write RAM */
+  __IO uint16_t REG; /* Read Register */
+  __IO uint16_t RAM; /* Read RAM */
 } TFT_LCD_TypeDef;
 
 /**
@@ -96,7 +95,7 @@ typedef struct
 
 
 /* Note: LCD /CS is CE4 - Bank 4 of NOR/SRAM Bank 1~4 */
-#define TFT_LCD_BASE           ((uint32_t)(0x60000000 | 0x0C000000))
+#define TFT_LCD_BASE           FSMC_BANK1_4
 #define TFT_LCD                ((TFT_LCD_TypeDef *) TFT_LCD_BASE)
 
 /**
@@ -136,34 +135,13 @@ const uint16_t BUTTON_IRQn[BUTTONn] = {WAKEUP_BUTTON_EXTI_IRQn,
                                        KEY_BUTTON_EXTI_IRQn};
 
 
-/**
- * @brief COM variables
- */
-USART_TypeDef* COM_USART[COMn]   = {EVAL_COM1};
-
-GPIO_TypeDef* COM_TX_PORT[COMn]   = {EVAL_COM1_TX_GPIO_PORT};
-
-GPIO_TypeDef* COM_RX_PORT[COMn]   = {EVAL_COM1_RX_GPIO_PORT};
-
-const uint16_t COM_TX_PIN[COMn]   = {EVAL_COM1_TX_PIN};
-
-const uint16_t COM_RX_PIN[COMn]   = {EVAL_COM1_RX_PIN};
 
 /**
  * @brief BUS variables
  */
 
-TIM_HandleTypeDef htim2;
+TIM_HandleTypeDef htim5;
 
-#ifdef HAL_SPI_MODULE_ENABLED
-uint32_t SpixTimeout = EVAL_SPIx_TIMEOUT_MAX;        /*<! Value of Timeout when SPI communication fails */
-static SPI_HandleTypeDef heval_Spi;
-#endif /* HAL_SPI_MODULE_ENABLED */
-
-#ifdef HAL_I2C_MODULE_ENABLED
-uint32_t I2cxTimeout = EVAL_I2Cx_TIMEOUT_MAX;   /*<! Value of Timeout when I2C communication fails */
-I2C_HandleTypeDef heval_I2c;
-#endif /* HAL_I2C_MODULE_ENABLED */
 
 /**
   * @}
@@ -173,78 +151,25 @@ I2C_HandleTypeDef heval_I2c;
 void TIMx_Init();
 void TIM_PWM_MspInit(TIM_HandleTypeDef* tim_pwmHandle);
 
-/* I2Cx bus function */
-#ifdef HAL_I2C_MODULE_ENABLED
-/* Link function for I2C EEPROM peripheral */
-static void               I2Cx_Init(void);
-static void               I2Cx_ITConfig(void);
-static HAL_StatusTypeDef  I2Cx_ReadMultiple(uint8_t Addr, uint16_t Reg, uint16_t MemAddress, uint8_t *Buffer, uint16_t Length);
-static HAL_StatusTypeDef  I2Cx_ReadBuffer(uint16_t Addr, uint8_t Reg, uint16_t RegSize, uint8_t *pBuffer, uint16_t Length);
-static void               I2Cx_WriteData(uint16_t Addr, uint8_t Reg, uint8_t Value);
-static HAL_StatusTypeDef  I2Cx_WriteBuffer(uint16_t Addr, uint8_t Reg, uint16_t RegSize, uint8_t *pBuffer, uint16_t Length);
-static uint8_t            I2Cx_ReadData(uint16_t Addr, uint8_t Reg);
-static HAL_StatusTypeDef  I2Cx_IsDeviceReady(uint16_t DevAddress, uint32_t Trials);
-static void               I2Cx_Error(uint8_t Addr);
-static void               I2Cx_MspInit(I2C_HandleTypeDef *hi2c);
+#if defined(HAL_SRAM_MODULE_ENABLED)
 
-/* Link function for IO Expander over I2C */
-void                      IOE_Init(void);
-void                      IOE_ITConfig(void);
-void                      IOE_Delay(uint32_t Delay);
-void                      IOE_Write(uint8_t Addr, uint8_t Reg, uint8_t Value);
-uint8_t                   IOE_Read(uint8_t Addr, uint8_t Reg);
-uint16_t                  IOE_ReadMultiple(uint8_t Addr, uint8_t Reg, uint8_t *Buffer, uint16_t Length);
+static void     FSMC_BANK1NORSRAM4_WriteData(uint16_t Data);
+static void     FSMC_BANK1NORSRAM4_WriteReg(uint8_t Reg);
+static uint16_t FSMC_BANK1NORSRAM4_ReadData();
+static void     FSMC_BANK1NORSRAM4_Init(void);
+static void     FSMC_BANK1NORSRAM4_MspInit(void);
 
-/* Link function for EEPROM peripheral over I2C */
-void                      EEPROM_I2C_IO_Init(void);
-HAL_StatusTypeDef         EEPROM_I2C_IO_WriteData(uint16_t DevAddress, uint16_t MemAddress, uint8_t* pBuffer, uint32_t BufferSize);
-HAL_StatusTypeDef         EEPROM_I2C_IO_ReadData(uint16_t DevAddress, uint16_t MemAddress, uint8_t* pBuffer, uint32_t BufferSize);
-HAL_StatusTypeDef         EEPROM_I2C_IO_IsDeviceReady(uint16_t DevAddress, uint32_t Trials);
-
-/* Link functions for Temperature Sensor peripheral */
-void                      TSENSOR_IO_Init(void);
-void                      TSENSOR_IO_Write(uint16_t DevAddress, uint8_t* pBuffer, uint8_t WriteAddr, uint16_t Length);
-void                      TSENSOR_IO_Read(uint16_t DevAddress, uint8_t* pBuffer, uint8_t ReadAddr, uint16_t Length);
-uint16_t                  TSENSOR_IO_IsDeviceReady(uint16_t DevAddress, uint32_t Trials);
-
-/* Link function for Audio peripheral */
-void                      AUDIO_IO_Init(void);
-void                      AUDIO_IO_DeInit(void);
-void                      AUDIO_IO_Write(uint8_t Addr, uint8_t Reg, uint8_t Value);
-uint8_t                   AUDIO_IO_Read(uint8_t Addr, uint8_t Reg);
-
-/* Link function for Accelero peripheral */
-void                      ACCELERO_IO_Init(void);
-void                      ACCELERO_IO_ITConfig(void);
-void                      ACCELERO_IO_Write(uint8_t* pBuffer, uint8_t WriteAddr, uint16_t NumByteToWrite);
-void                      ACCELERO_IO_Read(uint8_t* pBuffer, uint8_t ReadAddr, uint16_t NumByteToRead);
-
-#endif /* HAL_I2C_MODULE_ENABLED */
-
-/* SPIx bus function */
-#ifdef HAL_SPI_MODULE_ENABLED
-static void     	  	  SPIx_Init(void);
-static void      		  SPIx_Write(uint8_t Value);
-static void      		  SPIx_Error(void);
-static void       		  SPIx_MspInit();
-
-/* Link function for LCD peripheral over SPI */
 /* LCD IO functions */
-void              		  LCD_IO_Init(void);
-void              		  LCD_IO_WriteData(uint8_t Data);
-void              		  LCD_IO_WriteMultipleData(uint8_t *pData, uint32_t Size);
-void              		  LCD_IO_WriteReg(uint8_t LCDReg);
-void             		  LCD_Delay(uint32_t delay);
+void            LCD_IO_Init(void);
+void            LCD_IO_WriteData(uint16_t RegValue);
+void            LCD_IO_WriteMultipleData(uint16_t *pData, uint32_t Size);
+void 			LCD_IO_ReadMultipleData(uint16_t *pData, uint32_t Size);
+void            LCD_IO_WriteReg(uint8_t Reg);
+uint16_t        LCD_IO_ReadData();
+void            LCD_Delay (uint32_t delay);
+#endif /*HAL_SRAM_MODULE_ENABLED*/
 
 
-/* Link functions for SD Card peripheral over SPI */
-void                      SD_IO_Init(void);
-void                      SD_IO_CSState(uint8_t state);
-void                      SD_IO_WriteReadData(const uint8_t *DataIn, uint8_t *DataOut, uint16_t DataLength);
-void                      SD_IO_WriteData(const uint8_t *Data, uint16_t DataLength);
-void                      SD_IO_ReadData(const uint8_t *Data, uint16_t DataLength);
-uint8_t                   SD_IO_WriteByte(uint8_t Data);
-#endif /* HAL_SPI_MODULE_ENABLED */
 
 
 /** @defgroup STM3210C_EVAL_Exported_Functions STM3210C EVAL Exported Functions
@@ -528,29 +453,29 @@ void TIMx_Init() {
 	TIM_ClockConfigTypeDef sClockSourceConfig;
 	TIM_MasterConfigTypeDef sMasterConfig;
 	TIM_OC_InitTypeDef sConfigOC;
-    __HAL_RCC_TIM2_CLK_ENABLE();
-	htim2.Instance = TIM2;
-	htim2.Init.Prescaler = 72 - 1;
-	htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-	htim2.Init.Period = 1000;
-	htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-	htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-	if (HAL_TIM_Base_Init(&htim2) != HAL_OK) {
+    __HAL_RCC_TIM5_CLK_ENABLE();
+	htim5.Instance = TIM5;
+	htim5.Init.Prescaler = 72 - 1;
+	htim5.Init.CounterMode = TIM_COUNTERMODE_UP;
+	htim5.Init.Period = 1000;
+	htim5.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+	htim5.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+	if (HAL_TIM_Base_Init(&htim5) != HAL_OK) {
 		_Error_Handler(__FILE__, __LINE__);
 	}
 
 	sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
-	if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK) {
+	if (HAL_TIM_ConfigClockSource(&htim5, &sClockSourceConfig) != HAL_OK) {
 		_Error_Handler(__FILE__, __LINE__);
 	}
 
-	if (HAL_TIM_PWM_Init(&htim2) != HAL_OK) {
+	if (HAL_TIM_PWM_Init(&htim5) != HAL_OK) {
 		_Error_Handler(__FILE__, __LINE__);
 	}
 
 	sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
 	sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-	if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig)
+	if (HAL_TIMEx_MasterConfigSynchronization(&htim5, &sMasterConfig)
 			!= HAL_OK) {
 		_Error_Handler(__FILE__, __LINE__);
 	}
@@ -559,27 +484,157 @@ void TIMx_Init() {
 	sConfigOC.Pulse = 900;
 	sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
 	sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-	if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_4)
+	if (HAL_TIM_PWM_ConfigChannel(&htim5, &sConfigOC, TIM_CHANNEL_2)
 			!= HAL_OK) {
 		_Error_Handler(__FILE__, __LINE__);
 	}
 
 
-	TIM_PWM_MspInit(&htim2);
+	TIM_PWM_MspInit(&htim5);
 
 }
 
 void TIM_PWM_MspInit(TIM_HandleTypeDef* tim_Handle) {
 	GPIO_InitTypeDef GPIO_InitStruct;
-	if (tim_Handle->Instance == TIM2) {
-		GPIO_InitStruct.Pin = LCD_BL_Pin;
-		GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-		HAL_GPIO_Init(LCD_BL_GPIO_Port, &GPIO_InitStruct);
-		__HAL_AFIO_REMAP_TIM2_PARTIAL_2()
+	if (tim_Handle->Instance == TIM5) {
+	    GPIO_InitStruct.Pin = GPIO_PIN_1;
+	    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+	    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 		;
 	}
 }
+
+
+/*******************************************************************************
+                            BUS OPERATIONS
+*******************************************************************************/
+
+/*************************** FSMC Routines ************************************/
+#if defined(HAL_SRAM_MODULE_ENABLED)
+/**
+  * @brief  Initializes FSMC_BANK4 MSP.
+  */
+static void FSMC_BANK1NORSRAM4_MspInit(void)
+{
+  GPIO_InitTypeDef gpioinitstruct = {0};
+
+  /* Enable FMC clock */
+  __HAL_RCC_FSMC_CLK_ENABLE();
+
+  /* Enable GPIOs clock */
+  __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOE_CLK_ENABLE();
+  __HAL_RCC_GPIOF_CLK_ENABLE();
+  __HAL_RCC_GPIOG_CLK_ENABLE();
+  __HAL_RCC_AFIO_CLK_ENABLE();
+
+  /* Common GPIO configuration */
+  gpioinitstruct.Mode      = GPIO_MODE_AF_PP;
+  gpioinitstruct.Speed     = GPIO_SPEED_FREQ_HIGH;
+
+  /* Set PD.00(D2), PD.01(D3), PD.04(NOE), PD.05(NWE), PD.08(D13), PD.09(D14),
+     PD.10(D15), PD.14(D0), PD.15(D1) as alternate function push pull */
+  gpioinitstruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_4 | GPIO_PIN_5 |
+                                GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_14 |
+                                GPIO_PIN_15;
+  HAL_GPIO_Init(GPIOD, &gpioinitstruct);
+
+  /* Set PE.07(D4), PE.08(D5), PE.09(D6), PE.10(D7), PE.11(D8), PE.12(D9), PE.13(D10),
+     PE.14(D11), PE.15(D12) as alternate function push pull */
+  gpioinitstruct.Pin = GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 |
+                                GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 |
+                                GPIO_PIN_15;
+  HAL_GPIO_Init(GPIOE, &gpioinitstruct);
+
+  /* Set PF.00(A0 (RS)) as alternate function push pull */
+  gpioinitstruct.Pin = GPIO_PIN_0;
+  HAL_GPIO_Init(GPIOF, &gpioinitstruct);
+
+  /* Set PG.12(NE4 (LCD/CS)) as alternate function push pull - CE3(LCD /CS) */
+  gpioinitstruct.Pin = GPIO_PIN_12;
+  HAL_GPIO_Init(GPIOG, &gpioinitstruct);
+}
+
+/**
+  * @brief  Initializes LCD IO.
+  */
+static void FSMC_BANK1NORSRAM4_Init(void)
+{
+  SRAM_HandleTypeDef          hsram;
+  FSMC_NORSRAM_TimingTypeDef  sramtiming = {0};
+
+  /*** Configure the SRAM Bank 4 ***/
+  /* Configure IPs */
+  hsram.Instance  = FSMC_NORSRAM_DEVICE;
+  hsram.Extended  = FSMC_NORSRAM_EXTENDED_DEVICE;
+
+  sramtiming.AddressSetupTime       = 1;
+  sramtiming.AddressHoldTime        = 1;
+  sramtiming.DataSetupTime          = 2;
+  sramtiming.BusTurnAroundDuration  = 1;
+  sramtiming.CLKDivision            = 2;
+  sramtiming.DataLatency            = 2;
+  sramtiming.AccessMode             = FSMC_ACCESS_MODE_A;
+
+  /* Color LCD configuration
+     LCD configured as follow:
+        - Data/Address MUX = Disable
+        - Memory Type = SRAM
+        - Data Width = 16bit
+        - Write Operation = Enable
+        - Extended Mode = Enable
+        - Asynchronous Wait = Disable */
+  hsram.Init.NSBank             = FSMC_NORSRAM_BANK4;
+  hsram.Init.DataAddressMux     = FSMC_DATA_ADDRESS_MUX_DISABLE;
+  hsram.Init.MemoryType         = FSMC_MEMORY_TYPE_SRAM;
+  hsram.Init.MemoryDataWidth    = FSMC_NORSRAM_MEM_BUS_WIDTH_16;
+  hsram.Init.BurstAccessMode    = FSMC_BURST_ACCESS_MODE_DISABLE;
+  hsram.Init.WaitSignalPolarity = FSMC_WAIT_SIGNAL_POLARITY_LOW;
+  hsram.Init.WrapMode           = FSMC_WRAP_MODE_DISABLE;
+  hsram.Init.WaitSignalActive   = FSMC_WAIT_TIMING_BEFORE_WS;
+  hsram.Init.WriteOperation     = FSMC_WRITE_OPERATION_ENABLE;
+  hsram.Init.WaitSignal         = FSMC_WAIT_SIGNAL_DISABLE;
+  hsram.Init.ExtendedMode       = FSMC_EXTENDED_MODE_DISABLE;
+  hsram.Init.AsynchronousWait   = FSMC_ASYNCHRONOUS_WAIT_DISABLE;
+  hsram.Init.WriteBurst         = FSMC_WRITE_BURST_DISABLE;
+
+  /* Initialize the SRAM controller */
+  FSMC_BANK1NORSRAM4_MspInit();
+  HAL_SRAM_Init(&hsram, &sramtiming, &sramtiming);
+}
+
+/**
+  * @brief  Writes register value.
+  */
+static void FSMC_BANK1NORSRAM4_WriteData(uint16_t Data)
+{
+  /* Write 16-bit Data */
+  TFT_LCD->RAM = Data;
+}
+
+/**
+  * @brief  Writes register address.
+  * @param  Reg:
+  * @retval None
+  */
+static void FSMC_BANK1NORSRAM4_WriteReg(uint8_t Reg)
+{
+  /* Write 16-bit Index, then Write Reg */
+  TFT_LCD->REG = Reg;
+}
+
+/**
+  * @brief  Reads register value.
+  * @retval Read value
+  */
+static uint16_t FSMC_BANK1NORSRAM4_ReadData()
+{
+  /* Read 16-bit Reg */
+  return (TFT_LCD->RAM);
+}
+#endif /*HAL_SRAM_MODULE_ENABLED*/
+
 
 #ifdef HAL_I2C_MODULE_ENABLED
 /******************************* I2C Routines**********************************/
@@ -1030,20 +1085,6 @@ void IOE_Delay(uint32_t Delay)
 
 
 /********************************* LINK LCD ***********************************/
-/********************************* LINK LCD ***********************************/
-void LCD_IO_SetPin(register uint16_t data) {
-	register int portA = data & 0x1fff;
-	register int portB = data & 0xe000;
-
-	GPIOA->BSRR = portA;
-	GPIOA->BRR = portA ^ 0x1fff;
-	GPIOB->BSRR = portB;
-	GPIOB->BRR = portB ^ 0xe000;
-}
-
-uint16_t LCD_IO_GetPin() {
-	return (GPIOA->IDR & 0x1fff)|(GPIOB->IDR & 0xe000);
-}
 /**
   * @brief  Initializes the LCD
   * @param  None
@@ -1051,194 +1092,80 @@ uint16_t LCD_IO_GetPin() {
   */
 void LCD_IO_Init(void)
 {
-	GPIO_InitTypeDef GPIO_InitStruct;
-
-	/* GPIO Ports Clock Enable */
-
-	__HAL_RCC_GPIOA_CLK_ENABLE()
-	;
-	__HAL_RCC_GPIOB_CLK_ENABLE()
-	;
-
-	/*Configure GPIO pin Output Level */
-	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
-
-	/*Configure GPIO pin Output Level */
-	HAL_GPIO_WritePin(GPIOA,
-			LCD_D0_Pin | LCD_D1_Pin | LCD_D2_Pin | LCD_D3_Pin | LCD_D4_Pin
-					| LCD_D5_Pin | LCD_D6_Pin | LCD_D7_Pin, GPIO_PIN_SET);
-
-	/*Configure GPIO pin Output Level */
-	HAL_GPIO_WritePin(GPIOB,
-	LCD_RS_Pin | LCD_CS_Pin | LCD_RD_Pin | LCD_WR_Pin | LCD_RST_Pin,
-			GPIO_PIN_SET);
-
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-
-	GPIO_InitStruct.Pin = LCD_D0_Pin | LCD_D1_Pin | LCD_D2_Pin | LCD_D3_Pin
-			| LCD_D4_Pin | LCD_D5_Pin | LCD_D6_Pin | LCD_D7_Pin
-			| LCD_D8_Pin | LCD_D9_Pin | LCD_D10_Pin | LCD_D11_Pin | LCD_D12_Pin;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-	GPIO_InitStruct.Pin = LCD_D13_Pin | LCD_D14_Pin | LCD_D15_Pin;
-	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-	GPIO_InitStruct.Pin = LCD_RS_Pin | LCD_CS_Pin | LCD_RD_Pin | LCD_WR_Pin
-			| LCD_RST_Pin;
-	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
+	  FSMC_BANK1NORSRAM4_Init();
 	TIMx_Init();
 	/* Start channel 4 */
-	if (HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4) != HAL_OK) {
+	if (HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_2) != HAL_OK) {
 		/* PWM generation Error */
 		Error_Handler();
 	}
-	LCD_RST_HIGH();
-	LCD_Delay(1);
-	LCD_RST_LOW();
-	LCD_Delay(10);
-	LCD_RST_HIGH();
-	LCD_Delay(120);
-	/* Reset LCD control line CS */
-	LCD_CS_LOW();
 }
 
 /**
-  * @brief  Writes command to select the LCD register.
-  * @param  LCDReg: Address of the selected register.
+  * @brief  Writes data on LCD data register.
+  * @param  RegValue: Data to be written
   * @retval None
+  */
+void  LCD_IO_WriteData(uint16_t RegValue)
+{
+    FSMC_BANK1NORSRAM4_WriteData(RegValue);
+}
+
+/**
+  * @brief  Writes multiple data on LCD data register.
+  * @param  pData: Data to be written
+  * @param  Size: number of data to write
+  */
+void LCD_IO_WriteMultipleData(uint16_t *pData, uint32_t Size)
+{
+  while(Size-- > 0)
+  {
+    /* Write 16-bit Reg */
+    FSMC_BANK1NORSRAM4_WriteData(*pData++);
+  }
+}
+/**
+  * @brief  Read multiple data from LCD data register.
+  * @param  pData: Data to be written
+  * @param  Size: number of data to write
+  */
+void LCD_IO_ReadMultipleData(uint16_t *pData, uint32_t Size)
+{
+	  while(Size-- > 0)
+	  {
+	    /* Write 16-bit Reg */
+		  *pData = FSMC_BANK1NORSRAM4_ReadData();
+	  }
+}
+/**
+  * @brief  Writes register on LCD register.
+  * @param  Reg: Register to be written
   */
 void LCD_IO_WriteReg(uint8_t Reg)
 {
-
-  /* Set LCD data/command line DC to Low */
-	LCD_RS_LOW();
-
-
-  /* Send Command */
-	LCD_IO_SetPin(Reg);
-
-	LCD_WR_LOW();
-	LCD_WR_HIGH();
-	LCD_RS_HIGH();
-
+  FSMC_BANK1NORSRAM4_WriteReg(Reg);
 }
 
-
 /**
-  * @brief  Writes data to select the LCD register.
-  *         This function must be used after st7735_WriteReg() function
-  * @param  Data: data to write to the selected register.
-  * @retval None
+  * @brief  Reads data from LCD data register.
+  * @param  Reg: Register to be read
+  * @retval Read data.
   */
-void LCD_IO_WriteData(uint16_t Data)
+uint16_t LCD_IO_ReadData()
 {
-	LCD_IO_SetPin(Data);
-	LCD_WR_LOW();
-	LCD_WR_HIGH();
-}
-
-/**
- * @brief  Reads data from select the LCD register.
- * @retval Data to read from the selected register.
- */
-uint16_t LCD_IO_ReadData() {
-	uint32_t ret = 0;
-	GPIO_InitTypeDef GPIO_InitStruct;
-	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-
-	GPIO_InitStruct.Pin = LCD_D0_Pin | LCD_D1_Pin | LCD_D2_Pin | LCD_D3_Pin
-			| LCD_D4_Pin | LCD_D5_Pin | LCD_D6_Pin | LCD_D7_Pin
-			| LCD_D8_Pin | LCD_D9_Pin | LCD_D10_Pin | LCD_D11_Pin | LCD_D12_Pin;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-	GPIO_InitStruct.Pin = LCD_D13_Pin | LCD_D14_Pin | LCD_D15_Pin;
-	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-	/* Set LCD data/command line DC to High */
-		LCD_RD_LOW();
-		LCD_RD_HIGH();
-		/* get Data */
-		ret = LCD_IO_GetPin();
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-
-	GPIO_InitStruct.Pin = LCD_D0_Pin | LCD_D1_Pin | LCD_D2_Pin | LCD_D3_Pin
-			| LCD_D4_Pin | LCD_D5_Pin | LCD_D6_Pin | LCD_D7_Pin
-			| LCD_D8_Pin | LCD_D9_Pin | LCD_D10_Pin | LCD_D11_Pin | LCD_D12_Pin;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-	GPIO_InitStruct.Pin = LCD_D13_Pin | LCD_D14_Pin | LCD_D15_Pin;
-	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-	return ret;
-}
-void LCD_IO_ReadMultipleData(uint16_t * pData,int32_t Size)
-{
-	GPIO_InitTypeDef GPIO_InitStruct;
-	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-
-	GPIO_InitStruct.Pin = LCD_D0_Pin | LCD_D1_Pin | LCD_D2_Pin | LCD_D3_Pin
-			| LCD_D4_Pin | LCD_D5_Pin | LCD_D6_Pin | LCD_D7_Pin
-			| LCD_D8_Pin | LCD_D9_Pin | LCD_D10_Pin | LCD_D11_Pin | LCD_D12_Pin;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-	GPIO_InitStruct.Pin = LCD_D13_Pin | LCD_D14_Pin | LCD_D15_Pin;
-	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-	/* Set LCD data/command line DC to High */
-	int32_t i = 0;
-	while(Size--)
-	{
-		LCD_RD_LOW();
-		LCD_RD_HIGH();
-		/* get Data */
-		*pData++ = LCD_IO_GetPin();
-	}
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-
-	GPIO_InitStruct.Pin = LCD_D0_Pin | LCD_D1_Pin | LCD_D2_Pin | LCD_D3_Pin
-			| LCD_D4_Pin | LCD_D5_Pin | LCD_D6_Pin | LCD_D7_Pin
-			| LCD_D8_Pin | LCD_D9_Pin | LCD_D10_Pin | LCD_D11_Pin | LCD_D12_Pin;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-	GPIO_InitStruct.Pin = LCD_D13_Pin | LCD_D14_Pin | LCD_D15_Pin;
-	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-}
-
-
-/**
-* @brief  Write register value.
-* @param  pData Pointer on the register value
-* @param  Size Size of byte to transmit to the register
-* @retval None
-*/
-void LCD_IO_WriteMultipleData(uint16_t *pData, int32_t Size)
-{
-	/* Send Data */
-	while (Size--)
-	{
-		LCD_IO_SetPin(*pData++);
-		LCD_WR_LOW();
-		LCD_WR_HIGH();
-	}
+  /* Read 16-bit Reg */
+  return (FSMC_BANK1NORSRAM4_ReadData());
 }
 
 /**
   * @brief  Wait for loop in ms.
   * @param  Delay in ms.
-  * @retval None
   */
-void LCD_Delay(uint32_t Delay)
+void LCD_Delay (uint32_t Delay)
 {
   HAL_Delay(Delay);
 }
+
 #ifdef HAL_SPI_MODULE_ENABLED
 /******************************** LINK SD Card ********************************/
 

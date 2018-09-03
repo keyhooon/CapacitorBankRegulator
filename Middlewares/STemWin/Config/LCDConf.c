@@ -109,8 +109,20 @@ Purpose     : Display controller configuration (single layer)
 */
 static void LcdWriteReg(U16 Data)
 {
-	LCD_IO_WriteReg(Data);
+	LCD_IO_WriteReg((U8)Data);
 }
+
+/********************************************************************
+*
+*       LcdReadData
+*
+* Function description:
+*   Writes a value to a display register
+*/
+static U16 LcdReadData() {
+	return LCD_IO_ReadData();
+}
+
 
 /********************************************************************
 *
@@ -183,6 +195,7 @@ void LCD_X_Config(void) {
   //
   PortAPI.pfWrite16_A0  = LcdWriteReg;
   PortAPI.pfWrite16_A1  = LcdWriteData;
+  PortAPI.pfRead16_A1  = LcdReadData;
   PortAPI.pfWriteM16_A1 = LcdWriteDataMultiple;
   PortAPI.pfReadM16_A1  = LcdReadDataMultiple;
   GUIDRV_FlexColor_SetFunc(pDevice, &PortAPI, GUIDRV_FLEXCOLOR_F66709, GUIDRV_FLEXCOLOR_M16C0B16);
