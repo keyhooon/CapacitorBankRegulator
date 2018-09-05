@@ -117,23 +117,24 @@ static LCD_DrvTypeDef *lcd_drv;
 static uint8_t bitmap[MAX_HEIGHT_FONT*MAX_WIDTH_FONT*2+OFFSET_BITMAP] = {0};
 
 /**
-  * @}
+ * @}
  */
 
 /** @defgroup STM3210C_EVAL_LCD_Private_Functions STM3210C EVAL LCD Private Functions
-  * @{
+ * @{
  */
 static void LCD_DrawPixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode);
 static void LCD_DrawChar(uint16_t Xpos, uint16_t Ypos, const uint8_t *c);
-static void LCD_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height);
+static void LCD_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width,
+		uint16_t Height);
 /**
-  * @}
+ * @}
  */
 
 
 /** @defgroup STM3210C_EVAL_LCD_Exported_Functions STM3210C EVAL LCD Exported Functions
-  * @{
-  */
+ * @{
+ */
 
 /**
   * @brief  Initializes the LCD.
@@ -799,103 +800,93 @@ void BSP_LCD_DisplayOff(void)
  */
 
 /******************************************************************************
-                            Static Function
-*******************************************************************************/
+ Static Function
+ *******************************************************************************/
 /**
-  * @brief  Draws a pixel on LCD.
+ * @brief  Draws a pixel on LCD.
  * @param  Xpos: X position
-  * @param  Ypos: Y position
+ * @param  Ypos: Y position
  * @param  RGBCode: Pixel color in RGB mode (5-6-5)
-  */
-static void LCD_DrawPixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode)
-{
-  if(lcd_drv->WritePixel != NULL)
-  {
-    lcd_drv->WritePixel(Xpos, Ypos, RGBCode);
-  }
+ */
+static void LCD_DrawPixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode) {
+	if (lcd_drv->WritePixel != NULL) {
+		lcd_drv->WritePixel(Xpos, Ypos, RGBCode);
+	}
 }
 
 /**
-  * @brief  Draws a character on LCD.
-  * @param  Xpos: Line where to display the character shape
-  * @param  Ypos: Start column address
-  * @param  pChar: Pointer to the character data
-  */
-static void LCD_DrawChar(uint16_t Xpos, uint16_t Ypos, const uint8_t *pChar)
-{
-  uint32_t counterh = 0, counterw = 0, index = 0;
-  uint16_t height = 0, width = 0;
-  uint8_t offset = 0;
-  uint8_t *pchar = NULL;
-  uint32_t line = 0;
+ * @brief  Draws a character on LCD.
+ * @param  Xpos: Line where to display the character shape
+ * @param  Ypos: Start column address
+ * @param  pChar: Pointer to the character data
+ */
+static void LCD_DrawChar(uint16_t Xpos, uint16_t Ypos, const uint8_t *pChar) {
+	uint32_t counterh = 0, counterw = 0, index = 0;
+	uint16_t height = 0, width = 0;
+	uint8_t offset = 0;
+	uint8_t *pchar = NULL;
+	uint32_t line = 0;
 
+	height = DrawProp.pFont->Height;
+	width = DrawProp.pFont->Width;
 
-  height = DrawProp.pFont->Height;
-  width  = DrawProp.pFont->Width;
+	/* Fill bitmap header*/
+	*(uint16_t *) (bitmap + 2) =
+			(uint16_t) (height * width * 2 + OFFSET_BITMAP);
+	*(uint16_t *) (bitmap + 4) =
+			(uint16_t) ((height * width * 2 + OFFSET_BITMAP) >> 16);
+	*(uint16_t *) (bitmap + 10) = OFFSET_BITMAP;
+	*(uint16_t *) (bitmap + 18) = (uint16_t) (width);
+	*(uint16_t *) (bitmap + 20) = (uint16_t) ((width) >> 16);
+	*(uint16_t *) (bitmap + 22) = (uint16_t) (height);
+	*(uint16_t *) (bitmap + 24) = (uint16_t) ((height) >> 16);
 
-  /* Fill bitmap header*/
-  *(uint16_t *) (bitmap + 2) = (uint16_t)(height*width*2+OFFSET_BITMAP);
-  *(uint16_t *) (bitmap + 4) = (uint16_t)((height*width*2+OFFSET_BITMAP)>>16);
-  *(uint16_t *) (bitmap + 10) = OFFSET_BITMAP;
-  *(uint16_t *) (bitmap + 18) = (uint16_t)(width);
-  *(uint16_t *) (bitmap + 20) = (uint16_t)((width)>>16);
-  *(uint16_t *) (bitmap + 22) = (uint16_t)(height);
-  *(uint16_t *) (bitmap + 24) = (uint16_t)((height)>>16);
+	offset = 8 * ((width + 7) / 8) - width;
 
-  offset =  8 *((width + 7)/8) -  width ;
+	for (counterh = 0; counterh < height; counterh++) {
+		pchar = ((uint8_t *) pChar + (width + 7) / 8 * counterh);
 
-  for(counterh = 0; counterh < height; counterh++)
-  {
-    pchar = ((uint8_t *)pChar + (width + 7)/8 * counterh);
-
-    if(((width + 7)/8) == 3)
-    {
-      line =  (pchar[0]<< 16) | (pchar[1]<< 8) | pchar[2];
-    }
-
-    if(((width + 7)/8) == 2)
-    {
-      line =  (pchar[0]<< 8) | pchar[1];
-    }
-
-    if(((width + 7)/8) == 1)
-    {
-      line =  pchar[0];
+		if (((width + 7) / 8) == 3) {
+			line = (pchar[0] << 16) | (pchar[1] << 8) | pchar[2];
 		}
 
-    for (counterw = 0; counterw < width; counterw++)
-    {
-      /* Image in the bitmap is written from the bottom to the top */
-      /* Need to invert image in the bitmap */
-      index = (((height-counterh-1)*width)+(counterw))*2+OFFSET_BITMAP;
-			if (line & (1 << (width - counterw + offset - 1)))
-      {
-        bitmap[index] = (uint8_t)DrawProp.TextColor;
-        bitmap[index+1] = (uint8_t)(DrawProp.TextColor >> 8);
-      }
-      else
-      {
-        bitmap[index] = (uint8_t)DrawProp.BackColor;
-        bitmap[index+1] = (uint8_t)(DrawProp.BackColor >> 8);
-			}
-    }
-  }
+		if (((width + 7) / 8) == 2) {
+			line = (pchar[0] << 8) | pchar[1];
+		}
 
-  BSP_LCD_DrawBitmap(Xpos, Ypos, bitmap);
+		if (((width + 7) / 8) == 1) {
+			line = pchar[0];
+		}
+
+		for (counterw = 0; counterw < width; counterw++) {
+			/* Image in the bitmap is written from the bottom to the top */
+			/* Need to invert image in the bitmap */
+			index = (((height - counterh - 1) * width) + (counterw))
+					* 2+OFFSET_BITMAP;
+			if (line & (1 << (width - counterw + offset - 1))) {
+				bitmap[index] = (uint8_t) DrawProp.TextColor;
+				bitmap[index + 1] = (uint8_t) (DrawProp.TextColor >> 8);
+			} else {
+				bitmap[index] = (uint8_t) DrawProp.BackColor;
+				bitmap[index + 1] = (uint8_t) (DrawProp.BackColor >> 8);
+			}
+		}
+	}
+
+	BSP_LCD_DrawBitmap(Xpos, Ypos, bitmap);
 }
 
 /**
-  * @brief  Sets display window.
-  * @param  Xpos: LCD X position
-  * @param  Ypos: LCD Y position
-  * @param  Width: LCD window width
+ * @brief  Sets display window.
+ * @param  Xpos: LCD X position
+ * @param  Ypos: LCD Y position
+ * @param  Width: LCD window width
  * @param  Height: LCD window height
-  */
-static void LCD_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height)
-{
-  if(lcd_drv->SetDisplayWindow != NULL)
-  {
-    lcd_drv->SetDisplayWindow(Xpos, Ypos, Width, Height);
+ */
+static void LCD_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width,
+		uint16_t Height) {
+	if (lcd_drv->SetDisplayWindow != NULL) {
+		lcd_drv->SetDisplayWindow(Xpos, Ypos, Width, Height);
 	}
 }
 

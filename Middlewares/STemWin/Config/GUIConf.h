@@ -42,15 +42,15 @@ Purpose     : Configures emWins abilities, fonts etc.
   *
   *        http://www.st.com/software_license_agreement_liberty_v2
   *
-  * Unless required by applicable law or agreed to in writing, software 
-  * distributed under the License is distributed on an "AS IS" BASIS, 
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   * See the License for the specific language governing permissions and
   * limitations under the License.
   *
   ******************************************************************************
   */
- 
+
 #ifndef GUICONF_H
 #define GUICONF_H
 
@@ -64,6 +64,7 @@ Purpose     : Configures emWins abilities, fonts etc.
 *
 *       Multi tasking support
 */
+#define OS_SUPPORT
 #ifdef OS_SUPPORT
  #define GUI_OS                    (1)  // Compile with multitasking support
 #else
@@ -89,8 +90,10 @@ Purpose     : Configures emWins abilities, fonts etc.
 *         Configuration of available packages
 */
 #define GUI_SUPPORT_MOUSE             (0)    /* Support a mouse */
-#define GUI_WINSUPPORT                (0)    /* Use window manager */
-#define GUI_SUPPORT_MEMDEV            (0)    /* Memory device package available */
+#define GUI_WINSUPPORT                (1)    /* Use window manager */
+#define GUI_SUPPORT_MEMDEV            (1)    /* Memory device package available */
 #define GUI_SUPPORT_DEVICES           (0)    /* Enable use of device pointers */
+#define GUI_USE_ARGB				  (1)
+
 
 #endif  /* Avoid multiple inclusion */

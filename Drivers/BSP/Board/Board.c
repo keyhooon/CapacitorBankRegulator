@@ -124,15 +124,15 @@ const uint16_t LED_PIN[LEDn] = {LED1_PIN,
  */
 GPIO_TypeDef* BUTTON_PORT[BUTTONn] = {WAKEUP_BUTTON_GPIO_PORT,
                                       TAMPER_BUTTON_GPIO_PORT,
-                                      KEY_BUTTON_GPIO_PORT};
+KEY1_BUTTON_GPIO_PORT, KEY2_BUTTON_GPIO_PORT };
 
 const uint16_t BUTTON_PIN[BUTTONn] = {WAKEUP_BUTTON_PIN,
                                       TAMPER_BUTTON_PIN,
-                                      KEY_BUTTON_PIN};
+KEY1_BUTTON_PIN, KEY2_BUTTON_PIN };
 
 const uint16_t BUTTON_IRQn[BUTTONn] = {WAKEUP_BUTTON_EXTI_IRQn,
                                        TAMPER_BUTTON_EXTI_IRQn,
-                                       KEY_BUTTON_EXTI_IRQn};
+KEY1_BUTTON_EXTI_IRQn, KEY2_BUTTON_EXTI_IRQn };
 
 
 
@@ -395,47 +395,7 @@ JOYState_TypeDef BSP_JOY_GetState(void)
 }
 #endif /*HAL_I2C_MODULE_ENABLED*/
 
-#ifdef HAL_UART_MODULE_ENABLED
-/**
-  * @brief  Configures COM port.
-  * @param  COM: Specifies the COM port to be configured.
-  *   This parameter can be one of following parameters:
-  *     @arg COM1
-  * @param  huart: pointer to a UART_HandleTypeDef structure that
-  *   contains the configuration information for the specified UART peripheral.
-  */
-void BSP_COM_Init(COM_TypeDef COM, UART_HandleTypeDef* huart)
-{
-  GPIO_InitTypeDef gpioinitstruct = {0};
 
-  /* Enable GPIO clock */
-  COMx_TX_GPIO_CLK_ENABLE(COM);
-  COMx_RX_GPIO_CLK_ENABLE(COM);
-
-  /* Enable USART clock */
-  COMx_CLK_ENABLE(COM);
-
-  /* Remap AFIO if needed */
-  AFIOCOMx_CLK_ENABLE(COM);
-  AFIOCOMx_REMAP(COM);
-
-  /* Configure USART Tx as alternate function push-pull */
-  gpioinitstruct.Pin        = COM_TX_PIN[COM];
-  gpioinitstruct.Mode       = GPIO_MODE_AF_PP;
-  gpioinitstruct.Speed      = GPIO_SPEED_FREQ_HIGH;
-  gpioinitstruct.Pull       = GPIO_PULLUP;
-  HAL_GPIO_Init(COM_TX_PORT[COM], &gpioinitstruct);
-
-  /* Configure USART Rx as alternate function push-pull */
-  gpioinitstruct.Mode       = GPIO_MODE_INPUT;
-  gpioinitstruct.Pin        = COM_RX_PIN[COM];
-  HAL_GPIO_Init(COM_RX_PORT[COM], &gpioinitstruct);
-
-  /* USART configuration */
-  huart->Instance = COM_USART[COM];
-  HAL_UART_Init(huart);
-}
-#endif /* HAL_UART_MODULE_ENABLED */
 
 /**
   * @}
@@ -569,12 +529,12 @@ static void FSMC_BANK1NORSRAM4_Init(void)
   hsram.Instance  = FSMC_NORSRAM_DEVICE;
   hsram.Extended  = FSMC_NORSRAM_EXTENDED_DEVICE;
 
-  sramtiming.AddressSetupTime       = 1;
-  sramtiming.AddressHoldTime        = 1;
-  sramtiming.DataSetupTime          = 2;
-  sramtiming.BusTurnAroundDuration  = 1;
-  sramtiming.CLKDivision            = 2;
-  sramtiming.DataLatency            = 2;
+	sramtiming.AddressSetupTime = 0;
+	sramtiming.AddressHoldTime = 0;
+	sramtiming.DataSetupTime = 5;
+	sramtiming.BusTurnAroundDuration = 0;
+	sramtiming.CLKDivision = 0;
+	sramtiming.DataLatency = 0;
   sramtiming.AccessMode             = FSMC_ACCESS_MODE_A;
 
   /* Color LCD configuration
@@ -1134,7 +1094,7 @@ void LCD_IO_ReadMultipleData(uint16_t *pData, uint32_t Size)
 	  while(Size-- > 0)
 	  {
 	    /* Write 16-bit Reg */
-		  *pData = FSMC_BANK1NORSRAM4_ReadData();
+		*pData++ = FSMC_BANK1NORSRAM4_ReadData();
 	  }
 }
 /**

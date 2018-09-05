@@ -58,9 +58,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
-#ifdef HAL_I2C_MODULE_ENABLED
-#include "stm3210c_eval_io.h"
-#endif /* HAL_I2C_MODULE_ENABLED */
 
 /** @defgroup STM3210C_EVAL_Exported_Types STM3210C EVAL Exported Types
   * @{
@@ -90,8 +87,7 @@ typedef enum
 {
   BUTTON_WAKEUP = 0,
   BUTTON_TAMPER = 1,
-  BUTTON_KEY    = 2,
-
+  BUTTON_KEY1 = 2, BUTTON_KEY2 = 3,
 } Button_TypeDef;
 
 typedef enum
@@ -140,36 +136,33 @@ typedef enum
 /**
   * @brief  Define for STM3210C_EVAL board
   */
-#if !defined (USE_STM3210C_EVAL)
- #define USE_STM3210C_EVAL
-#endif
 
 /** @addtogroup STM3210C_EVAL_LED STM3210C EVAL LED
   * @{
   */
-#define LEDn                             1
+#define LEDn                             4
 
-#define LED1_PIN                         GPIO_PIN_13             /* PC.13*/
-#define LED1_GPIO_PORT                   GPIOC
-#define LED1_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOC_CLK_ENABLE()
-#define LED1_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOC_CLK_DISABLE()
+#define LED1_PIN                         GPIO_PIN_6             /* PF.6*/
+#define LED1_GPIO_PORT                   GPIOF
+#define LED1_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOF_CLK_ENABLE()
+#define LED1_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOF_CLK_DISABLE()
 
-#define LED2_PIN                         GPIO_PIN_13            /* PD.13*/
-#define LED2_GPIO_PORT                   GPIOD
-#define LED2_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOD_CLK_ENABLE()
-#define LED2_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOD_CLK_DISABLE()
-
-
-#define LED3_PIN                         GPIO_PIN_3            /* PD.03*/
-#define LED3_GPIO_PORT                   GPIOD
-#define LED3_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOD_CLK_ENABLE()
-#define LED3_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOD_CLK_DISABLE()
+#define LED2_PIN                         GPIO_PIN_7            /* PF.7*/
+#define LED2_GPIO_PORT                   GPIOF
+#define LED2_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOF_CLK_ENABLE()
+#define LED2_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOF_CLK_DISABLE()
 
 
-#define LED4_PIN                         GPIO_PIN_4            /* PD.04*/
-#define LED4_GPIO_PORT                   GPIOD
-#define LED4_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOD_CLK_ENABLE()
-#define LED4_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOD_CLK_DISABLE()
+#define LED3_PIN                         GPIO_PIN_8            /* PF.8*/
+#define LED3_GPIO_PORT                   GPIOF
+#define LED3_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOF_CLK_ENABLE()
+#define LED3_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOF_CLK_DISABLE()
+
+
+#define LED4_PIN                         GPIO_PIN_9            /* PF.09*/
+#define LED4_GPIO_PORT                   GPIOF
+#define LED4_GPIO_CLK_ENABLE()           __HAL_RCC_GPIOF_CLK_ENABLE()
+#define LED4_GPIO_CLK_DISABLE()          __HAL_RCC_GPIOF_CLK_DISABLE()
 
 #define LEDx_GPIO_CLK_ENABLE(__LED__)    do { if ((__LED__) == LED1) LED1_GPIO_CLK_ENABLE(); else \
                                               if ((__LED__) == LED2) LED2_GPIO_CLK_ENABLE(); else \
@@ -188,7 +181,7 @@ typedef enum
 /** @addtogroup STM3210C_EVAL_BUTTON STM3210C EVAL BUTTON
   * @{
   */
-#define BUTTONn                          3
+#define BUTTONn                          4
 
 /**
  * @brief Tamper push-button
@@ -202,11 +195,17 @@ typedef enum
 /**
  * @brief Key push-button
  */
-#define KEY_BUTTON_PIN                      GPIO_PIN_9             /* PB.09*/
-#define KEY_BUTTON_GPIO_PORT                GPIOB
-#define KEY_BUTTON_GPIO_CLK_ENABLE()        __HAL_RCC_GPIOB_CLK_ENABLE()
-#define KEY_BUTTON_GPIO_CLK_DISABLE()       __HAL_RCC_GPIOB_CLK_DISABLE()
-#define KEY_BUTTON_EXTI_IRQn                EXTI9_5_IRQn
+#define KEY1_BUTTON_PIN                      GPIO_PIN_8             /* PA.8*/
+#define KEY1_BUTTON_GPIO_PORT                GPIOA
+#define KEY1_BUTTON_GPIO_CLK_ENABLE()        __HAL_RCC_GPIOA_CLK_ENABLE()
+#define KEY1_BUTTON_GPIO_CLK_DISABLE()       __HAL_RCC_GPIOA_CLK_DISABLE()
+#define KEY1_BUTTON_EXTI_IRQn                EXTI9_5_IRQn
+
+#define KEY2_BUTTON_PIN                      GPIO_PIN_3             /* PD.3*/
+#define KEY2_BUTTON_GPIO_PORT                GPIOD
+#define KEY2_BUTTON_GPIO_CLK_ENABLE()        __HAL_RCC_GPIOD_CLK_ENABLE()
+#define KEY2_BUTTON_GPIO_CLK_DISABLE()       __HAL_RCC_GPIOD_CLK_DISABLE()
+#define KEY2_BUTTON_EXTI_IRQn                EXTI3_IRQn
 
 /**
  * @brief Wake-up push-button
@@ -218,11 +217,13 @@ typedef enum
 #define WAKEUP_BUTTON_EXTI_IRQn             EXTI0_IRQn
 
 #define BUTTONx_GPIO_CLK_ENABLE(__BUTTON__) do { if ((__BUTTON__) == BUTTON_TAMPER) TAMPER_BUTTON_GPIO_CLK_ENABLE()  ; else \
-                                                 if ((__BUTTON__) == BUTTON_KEY) KEY_BUTTON_GPIO_CLK_ENABLE()  ; else \
+												 if ((__BUTTON__) == BUTTON_KEY1) KEY1_BUTTON_GPIO_CLK_ENABLE()  ; else \
+												 if ((__BUTTON__) == BUTTON_KEY2) KEY2_BUTTON_GPIO_CLK_ENABLE()  ; else \
                                                  if ((__BUTTON__) == BUTTON_WAKEUP) WAKEUP_BUTTON_GPIO_CLK_ENABLE();} while(0)
 
 #define BUTTONx_GPIO_CLK_DISABLE(__BUTTON__)    (((__BUTTON__) == BUTTON_TAMPER) TAMPER_BUTTON_GPIO_CLK_DISABLE()  :\
-                                                 ((__BUTTON__) == BUTTON_KEY) KEY_BUTTON_GPIO_CLK_DISABLE()  :\
+												((__BUTTON__) == BUTTON_KEY1) KEY1_BUTTON_GPIO_CLK_DISABLE()  :\
+												((__BUTTON__) == BUTTON_KEY2) KEY2_BUTTON_GPIO_CLK_DISABLE()  :\
                                                  ((__BUTTON__) == BUTTON_WAKEUP) WAKEUP_BUTTON_GPIO_CLK_DISABLE()  : 0 )
 
 /**

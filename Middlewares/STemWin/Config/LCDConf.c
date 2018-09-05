@@ -42,8 +42,8 @@ Purpose     : Display controller configuration (single layer)
   *
   *        http://www.st.com/software_license_agreement_liberty_v2
   *
-  * Unless required by applicable law or agreed to in writing, software 
-  * distributed under the License is distributed on an "AS IS" BASIS, 
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   * See the License for the specific language governing permissions and
   * limitations under the License.
@@ -55,6 +55,14 @@ Purpose     : Display controller configuration (single layer)
 #include "GUIDRV_FlexColor.h"
 
 #include "Board.h"
+
+typedef struct {
+	__IO uint16_t REG; /* Read Register */
+	__IO uint16_t RAM; /* Read RAM */
+} TFT_LCD_TypeDef;
+
+#define TFT_LCD_BASE           FSMC_BANK1_4
+#define TFT_LCD                ((TFT_LCD_TypeDef *) TFT_LCD_BASE)
 
 /*********************************************************************
 *
@@ -109,7 +117,7 @@ Purpose     : Display controller configuration (single layer)
 */
 static void LcdWriteReg(U16 Data)
 {
-	LCD_IO_WriteReg((U8)Data);
+	TFT_LCD->REG = Data;
 }
 
 /********************************************************************
@@ -120,7 +128,7 @@ static void LcdWriteReg(U16 Data)
 *   Writes a value to a display register
 */
 static U16 LcdReadData() {
-	return LCD_IO_ReadData();
+	return TFT_LCD->RAM;
 }
 
 
@@ -132,7 +140,7 @@ static U16 LcdReadData() {
 *   Writes a value to a display register
 */
 static void LcdWriteData(U16 Data) {
-	LCD_IO_WriteData(Data);
+	TFT_LCD->RAM = Data;
 }
 
 /********************************************************************
@@ -143,7 +151,10 @@ static void LcdWriteData(U16 Data) {
 *   Writes multiple values to a display register.
 */
 static void LcdWriteDataMultiple(U16 * pData, int NumItems) {
-	LCD_IO_WriteMultipleData(pData, NumItems);
+	while (NumItems-- > 0) {
+		/* Write 16-bit Reg */
+		TFT_LCD->RAM = *pData++;
+	}
 }
 
 /********************************************************************
@@ -154,7 +165,10 @@ static void LcdWriteDataMultiple(U16 * pData, int NumItems) {
 *   Reads multiple values from a display register.
 */
 static void LcdReadDataMultiple(U16 * pData, int NumItems) {
-	LCD_IO_ReadMultipleData(pData, NumItems);
+	while (NumItems-- > 0) {
+		/* Write 16-bit Reg */
+		*pData++ = TFT_LCD->RAM;
+	}
 }
 
 /*********************************************************************
@@ -195,9 +209,9 @@ void LCD_X_Config(void) {
   //
   PortAPI.pfWrite16_A0  = LcdWriteReg;
   PortAPI.pfWrite16_A1  = LcdWriteData;
-  PortAPI.pfRead16_A1  = LcdReadData;
+	PortAPI.pfRead16_A1 = LcdReadData;
   PortAPI.pfWriteM16_A1 = LcdWriteDataMultiple;
-  PortAPI.pfReadM16_A1  = LcdReadDataMultiple;
+	PortAPI.pfReadM16_A1 = LcdReadDataMultiple;
   GUIDRV_FlexColor_SetFunc(pDevice, &PortAPI, GUIDRV_FLEXCOLOR_F66709, GUIDRV_FLEXCOLOR_M16C0B16);
 }
 
@@ -230,7 +244,7 @@ int LCD_X_DisplayDriver(unsigned LayerIndex, unsigned Cmd, void * pData) {
   int r;
   (void) LayerIndex;
   (void) pData;
-  
+
   switch (Cmd) {
   case LCD_X_INITCONTROLLER: {
 	  /**
