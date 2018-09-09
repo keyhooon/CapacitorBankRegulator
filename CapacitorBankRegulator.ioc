@@ -1,11 +1,12 @@
 #MicroXplorer Configuration settings - do not modify
 FREERTOS.BinarySemaphores01=CalculateNeededSem,Dynamic,NULL
 FREERTOS.FootprintOK=true
-FREERTOS.IPParameters=Tasks01,configUSE_TIMERS,FootprintOK,Timers01,BinarySemaphores01,configTOTAL_HEAP_SIZE,configUSE_IDLE_HOOK,configUSE_MALLOC_FAILED_HOOK,configCHECK_FOR_STACK_OVERFLOW
+FREERTOS.INCLUDE_pcTaskGetTaskName=1
+FREERTOS.IPParameters=Tasks01,configUSE_TIMERS,FootprintOK,Timers01,BinarySemaphores01,configTOTAL_HEAP_SIZE,configUSE_IDLE_HOOK,configUSE_MALLOC_FAILED_HOOK,configCHECK_FOR_STACK_OVERFLOW,INCLUDE_pcTaskGetTaskName
 FREERTOS.Tasks01=defaultTask,0,128,DefaultProc,Default,NULL,Dynamic,NULL,NULL;guiTask,-3,128,GuiProc,Default,NULL,Dynamic,NULL,NULL;CalculateTask,-3,128,CalculationProc,Default,NULL,Dynamic,NULL,NULL
 FREERTOS.Timers01=StatusTimer,StatusShowCallback,osTimerPeriodic,Default,NULL,Dynamic,NULL
 FREERTOS.configCHECK_FOR_STACK_OVERFLOW=1
-FREERTOS.configTOTAL_HEAP_SIZE=10000
+FREERTOS.configTOTAL_HEAP_SIZE=20000
 FREERTOS.configUSE_IDLE_HOOK=1
 FREERTOS.configUSE_MALLOC_FAILED_HOOK=1
 FREERTOS.configUSE_TIMERS=1

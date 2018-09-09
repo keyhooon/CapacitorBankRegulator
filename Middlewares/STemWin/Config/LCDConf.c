@@ -75,7 +75,7 @@ typedef struct {
 // Physical display size
 //
 #define XSIZE_PHYS  480 // To be adapted to x-screen size
-#define YSIZE_PHYS  864 // To be adapted to y-screen size
+#define YSIZE_PHYS  850 // To be adapted to y-screen size
 
 /*********************************************************************
 *
@@ -202,7 +202,7 @@ void LCD_X_Config(void) {
   //
   // Orientation
   //
-  Config.Orientation = GUI_SWAP_XY | GUI_MIRROR_Y;
+  Config.Orientation = GUI_SWAP_XY | GUI_MIRROR_X ;
   GUIDRV_FlexColor_Config(pDevice, &Config);
   //
   // Set controller and operation mode

@@ -104,6 +104,10 @@ __weak void vApplicationIdleHook( void )
 /* USER CODE BEGIN 4 */
 __weak void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
 {
+	while(1)
+	{
+
+	}
    /* Run time stack overflow checking is performed if
    configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook function is
    called if a stack overflow is detected. */
@@ -113,6 +117,10 @@ __weak void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTask
 /* USER CODE BEGIN 5 */
 __weak void vApplicationMallocFailedHook(void)
 {
+	while(1)
+	{
+
+	}
    /* vApplicationMallocFailedHook() will only be called if
    configUSE_MALLOC_FAILED_HOOK is set to 1 in FreeRTOSConfig.h. It is a hook
    function that will get called if a call to pvPortMalloc() fails.
@@ -160,7 +168,7 @@ void MX_FREERTOS_Init(void) {
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of guiTask */
-  osThreadDef(guiTask, GuiProc, osPriorityIdle, 0, 128);
+  osThreadDef(guiTask, GuiProc, osPriorityIdle, 0, 512);
   guiTaskHandle = osThreadCreate(osThread(guiTask), NULL);
 
   /* definition and creation of CalculateTask */
@@ -194,18 +202,18 @@ void DefaultProc(void const * argument)
 void GuiProc(void const * argument)
 {
   /* USER CODE BEGIN GuiProc */
-
+	WM_SetCreateFlags(WM_CF_MEMDEV);
 	/* Init the STemWin GUI Library */
 	GUI_Init();
 
-	//CreateStartUpWindow();
+	StartUpWindow();
 
-	MainTask();
+	MainWindow();
 
   /* Infinite loop */
   for(;;)
   {
-		GUI_Exec();
+//		GUI_Exec();
 		osDelay(10);
   }
   /* USER CODE END GuiProc */

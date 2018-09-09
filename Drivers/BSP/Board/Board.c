@@ -70,16 +70,6 @@ typedef struct
   * @{
   */
 
-/* LINK LCD */
-#define START_BYTE         0x70
-#define SET_INDEX          0x00
-#define READ_STATUS        0x01
-#define LCD_WRITE_REG      0x02
-#define LCD_READ_REG       0x03
-
-/* LINK SD Card */
-#define SD_DUMMY_BYTE      0xFF
-#define SD_NO_RESPONSE_EXPECTED  0x80
 
 /**
  * @brief STM3210C EVAL BSP Driver version number
@@ -136,9 +126,12 @@ KEY1_BUTTON_EXTI_IRQn, KEY2_BUTTON_EXTI_IRQn };
 
 
 
+
 /**
  * @brief BUS variables
  */
+
+static uint32_t FSMC_Initialized = 0;
 
 TIM_HandleTypeDef htim5;
 
@@ -475,45 +468,118 @@ void TIM_PWM_MspInit(TIM_HandleTypeDef* tim_Handle) {
 /**
   * @brief  Initializes FSMC_BANK4 MSP.
   */
-static void FSMC_BANK1NORSRAM4_MspInit(void)
-{
-  GPIO_InitTypeDef gpioinitstruct = {0};
+static void FSMC_MspInit(void){
+  /* USER CODE BEGIN FSMC_MspInit 0 */
 
-  /* Enable FMC clock */
+  /* USER CODE END FSMC_MspInit 0 */
+  GPIO_InitTypeDef GPIO_InitStruct;
+  if (FSMC_Initialized) {
+    return;
+  }
+  FSMC_Initialized = 1;
+  /* Peripheral clock enable */
   __HAL_RCC_FSMC_CLK_ENABLE();
 
-  /* Enable GPIOs clock */
-  __HAL_RCC_GPIOD_CLK_ENABLE();
-  __HAL_RCC_GPIOE_CLK_ENABLE();
-  __HAL_RCC_GPIOF_CLK_ENABLE();
-  __HAL_RCC_GPIOG_CLK_ENABLE();
-  __HAL_RCC_AFIO_CLK_ENABLE();
+  /** FSMC GPIO Configuration
+  PE3   ------> FSMC_A19
+  PE4   ------> FSMC_A20
+  PE5   ------> FSMC_A21
+  PE6   ------> FSMC_A22
+  PF0   ------> FSMC_A0
+  PF1   ------> FSMC_A1
+  PF2   ------> FSMC_A2
+  PF3   ------> FSMC_A3
+  PF4   ------> FSMC_A4
+  PF5   ------> FSMC_A5
+  PF12   ------> FSMC_A6
+  PF13   ------> FSMC_A7
+  PF14   ------> FSMC_A8
+  PF15   ------> FSMC_A9
+  PG0   ------> FSMC_A10
+  PG1   ------> FSMC_A11
+  PE7   ------> FSMC_D4
+  PE8   ------> FSMC_D5
+  PE9   ------> FSMC_D6
+  PE10   ------> FSMC_D7
+  PE11   ------> FSMC_D8
+  PE12   ------> FSMC_D9
+  PE13   ------> FSMC_D10
+  PE14   ------> FSMC_D11
+  PE15   ------> FSMC_D12
+  PD8   ------> FSMC_D13
+  PD9   ------> FSMC_D14
+  PD10   ------> FSMC_D15
+  PD11   ------> FSMC_A16
+  PD12   ------> FSMC_A17
+  PD13   ------> FSMC_A18
+  PD14   ------> FSMC_D0
+  PD15   ------> FSMC_D1
+  PG2   ------> FSMC_A12
+  PG3   ------> FSMC_A13
+  PG4   ------> FSMC_A14
+  PG5   ------> FSMC_A15
+  PD0   ------> FSMC_D2
+  PD1   ------> FSMC_D3
+  PD4   ------> FSMC_NOE
+  PD5   ------> FSMC_NWE
+  PD6   ------> FSMC_NWAIT
+  PG9   ------> FSMC_NE2
+  PG12   ------> FSMC_NE4
+  */
+  /* GPIO_InitStruct */
+  GPIO_InitStruct.Pin = GPIO_PIN_3|GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6
+                          |GPIO_PIN_7|GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10
+                          |GPIO_PIN_11|GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14
+                          |GPIO_PIN_15;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
 
-  /* Common GPIO configuration */
-  gpioinitstruct.Mode      = GPIO_MODE_AF_PP;
-  gpioinitstruct.Speed     = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-  /* Set PD.00(D2), PD.01(D3), PD.04(NOE), PD.05(NWE), PD.08(D13), PD.09(D14),
-     PD.10(D15), PD.14(D0), PD.15(D1) as alternate function push pull */
-  gpioinitstruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_4 | GPIO_PIN_5 |
-                                GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_14 |
-                                GPIO_PIN_15;
-  HAL_GPIO_Init(GPIOD, &gpioinitstruct);
+  /* GPIO_InitStruct */
+  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3
+                          |GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_12|GPIO_PIN_13
+                          |GPIO_PIN_14|GPIO_PIN_15;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
 
-  /* Set PE.07(D4), PE.08(D5), PE.09(D6), PE.10(D7), PE.11(D8), PE.12(D9), PE.13(D10),
-     PE.14(D11), PE.15(D12) as alternate function push pull */
-  gpioinitstruct.Pin = GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 |
-                                GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 |
-                                GPIO_PIN_15;
-  HAL_GPIO_Init(GPIOE, &gpioinitstruct);
+  HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
-  /* Set PF.00(A0 (RS)) as alternate function push pull */
-  gpioinitstruct.Pin = GPIO_PIN_0;
-  HAL_GPIO_Init(GPIOF, &gpioinitstruct);
+  /* GPIO_InitStruct */
+  GPIO_InitStruct.Pin = GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3
+                          |GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_9|GPIO_PIN_12;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
 
-  /* Set PG.12(NE4 (LCD/CS)) as alternate function push pull - CE3(LCD /CS) */
-  gpioinitstruct.Pin = GPIO_PIN_12;
-  HAL_GPIO_Init(GPIOG, &gpioinitstruct);
+  HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
+
+  /* GPIO_InitStruct */
+  GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11
+                          |GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15
+                          |GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_4|GPIO_PIN_5;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+  /* GPIO_InitStruct */
+  GPIO_InitStruct.Pin = GPIO_PIN_6;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+  /* USER CODE BEGIN FSMC_MspInit 1 */
+
+  /* USER CODE END FSMC_MspInit 1 */
+}
+
+
+
+
+static void FSMC_BANK1NORSRAM4_MspInit(void)
+{
+	  FSMC_MspInit();
 }
 
 /**
@@ -529,9 +595,9 @@ static void FSMC_BANK1NORSRAM4_Init(void)
   hsram.Instance  = FSMC_NORSRAM_DEVICE;
   hsram.Extended  = FSMC_NORSRAM_EXTENDED_DEVICE;
 
-	sramtiming.AddressSetupTime = 0;
+	sramtiming.AddressSetupTime = 1;
 	sramtiming.AddressHoldTime = 0;
-	sramtiming.DataSetupTime = 5;
+	sramtiming.DataSetupTime = 1;
 	sramtiming.BusTurnAroundDuration = 0;
 	sramtiming.CLKDivision = 0;
 	sramtiming.DataLatency = 0;
@@ -561,6 +627,7 @@ static void FSMC_BANK1NORSRAM4_Init(void)
 
   /* Initialize the SRAM controller */
   FSMC_BANK1NORSRAM4_MspInit();
+
   HAL_SRAM_Init(&hsram, &sramtiming, &sramtiming);
 }
 
@@ -593,6 +660,91 @@ static uint16_t FSMC_BANK1NORSRAM4_ReadData()
   /* Read 16-bit Reg */
   return (TFT_LCD->RAM);
 }
+
+static void FSMC_BANK2NORSRAM2_MspInit(void)
+{
+	  FSMC_MspInit();
+}
+
+/**
+  * @brief  Initializes LCD IO.
+  */
+static void FSMC_BANK2NORSRAM2_Init(void)
+{
+	  FSMC_NORSRAM_TimingTypeDef Timing;
+	  SRAM_HandleTypeDef          hnor2;
+	  /** Perform the NOR2 memory initialization sequence
+	  */
+	  hnor2.Instance = FSMC_NORSRAM_DEVICE;
+	  hnor2.Extended = FSMC_NORSRAM_EXTENDED_DEVICE;
+	  /* hnor2.Init */
+	  hnor2.Init.NSBank = FSMC_NORSRAM_BANK2;
+	  hnor2.Init.DataAddressMux = FSMC_DATA_ADDRESS_MUX_DISABLE;
+	  hnor2.Init.MemoryType = FSMC_MEMORY_TYPE_NOR;
+	  hnor2.Init.MemoryDataWidth = FSMC_NORSRAM_MEM_BUS_WIDTH_16;
+	  hnor2.Init.BurstAccessMode = FSMC_BURST_ACCESS_MODE_DISABLE;
+	  hnor2.Init.WaitSignalPolarity = FSMC_WAIT_SIGNAL_POLARITY_LOW;
+	  hnor2.Init.WrapMode = FSMC_WRAP_MODE_DISABLE;
+	  hnor2.Init.WaitSignalActive = FSMC_WAIT_TIMING_BEFORE_WS;
+	  hnor2.Init.WriteOperation = FSMC_WRITE_OPERATION_DISABLE;
+	  hnor2.Init.WaitSignal = FSMC_WAIT_SIGNAL_DISABLE;
+	  hnor2.Init.ExtendedMode = FSMC_EXTENDED_MODE_DISABLE;
+	  hnor2.Init.AsynchronousWait = FSMC_ASYNCHRONOUS_WAIT_ENABLE;
+	  hnor2.Init.WriteBurst = FSMC_WRITE_BURST_DISABLE;
+	  /* Timing */
+	  Timing.AddressSetupTime = 0;
+	  Timing.AddressHoldTime = 15;
+	  Timing.DataSetupTime = 5;
+	  Timing.BusTurnAroundDuration = 0;
+	  Timing.CLKDivision = 16;
+	  Timing.DataLatency = 17;
+	  Timing.AccessMode = FSMC_ACCESS_MODE_A;
+	  /* ExtTiming */
+	  FSMC_BANK2NORSRAM2_MspInit();
+	  if (HAL_NOR_Init(&hnor2, &Timing, NULL) != HAL_OK)
+	  {
+	    _Error_Handler(__FILE__, __LINE__);
+	  }
+
+	  /** Disconnect NADV
+	  */
+
+	  __HAL_AFIO_FSMCNADV_DISCONNECTED();
+
+}
+
+/**
+  * @brief  Writes register value.
+  */
+static void FSMC_BANK2NORSRAM2_WriteData(uint16_t Data)
+{
+  /* Write 16-bit Data */
+  TFT_LCD->RAM = Data;
+}
+
+/**
+  * @brief  Writes register address.
+  * @param  Reg:
+  * @retval None
+  */
+static void FSMC_BANK2NORSRAM2_WriteReg(uint8_t Reg)
+{
+  /* Write 16-bit Index, then Write Reg */
+  TFT_LCD->REG = Reg;
+}
+
+/**
+  * @brief  Reads register value.
+  * @retval Read value
+  */
+static uint16_t FSMC_BANK2NORSRAM2_ReadData()
+{
+  /* Read 16-bit Reg */
+  return (TFT_LCD->RAM);
+}
+
+
+
 #endif /*HAL_SRAM_MODULE_ENABLED*/
 
 

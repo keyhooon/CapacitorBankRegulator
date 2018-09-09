@@ -130,13 +130,13 @@ int main(void)
 //	BSP_LCD_Init();
 //	BSP_LCD_SetFont(&Font20);
 //
-//	BSP_LCD_SetTextColor(LCD_COLOR_RED);
+//	BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
 //	BSP_LCD_DisplayStringAt(200, 400, "salam", CENTER_MODE);
 //	BSP_LCD_DisplayStringAt(100, 200, "salam", CENTER_MODE);
 	/* Init the STemWin GUI Library */
 	//CreateStartUpWindow();
 
-	MainTask();
+	//MainTask();
   while (1)
   {
   /* USER CODE END WHILE */

@@ -121,21 +121,21 @@ void ili9806_Init(void) {
 	/////GIP Timing Setting for //
 	ili9806_WriteReg(0xBC); //GPI
 	ili9806_WriteData(0x03);
-	ili9806_WriteData(0x0E);
+	ili9806_WriteData(0x0D);
 	ili9806_WriteData(0x03);
 	ili9806_WriteData(0x63);
 	ili9806_WriteData(0x01);
 	ili9806_WriteData(0x01);
 	ili9806_WriteData(0x1B);
-	ili9806_WriteData(0x12);
-	ili9806_WriteData(0x39);
+	ili9806_WriteData(0x11);
+	ili9806_WriteData(0x6E);
 	ili9806_WriteData(0x00);
 	ili9806_WriteData(0x00);
 	ili9806_WriteData(0x00);
 	ili9806_WriteData(0x01);
 	ili9806_WriteData(0x01);
-	ili9806_WriteData(0x02);
-	ili9806_WriteData(0x02);
+	ili9806_WriteData(0x16);
+	ili9806_WriteData(0x00);
 	ili9806_WriteData(0xFF);
 	ili9806_WriteData(0xF2);
 	ili9806_WriteData(0x01);
@@ -163,141 +163,9 @@ void ili9806_Init(void) {
 	ili9806_WriteData(0x22);
 	ili9806_WriteData(0x22);
 
-	ili9806_WriteReg(LCD_VCOM1); // 0xC7
-	ili9806_WriteData(0X1e);
-
-	ili9806_WriteReg(LCD_VOLT_MSET); // 0xED en_volt_reg measure VGMP
-	ili9806_WriteData(0x7F);
-	ili9806_WriteData(0x0F);
-	ili9806_WriteData(0x00);
-
-	ili9806_WriteReg(LCD_POWER1); // 0xC0 Power Control 1
-	ili9806_WriteData(0x03);
-	ili9806_WriteData(0x0B);
-	ili9806_WriteData(0x0A);
-
-	ili9806_WriteReg(LCD_POWER5); // 0xF5 Select AVDD regulator voltage level
-	ili9806_WriteData(0x20);
-	ili9806_WriteData(0x43);
-	ili9806_WriteData(0x00);
-
-	ili9806_WriteReg(0xEE); // GIP 3
-	ili9806_WriteData(0x0A);
-	ili9806_WriteData(0x1B);
-	ili9806_WriteData(0x5F);
-	ili9806_WriteData(0x40);
-	ili9806_WriteData(0x28);
-	ili9806_WriteData(0x38);
-	ili9806_WriteData(0x02);
-	ili9806_WriteData(0x2B);
-	ili9806_WriteData(0x50);
-	ili9806_WriteData(0x00);
-	ili9806_WriteData(0x80);
-
-	ili9806_WriteReg(LCD_LVGL_V); //LVGL Voltage Setting
-	ili9806_WriteData(0x08);
-
-	ili9806_WriteReg(0xDF); // GIP 3
-	ili9806_WriteData(0x00);
-	ili9806_WriteData(0x00);
-	ili9806_WriteData(0x00);
-	ili9806_WriteData(0x00);
-	ili9806_WriteData(0x00);
-	ili9806_WriteData(0x20);
-
-	ili9806_WriteReg(LCD_DVDD_V); // DVDD Voltage Setting
-	ili9806_WriteData(0x74);
-
-	ili9806_WriteReg(LCD_INVTR);	// 0xB4
-	ili9806_WriteData(0x02); // 2DOT inversion
-	ili9806_WriteData(0x02); // 2DOT inversion
-	ili9806_WriteData(0x02); // 2DOT inversion
-
-	ili9806_WriteReg(LCD_RESCTRL);	// 0xF7
-	ili9806_WriteData(0x80); //480x864
-
-	ili9806_WriteReg(LCD_FRMCTR1); // 0xB1 Frame Rate Control
-	ili9806_WriteData(0x00);
-	ili9806_WriteData(0x13); //70.39
-	ili9806_WriteData(0x13); //70.39
-
-	ili9806_WriteReg(LCD_PNLTCTRL2); // 0xF2 Panel Timing Control
-	ili9806_WriteData(0x89);
-	ili9806_WriteData(0x92);
-	ili9806_WriteData(0x52);
-	ili9806_WriteData(0x28);
-
-	ili9806_WriteReg(0xF9); //Panel Timing Control
-	ili9806_WriteData(0x00);
-	ili9806_WriteData(0xFD);
-	ili9806_WriteData(0x80);
-	ili9806_WriteData(0xF0);
-	ili9806_WriteData(0xF0);
-
-	ili9806_WriteReg(LCD_POWER2);
-	ili9806_WriteData(0x17); //Source OP Amp bias control.
-	ili9806_WriteData(0x85); //Sets the VGMP voltage for positive Gamma
-	ili9806_WriteData(0x85); //Sets the VGMN voltage for negative Gamma
-	ili9806_WriteData(0x20);
-
-	ili9806_WriteReg(LCD_PGAMMA); //GAMMA
-	ili9806_WriteData(0x00);
-	ili9806_WriteData(0x04);
-	ili9806_WriteData(0x0D);
-	ili9806_WriteData(0x0F);
-	ili9806_WriteData(0x11);
-	ili9806_WriteData(0x19);
-	ili9806_WriteData(0xC9);
-	ili9806_WriteData(0x08);
-	ili9806_WriteData(0x01);
-	ili9806_WriteData(0x06);
-	ili9806_WriteData(0x06);
-	ili9806_WriteData(0x0B);
-	ili9806_WriteData(0x0D);
-	ili9806_WriteData(0x31);
-	ili9806_WriteData(0x2C);
-	ili9806_WriteData(0x00);
-
-	ili9806_WriteReg(LCD_NGAMMA); //GAMMA
-	ili9806_WriteData(0x00);
-	ili9806_WriteData(0x05);
-	ili9806_WriteData(0x08);
-	ili9806_WriteData(0x0D);
-	ili9806_WriteData(0x10);
-	ili9806_WriteData(0x12);
-	ili9806_WriteData(0x79);
-	ili9806_WriteData(0x08);
-	ili9806_WriteData(0x03);
-	ili9806_WriteData(0x08);
-	ili9806_WriteData(0x09);
-	ili9806_WriteData(0x0E);
-	ili9806_WriteData(0x0E);
-	ili9806_WriteData(0x2A);
-	ili9806_WriteData(0x22);
-	ili9806_WriteData(0x00);
-	////////////////////////////////
-	ili9806_WriteReg(LCD_WRCABC); //CE
-	ili9806_WriteData(0x90);
 
 	ili9806_WriteReg(LCD_PIXEL_FORMAT);
 	ili9806_WriteData(0x55); //55-16BIT,66-18BIT,77-24BIT
-
-	ili9806_WriteReg(LCD_DFC);
-	ili9806_WriteData(0x20); //SET RGB DPI
-
-	//********µØÖ·´°¿Ú2A 2B **********
-	ili9806_WriteReg(LCD_COLUMN_ADDR); //480
-	ili9806_WriteData(0x00);
-	ili9806_WriteData(0x00);
-	ili9806_WriteData(0x01);
-	ili9806_WriteData(0xDF);
-
-	ili9806_WriteReg(LCD_PAGE_ADDR); //864
-	ili9806_WriteData(0x00);
-	ili9806_WriteData(0x00);
-	ili9806_WriteData(0x03);
-	ili9806_WriteData(0x60);
-	//*****************************
 
 	ili9806_WriteReg(LCD_SLEEP_OUT);
 	LCD_Delay(120);
