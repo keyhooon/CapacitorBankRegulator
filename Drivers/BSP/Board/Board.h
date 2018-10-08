@@ -4,7 +4,7 @@
   * @author  MCD Application Team
   * @version V6.1.0
   * @date    14-April-2017
-  * @brief   This file contains definitions for STM3210C_EVAL's LEDs,
+ * @brief   This file contains definitions for STM3210C_BOARD's LEDs,
   *          push-buttons and COM ports hardware resources.
   ******************************************************************************
   * @attention
@@ -40,17 +40,17 @@
   * @{
   */
 
-/** @addtogroup STM3210C_EVAL
+/** @addtogroup STM3210C_BOARD
   * @{
   */
 
-/** @addtogroup STM3210C_EVAL_COMMON
+/** @addtogroup STM3210C_BOARD_COMMON
   * @{
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM3210C_EVAL_H
-#define __STM3210C_EVAL_H
+#ifndef __STM3210C_BOARD_H
+#define __STM3210C_BOARD_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -59,7 +59,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
 
-/** @defgroup STM3210C_EVAL_Exported_Types STM3210C EVAL Exported Types
+/** @defgroup STM3210C_BOARD_Exported_Types STM3210C BOARD Exported Types
   * @{
   */
 
@@ -129,15 +129,15 @@ typedef enum
   * @}
   */
 
-/** @defgroup STM3210C_EVAL_Exported_Constants STM3210C EVAL Exported Constants
+/** @defgroup STM3210C_BOARD_Exported_Constants STM3210C BOARD Exported Constants
   * @{
   */
 
 /**
-  * @brief  Define for STM3210C_EVAL board
+ * @brief  Define for STM3210C_BOARD board
   */
 
-/** @addtogroup STM3210C_EVAL_LED STM3210C EVAL LED
+/** @addtogroup STM3210C_BOARD_LED STM3210C BOARD LED
   * @{
   */
 #define LEDn                             4
@@ -178,7 +178,7 @@ typedef enum
   * @}
   */
 
-/** @addtogroup STM3210C_EVAL_BUTTON STM3210C EVAL BUTTON
+/** @addtogroup STM3210C_BOARD_BUTTON STM3210C BOARD BUTTON
   * @{
   */
 #define BUTTONn                          4
@@ -229,19 +229,6 @@ typedef enum
 /**
   * @brief IO Pins definition
   */
-/* Joystick */
-#define JOY_SEL_PIN                  (IO2_PIN_7) /* IO_Expander_2 */
-#define JOY_DOWN_PIN                 (IO2_PIN_6) /* IO_Expander_2 */
-#define JOY_LEFT_PIN                 (IO2_PIN_5) /* IO_Expander_2 */
-#define JOY_RIGHT_PIN                (IO2_PIN_4) /* IO_Expander_2 */
-#define JOY_UP_PIN                   (IO2_PIN_3) /* IO_Expander_2 */
-#define JOY_NONE_PIN                 JOY_ALL_PINS
-#define JOY_ALL_PINS                 (JOY_SEL_PIN | JOY_DOWN_PIN | JOY_LEFT_PIN | JOY_RIGHT_PIN | JOY_UP_PIN)
-
-/* MEMS */
-#define MEMS_INT1_PIN                (IO1_PIN_3) /* IO_Expander_1 */ /* Input */
-#define MEMS_INT2_PIN                (IO1_PIN_2) /* IO_Expander_1 */ /* Input */
-#define MEMS_ALL_PINS                (MEMS_INT1_PIN | MEMS_INT2_PIN)
 
 #define AUDIO_RESET_PIN              (IO2_PIN_2) /* IO_Expander_2 */ /* Output */
 #define MII_INT_PIN                  (IO2_PIN_0) /* IO_Expander_2 */ /* Output */
@@ -251,7 +238,7 @@ typedef enum
   * @}
   */
 
-/** @addtogroup STM3210C_EVAL_COM STM3210C EVAL COM
+/** @addtogroup STM3210C_BOARD_COM STM3210C BOARD COM
   * @{
   */
 #define COMn                             1
@@ -259,44 +246,44 @@ typedef enum
 /**
  * @brief Definition for COM port1, connected to USART2
  */
-#define EVAL_COM1                        USART2
-#define EVAL_COM1_CLK_ENABLE()           __HAL_RCC_USART2_CLK_ENABLE()
-#define EVAL_COM1_CLK_DISABLE()          __HAL_RCC_USART2_CLK_DISABLE()
+#define BOARD_COM1                        USART2
+#define BOARD_COM1_CLK_ENABLE()           __HAL_RCC_USART2_CLK_ENABLE()
+#define BOARD_COM1_CLK_DISABLE()          __HAL_RCC_USART2_CLK_DISABLE()
 
 #define AFIOCOM1_CLK_ENABLE()            __HAL_RCC_AFIO_CLK_ENABLE()
 #define AFIOCOM1_CLK_DISABLE()           __HAL_RCC_AFIO_CLK_DISABLE()
 
-#define EVAL_COM1_TX_PIN                 GPIO_PIN_5             /* PD.05*/
-#define EVAL_COM1_TX_GPIO_PORT           GPIOD
-#define EVAL_COM1_TX_GPIO_CLK_ENABLE()   __HAL_RCC_GPIOD_CLK_ENABLE()
-#define EVAL_COM1_TX_GPIO_CLK_DISABLE()  __HAL_RCC_GPIOD_CLK_DISABLE()
+#define BOARD_COM1_TX_PIN                 GPIO_PIN_5             /* PD.05*/
+#define BOARD_COM1_TX_GPIO_PORT           GPIOD
+#define BOARD_COM1_TX_GPIO_CLK_ENABLE()   __HAL_RCC_GPIOD_CLK_ENABLE()
+#define BOARD_COM1_TX_GPIO_CLK_DISABLE()  __HAL_RCC_GPIOD_CLK_DISABLE()
 
-#define EVAL_COM1_RX_PIN                 GPIO_PIN_6             /* PD.06*/
-#define EVAL_COM1_RX_GPIO_PORT           GPIOD
-#define EVAL_COM1_RX_GPIO_CLK_ENABLE()   __HAL_RCC_GPIOD_CLK_ENABLE()
-#define EVAL_COM1_RX_GPIO_CLK_DISABLE()  __HAL_RCC_GPIOD_CLK_DISABLE()
+#define BOARD_COM1_RX_PIN                 GPIO_PIN_6             /* PD.06*/
+#define BOARD_COM1_RX_GPIO_PORT           GPIOD
+#define BOARD_COM1_RX_GPIO_CLK_ENABLE()   __HAL_RCC_GPIOD_CLK_ENABLE()
+#define BOARD_COM1_RX_GPIO_CLK_DISABLE()  __HAL_RCC_GPIOD_CLK_DISABLE()
 
-#define EVAL_COM1_IRQn                   USART2_IRQn
+#define BOARD_COM1_IRQn                   USART2_IRQn
 
-#define COMx_CLK_ENABLE(__INDEX__)              do { if((__INDEX__) == COM1) EVAL_COM1_CLK_ENABLE();} while(0)
-#define COMx_CLK_DISABLE(__INDEX__)             (((__INDEX__) == COM1) ? EVAL_COM1_CLK_DISABLE() : 0)
+#define COMx_CLK_ENABLE(__INDEX__)              do { if((__INDEX__) == COM1) BOARD_COM1_CLK_ENABLE();} while(0)
+#define COMx_CLK_DISABLE(__INDEX__)             (((__INDEX__) == COM1) ? BOARD_COM1_CLK_DISABLE() : 0)
 
 #define AFIOCOMx_CLK_ENABLE(__INDEX__)          do { if((__INDEX__) == COM1) AFIOCOM1_CLK_ENABLE();} while(0)
 #define AFIOCOMx_CLK_DISABLE(__INDEX__)         (((__INDEX__) == COM1) ? AFIOCOM1_CLK_DISABLE() : 0)
 
 #define AFIOCOMx_REMAP(__INDEX__)               (((__INDEX__) == COM1) ? (AFIO->MAPR |= (AFIO_MAPR_USART2_REMAP)) : 0)
 
-#define COMx_TX_GPIO_CLK_ENABLE(__INDEX__)      do { if((__INDEX__) == COM1) EVAL_COM1_TX_GPIO_CLK_ENABLE();} while(0)
-#define COMx_TX_GPIO_CLK_DISABLE(__INDEX__)     (((__INDEX__) == COM1) ? EVAL_COM1_TX_GPIO_CLK_DISABLE() : 0)
+#define COMx_TX_GPIO_CLK_ENABLE(__INDEX__)      do { if((__INDEX__) == COM1) BOARD_COM1_TX_GPIO_CLK_ENABLE();} while(0)
+#define COMx_TX_GPIO_CLK_DISABLE(__INDEX__)     (((__INDEX__) == COM1) ? BOARD_COM1_TX_GPIO_CLK_DISABLE() : 0)
 
-#define COMx_RX_GPIO_CLK_ENABLE(__INDEX__)      do { if((__INDEX__) == COM1) EVAL_COM1_RX_GPIO_CLK_ENABLE();} while(0)
-#define COMx_RX_GPIO_CLK_DISABLE(__INDEX__)     (((__INDEX__) == COM1) ? EVAL_COM1_RX_GPIO_CLK_DISABLE() : 0)
+#define COMx_RX_GPIO_CLK_ENABLE(__INDEX__)      do { if((__INDEX__) == COM1) BOARD_COM1_RX_GPIO_CLK_ENABLE();} while(0)
+#define COMx_RX_GPIO_CLK_DISABLE(__INDEX__)     (((__INDEX__) == COM1) ? BOARD_COM1_RX_GPIO_CLK_DISABLE() : 0)
 
 /**
   * @}
   */
 
-/** @addtogroup STM3210C_EVAL_BUS STM3210C EVAL BUS
+/** @addtogroup STM3210C_BOARD_BUS STM3210C BOARD BUS
   * @{
   */
 
@@ -332,25 +319,25 @@ supply LSb is ‘1’ (address 0011101b) else if SDO pad is connected to ground LSb 
 /* User can use this section to tailor I2Cx instance used and associated
    resources */
 /* Definition for I2Cx Pins */
-#define EVAL_I2Cx_SCL_PIN                       GPIO_PIN_6        /* PB.06*/
-#define EVAL_I2Cx_SCL_GPIO_PORT                 GPIOB
-#define EVAL_I2Cx_SDA_PIN                       GPIO_PIN_7        /* PB.07*/
-#define EVAL_I2Cx_SDA_GPIO_PORT                 GPIOB
+#define BOARD_I2Cx_SCL_PIN                       GPIO_PIN_6        /* PB.06*/
+#define BOARD_I2Cx_SCL_GPIO_PORT                 GPIOB
+#define BOARD_I2Cx_SDA_PIN                       GPIO_PIN_7        /* PB.07*/
+#define BOARD_I2Cx_SDA_GPIO_PORT                 GPIOB
 
 /* Definition for I2Cx clock resources */
-#define EVAL_I2Cx                               I2C1
-#define EVAL_I2Cx_CLK_ENABLE()                  __HAL_RCC_I2C1_CLK_ENABLE()
-#define EVAL_I2Cx_SDA_GPIO_CLK_ENABLE()         __HAL_RCC_GPIOB_CLK_ENABLE()
-#define EVAL_I2Cx_SCL_GPIO_CLK_ENABLE()         __HAL_RCC_GPIOB_CLK_ENABLE()
+#define BOARD_I2Cx                               I2C1
+#define BOARD_I2Cx_CLK_ENABLE()                  __HAL_RCC_I2C1_CLK_ENABLE()
+#define BOARD_I2Cx_SDA_GPIO_CLK_ENABLE()         __HAL_RCC_GPIOB_CLK_ENABLE()
+#define BOARD_I2Cx_SCL_GPIO_CLK_ENABLE()         __HAL_RCC_GPIOB_CLK_ENABLE()
 
-#define EVAL_I2Cx_FORCE_RESET()                 __HAL_RCC_I2C1_FORCE_RESET()
-#define EVAL_I2Cx_RELEASE_RESET()               __HAL_RCC_I2C1_RELEASE_RESET()
+#define BOARD_I2Cx_FORCE_RESET()                 __HAL_RCC_I2C1_FORCE_RESET()
+#define BOARD_I2Cx_RELEASE_RESET()               __HAL_RCC_I2C1_RELEASE_RESET()
 
 /* Definition for I2Cx's NVIC */
-#define EVAL_I2Cx_EV_IRQn                       I2C1_EV_IRQn
-#define EVAL_I2Cx_EV_IRQHandler                 I2C1_EV_IRQHandler
-#define EVAL_I2Cx_ER_IRQn                       I2C1_ER_IRQn
-#define EVAL_I2Cx_ER_IRQHandler                 I2C1_ER_IRQHandler
+#define BOARD_I2Cx_EV_IRQn                       I2C1_EV_IRQn
+#define BOARD_I2Cx_EV_IRQHandler                 I2C1_EV_IRQHandler
+#define BOARD_I2Cx_ER_IRQn                       I2C1_ER_IRQn
+#define BOARD_I2Cx_ER_IRQHandler                 I2C1_ER_IRQHandler
 
 /* I2C clock speed configuration (in Hz) */
 #ifndef BSP_I2C_SPEED
@@ -363,104 +350,146 @@ supply LSb is ‘1’ (address 0011101b) else if SDO pad is connected to ground LSb 
    stuck if the I2C communication is corrupted.
    You may modify these timeout values depending on CPU frequency and application
    conditions (interrupts routines ...). */
-#define EVAL_I2Cx_TIMEOUT_MAX                   3000
+#define BOARD_I2Cx_TIMEOUT_MAX                   3000
 
-/*##################### SPI3 ###################################*/
-#define EVAL_SPIx                               SPI1
-#define EVAL_SPIx_CLK_ENABLE()                  __HAL_RCC_SPI1_CLK_ENABLE()
+/*##################### SPI1 ###################################*/
+#define BOARD_SPI1                               SPI1
+#define BOARD_SPI1_CLK_ENABLE()                  __HAL_RCC_SPI1_CLK_ENABLE()
 
-#define EVAL_SPIx_SCK_GPIO_PORT                 GPIOA             /* PA.5*/
-#define EVAL_SPIx_SCK_PIN                       GPIO_PIN_5
-#define EVAL_SPIx_SCK_GPIO_CLK_ENABLE()         __HAL_RCC_GPIOA_CLK_ENABLE()
-#define EVAL_SPIx_SCK_GPIO_CLK_DISABLE()        __HAL_RCC_GPIOA_CLK_DISABLE()
+#define BOARD_SPI1_SCK_GPIO_PORT                 GPIOA             /* PA.05*/
+#define BOARD_SPI1_SCK_PIN                       GPIO_PIN_5
+#define BOARD_SPI1_SCK_GPIO_CLK_ENABLE()         __HAL_RCC_GPIOA_CLK_ENABLE()
+#define BOARD_SPI1_SCK_GPIO_CLK_DISABLE()        __HAL_RCC_GPIOA_CLK_DISABLE()
 
-#define EVAL_SPIx_MISO_MOSI_GPIO_PORT           GPIOA
-#define EVAL_SPIx_MISO_MOSI_GPIO_CLK_ENABLE()   __HAL_RCC_GPIOA_CLK_ENABLE()
-#define EVAL_SPIx_MISO_MOSI_GPIO_CLK_DISABLE()  __HAL_RCC_GPIOA_CLK_DISABLE()
-#define EVAL_SPIx_MOSI_PIN                      GPIO_PIN_7        /* PA.7*/
+#define BOARD_SPI1_MISO_MOSI_GPIO_PORT           GPIOA
+#define BOARD_SPI1_MISO_MOSI_GPIO_CLK_ENABLE()   __HAL_RCC_GPIOA_CLK_ENABLE()
+#define BOARD_SPI1_MISO_MOSI_GPIO_CLK_DISABLE()  __HAL_RCC_GPIOA_CLK_DISABLE()
+#define BOARD_SPI1_MISO_PIN                      GPIO_PIN_6       /* PA.06*/
+#define BOARD_SPI1_MOSI_PIN                      GPIO_PIN_7       /* PA.07*/
+
+/*##################### SPI2 ###################################*/
+#define BOARD_SPI2                               SPI2
+#define BOARD_SPI2_CLK_ENABLE()                  __HAL_RCC_SPI2_CLK_ENABLE()
+
+#define BOARD_SPI2_SCK_GPIO_PORT                 GPIOB             /* Pb.13*/
+#define BOARD_SPI2_SCK_PIN                       GPIO_PIN_13
+#define BOARD_SPI2_SCK_GPIO_CLK_ENABLE()         __HAL_RCC_GPIOB_CLK_ENABLE()
+#define BOARD_SPI2_SCK_GPIO_CLK_DISABLE()        __HAL_RCC_GPIOB_CLK_DISABLE()
+
+#define BOARD_SPI2_MISO_MOSI_GPIO_PORT           GPIOB
+#define BOARD_SPI2_MISO_MOSI_GPIO_CLK_ENABLE()   __HAL_RCC_GPIOB_CLK_ENABLE()
+#define BOARD_SPI2_MISO_MOSI_GPIO_CLK_DISABLE()  __HAL_RCC_GPIOB_CLK_DISABLE()
+#define BOARD_SPI2_MOSI_PIN                      GPIO_PIN_15      /* PB.15*/
+
 /* Maximum Timeout values for flags waiting loops. These timeouts are not based
    on accurate values, they just guarantee that the application will not remain
    stuck if the SPI communication is corrupted.
    You may modify these timeout values depending on CPU frequency and application
    conditions (interrupts routines ...). */
-#define EVAL_SPIx_TIMEOUT_MAX                   1000
+#define BOARD_SPI1_TIMEOUT_MAX                   1000
+#define BOARD_SPI2_TIMEOUT_MAX                   1000
 
 /**
   * @}
   */
 
-/** @addtogroup STM3210C_EVAL_COMPONENT STM3210C EVAL COMPONENT
+/** @addtogroup STM3210C_BOARD_COMPONENT STM3210C BOARD COMPONENT
   * @{
   */
 
 /*##################### LCD ###################################*/
 /* Chip Select macro definition */
+/**
+ * @brief  LCD Control Interface pins
+ */
 
-#define LCD_RST_LOW()      HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_RESET)
-#define LCD_RST_HIGH()     HAL_GPIO_WritePin(LCD_RST_GPIO_Port, LCD_RST_Pin, GPIO_PIN_SET)
+#define LCDex_BL_Pin							GPIO_PIN_1
+#define LCDex_BL_GPIO_Port 						GPIOA
 
-#define LCD_WR_LOW()       HAL_GPIO_WritePin(LCD_WR_GPIO_Port, LCD_WR_Pin, GPIO_PIN_RESET)
-#define LCD_WR_HIGH()      HAL_GPIO_WritePin(LCD_WR_GPIO_Port, LCD_WR_Pin, GPIO_PIN_SET)
+#define LCDex_BL_GPIO_CLK_ENABLE()              __HAL_RCC_GPIOA_CLK_ENABLE()
+#define LCDex_BL_GPIO_CLK_DISABLE()             __HAL_RCC_GPIOA_CLK_DISABLE()
 
-#define LCD_RD_LOW()       HAL_GPIO_WritePin(LCD_RD_GPIO_Port, LCD_RD_Pin, GPIO_PIN_RESET)
-#define LCD_RD_HIGH()      HAL_GPIO_WritePin(LCD_RD_GPIO_Port, LCD_RD_Pin, GPIO_PIN_SET)
+#define LCD_BL_Pin								GPIO_PIN_14
+#define LCD_BL_GPIO_Port 						GPIOB
 
-#define LCD_CS_LOW()      HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_RESET)
-#define LCD_CS_HIGH()     HAL_GPIO_WritePin(LCD_CS_GPIO_Port, LCD_CS_Pin, GPIO_PIN_SET)
+#define LCD_BL_GPIO_CLK_ENABLE()               __HAL_RCC_GPIOB_CLK_ENABLE()
+#define LCD_BL_GPIO_CLK_DISABLE()              __HAL_RCC_GPIOB_CLK_DISABLE()
 
-#define LCD_RS_LOW()      HAL_GPIO_WritePin(LCD_RS_GPIO_Port, LCD_RS_Pin, GPIO_PIN_RESET)
-#define LCD_RS_HIGH()     HAL_GPIO_WritePin(LCD_RS_GPIO_Port, LCD_RS_Pin, GPIO_PIN_SET)
+
+/* Chip Select macro definition */
+#define LCD_CS_LOW()       HAL_GPIO_WritePin(LCD_NCS_GPIO_PORT, LCD_NCS_PIN, GPIO_PIN_RESET)
+#define LCD_CS_HIGH()      HAL_GPIO_WritePin(LCD_NCS_GPIO_PORT, LCD_NCS_PIN, GPIO_PIN_SET)
+#define LCD_DC_LOW()       HAL_GPIO_WritePin(LCD_A0_GPIO_PORT, LCD_A0_PIN, GPIO_PIN_RESET)
+#define LCD_DC_HIGH()      HAL_GPIO_WritePin(LCD_A0_GPIO_PORT, LCD_A0_PIN, GPIO_PIN_SET)
+#define LCD_RES_LOW()      HAL_GPIO_WritePin(LCD_RES_GPIO_PORT, LCD_RES_PIN, GPIO_PIN_RESET)
+#define LCD_RES_HIGH()     HAL_GPIO_WritePin(LCD_RES_GPIO_PORT, LCD_RES_PIN, GPIO_PIN_SET)
 
 /**
-  * @brief  LCD Control Interface pins
-  */
+ * @brief  LCD Control Interface pins
+ */
+#define LCD_NCS_PIN                             GPIO_PIN_13        /* PD.13*/
+#define LCD_NCS_GPIO_PORT                       GPIOD
+#define LCD_NCS_GPIO_CLK_ENABLE()               __HAL_RCC_GPIOD_CLK_ENABLE()
+#define LCD_NCS_GPIO_CLK_DISABLE()              __HAL_RCC_GPIOD_CLK_DISABLE()
+
+#define LCD_A0_PIN                             GPIO_PIN_12        /* PB.12*/
+#define LCD_A0_GPIO_PORT                       GPIOB
+#define LCD_A0_GPIO_CLK_ENABLE()               __HAL_RCC_GPIOB_CLK_ENABLE()
+#define LCD_A0_GPIO_CLK_DISABLE()              __HAL_RCC_GPIOB_CLK_DISABLE()
+
+#define LCD_RES_PIN                             GPIO_PIN_8        /* PG.08*/
+#define LCD_RES_GPIO_PORT                       GPIOG
+#define LCD_RES_GPIO_CLK_ENABLE()               __HAL_RCC_GPIOG_CLK_ENABLE()
+#define LCD_RES_GPIO_CLK_DISABLE()              __HAL_RCC_GPIOG_CLK_DISABLE()
+
+/*##################### NRF ###################################*/
+
+/* Chip Select macro definition */
+#define NRF_NCS_LOW()       HAL_GPIO_WritePin(NRF_NCS_GPIO_PORT, NRF_NCS_PIN, GPIO_PIN_RESET)
+#define NRF_NCS_HIGH()      HAL_GPIO_WritePin(NRF_NCS_GPIO_PORT, NRF_NCS_PIN, GPIO_PIN_SET)
+/**
+ * @brief NRF Interface pins
+ */
+#define NRF_NCS_PIN                             GPIO_PIN_5        /* PC.05*/
+#define NRF_NCS_GPIO_PORT                       GPIOC
+#define NRF_NCS_GPIO_CLK_ENABLE()               __HAL_RCC_GPIOC_CLK_ENABLE()
+#define NRF_NCS_GPIO_CLK_DISABLE()              __HAL_RCC_GPIOC_CLK_DISABLE()
 
 
+/*##################### FLASH SPI ###################################*/
+/**
+ * @brief  M25P FLASH SPI Chip Select macro definition
+ */
+#define FLASH_SPI_CS_LOW()       HAL_GPIO_WritePin(FLASH_SPI_CS_GPIO_PORT, FLASH_SPI_CS_PIN, GPIO_PIN_RESET)
+#define FLASH_SPI_CS_HIGH()      HAL_GPIO_WritePin(FLASH_SPI_CS_GPIO_PORT, FLASH_SPI_CS_PIN, GPIO_PIN_SET)
 
-#define LCD_D0_Pin 					GPIO_PIN_0
-#define LCD_D0_GPIO_Port 			GPIOA
+/**
+ * @brief  M25P FLASH SPI Control Interface pins
+ */
+#define FLASH_SPI_CS_PIN                           GPIO_PIN_4        /* PC.04*/
+#define FLASH_SPI_CS_GPIO_PORT                     GPIOC
+#define FLASH_SPI_CS_GPIO_CLK_ENABLE()             __HAL_RCC_GPIOC_CLK_ENABLE()
+#define FLASH_SPI_CS_GPIO_CLK_DISABLE()            __HAL_RCC_GPIOC_CLK_DISABLE()
 
-#define LCD_D1_Pin 					GPIO_PIN_1
-#define LCD_D1_GPIO_Port 			GPIOA
+/**
+ * @brief  M25P FLASH SPI supported commands
+ */
+#define FLASH_SPI_CMD_WRITE          0x02  /*!< Write to Memory instruction */
+#define FLASH_SPI_CMD_WRSR           0x01  /*!< Write Status Register instruction */
+#define FLASH_SPI_CMD_WREN           0x06  /*!< Write enable instruction */
+#define FLASH_SPI_CMD_READ           0x03  /*!< Read from Memory instruction */
+#define FLASH_SPI_CMD_RDSR           0x05  /*!< Read Status Register instruction  */
+#define FLASH_SPI_CMD_RDID           0x9F  /*!< Read identification */
+#define FLASH_SPI_CMD_SE             0xD8  /*!< Sector Erase instruction */
+#define FLASH_SPI_CMD_BE             0xC7  /*!< Bulk Erase instruction */
 
-#define LCD_D2_Pin 					GPIO_PIN_2
-#define LCD_D2_GPIO_Port 			GPIOA
+#define FLASH_SPI_WIP_FLAG           0x01  /*!< Write In Progress (WIP) flag */
 
-#define LCD_D3_Pin 					GPIO_PIN_3
-#define LCD_D3_GPIO_Port 			GPIOA
+#define FLASH_SPI_DUMMY_BYTE         0xA5
+#define FLASH_SPI_PAGESIZE           0x100
 
-#define LCD_D4_Pin 					GPIO_PIN_4
-#define LCD_D4_GPIO_Port 			GPIOA
-
-#define LCD_D5_Pin 					GPIO_PIN_5
-#define LCD_D5_GPIO_Port 			GPIOA
-
-#define LCD_D6_Pin 					GPIO_PIN_6
-#define LCD_D6_GPIO_Port 			GPIOA
-
-#define LCD_RST_Pin 				GPIO_PIN_7
-#define LCD_RST_GPIO_Port 			GPIOB
-
-#define LCD_WR_Pin 					GPIO_PIN_6
-#define LCD_WR_GPIO_Port 			GPIOB
-
-#define LCD_RD_Pin 					GPIO_PIN_5
-#define LCD_RD_GPIO_Port 			GPIOB
-
-#define LCD_CS_Pin 					GPIO_PIN_4
-#define LCD_CS_GPIO_Port			GPIOB
-
-#define LCD_RS_Pin 					GPIO_PIN_3
-#define LCD_RS_GPIO_Port 			GPIOB
-
-#define LCD_BL_Pin					GPIO_PIN_11
-#define LCD_BL_GPIO_Port 			GPIOB
-
-#define LCD_CRTL_GPIO_CLK_ENABLE()               __HAL_RCC_GPIOB_CLK_ENABLE()
-#define LCD_CRTL_GPIO_CLK_DISABLE()              __HAL_RCC_GPIOB_CLK_DISABLE()
-
-#define LCD_DATA_GPIO_CLK_ENABLE()               __HAL_RCC_GPIOA_CLK_ENABLE()
-#define LCD_DATA_GPIO_CLK_DISABLE()              __HAL_RCC_GPIOA_CLK_DISABLE()
+#define FLASH_SPI_M25P128_ID         0x202018
+#define FLASH_SPI_M25P64_ID          0x202017
 
 
 /*##################### SD ###################################*/
@@ -501,7 +530,7 @@ supply LSb is ‘1’ (address 0011101b) else if SDO pad is connected to ground LSb 
 
 
 
-/** @addtogroup STM3210C_EVAL_Exported_Functions
+/** @addtogroup STM3210C_BOARD_Exported_Functions
   * @{
   */
 uint32_t                BSP_GetVersion(void);
@@ -529,7 +558,7 @@ JOYState_TypeDef        BSP_JOY_GetState(void);
 }
 #endif
 
-#endif /* __STM3210C_EVAL_H */
+#endif /* __STM3210C_BOARD_H */
 
 /**
   * @}

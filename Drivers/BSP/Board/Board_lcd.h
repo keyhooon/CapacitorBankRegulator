@@ -46,7 +46,9 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "../Board/Board.h"
-#include "../Components/ili9806/ili9806.h"
+//#include "../Components/ili9806/ili9806.h"
+#include "../Components/st7735/st7735.h"
+
 #include "../../../Utilities/Fonts/fonts.h"
 /** @addtogroup BSP
   * @{

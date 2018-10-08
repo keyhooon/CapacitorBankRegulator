@@ -107,7 +107,7 @@ LCD_DrvTypeDef ili9806_drv =
  */
 void ili9806_Init(void) {
 	/* Initialize ILI9806 low level bus layer ----------------------------------*/
-	LCD_IO_Init();
+	LCDex_IO_Init();
 
 	/* Configure LCD */
 	ili9806_WriteReg(LCD_EXCOM_SET_EN); // EXTC Command Set enable register
@@ -168,9 +168,9 @@ void ili9806_Init(void) {
 	ili9806_WriteData(0x55); //55-16BIT,66-18BIT,77-24BIT
 
 	ili9806_WriteReg(LCD_SLEEP_OUT);
-	LCD_Delay(120);
+	LCDex_Delay(120);
 	ili9806_WriteReg(LCD_DISPLAY_ON);
-	LCD_Delay(25);
+	LCDex_Delay(25);
 	ili9806_WriteReg(LCD_GRAM);
 
 }
@@ -181,7 +181,7 @@ void ili9806_Init(void) {
  * @retval LCD Register Value.
  */
 uint16_t ili9806_ReadID(void) {
-	LCD_IO_Init();
+	LCDex_IO_Init();
 	return  ili9806_ReadData(LCD_READ_ID1);
 }
 
@@ -347,7 +347,7 @@ void ili9806_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp) {
  * @retval None
  */
 inline void ili9806_WriteReg(uint8_t Reg) {
-	LCD_IO_WriteReg(Reg);
+	LCDex_IO_WriteReg(Reg);
 }
 
 /**
@@ -356,7 +356,7 @@ inline void ili9806_WriteReg(uint8_t Reg) {
  * @retval None
  */
 inline void ili9806_WriteData(uint16_t Value) {
-	LCD_IO_WriteData(Value);
+	LCDex_IO_WriteData(Value);
 }
 
 /**
@@ -366,8 +366,8 @@ inline void ili9806_WriteData(uint16_t Value) {
  * @retval LCD Register Value.
  */
 inline uint16_t ili9806_ReadData(uint8_t Reg) {
-	LCD_IO_WriteReg(Reg);
-	return (LCD_IO_ReadData());
+	LCDex_IO_WriteReg(Reg);
+	return (LCDex_IO_ReadData());
 }
 
 /**

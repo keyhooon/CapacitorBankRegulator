@@ -149,12 +149,12 @@ uint8_t BSP_LCD_Init(void)
   DrawProp.pFont     = &Font24;
   DrawProp.TextColor = 0x0000;
 
-	lcd_drv = &ili9806_drv;
+	lcd_drv = &st7735_drv;
 
 	/* LCD Init */
 	lcd_drv->Init();
     /* Clear the LCD screen */
-	BSP_LCD_Clear(LCD_COLOR_BLACK);
+	BSP_LCD_Clear(LCD_COLOR_RED);
     /* Initialize the font */
     BSP_LCD_SetFont(&LCD_DEFAULT_FONT);
 

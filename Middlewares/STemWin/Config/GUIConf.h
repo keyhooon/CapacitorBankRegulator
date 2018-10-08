@@ -58,7 +58,7 @@ Purpose     : Configures emWins abilities, fonts etc.
 *
 *       Multi layer/display support
 */
-#define GUI_NUM_LAYERS            1    // Maximum number of available layers
+#define GUI_NUM_LAYERS            2    // Maximum number of available layers
 
 /*********************************************************************
 *
@@ -94,6 +94,8 @@ Purpose     : Configures emWins abilities, fonts etc.
 #define GUI_SUPPORT_MEMDEV            (1)    /* Memory device package available */
 #define GUI_SUPPORT_DEVICES           (0)    /* Enable use of device pointers */
 #define GUI_USE_ARGB				  (1)
+#define WIDGET_USE_FLEX_SKIN 		  (1)
+
 
 
 #endif  /* Avoid multiple inclusion */
