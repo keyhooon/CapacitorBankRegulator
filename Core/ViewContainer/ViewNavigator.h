@@ -36,12 +36,7 @@ typedef struct {
 	void (*currentViewChanged)(void);
 } ViewNavigatorTypedef;
 
-/* Structure for menu items */
-typedef struct {
-	char * sText;
-	U16 Id;
-	U16 Flags;
-} MENU_ITEM;
+ViewNavigatorTypedef DefaultViewNavigator;
 
 /* Exported constants --------------------------------------------------------*/
 /* Exported macros -----------------------------------------------------------*/
@@ -60,10 +55,10 @@ uint8_t ViewNavigator_GetViewCount(ViewNavigatorTypedef *viewNavigator);
 uint8_t ViewNavigator_GoBackView(ViewNavigatorTypedef *viewNavigator);
 uint8_t ViewNavigator_GoHomeView(ViewNavigatorTypedef *viewNavigator);
 uint8_t ViewNavigator_GoToViewOf(ViewNavigatorTypedef *viewNavigator,
-		View_Typedef *view, void * param);
+		View_Typedef *view);
 uint8_t ViewNavigator_GoToViewOfByID(ViewNavigatorTypedef *viewNavigator,
-		uint8_t viewId, void* param);
-View_Typedef ViewNavigator_GetCurrentView(ViewNavigatorTypedef *viewNavigator);
+		uint8_t viewId);
+View_Typedef * ViewNavigator_GetCurrentView(ViewNavigatorTypedef *viewNavigator);
 
 uint8_t ExistViewIDInRouteVerify(ViewNavigatorTypedef *viewNavigator,
 		uint8_t viewId);

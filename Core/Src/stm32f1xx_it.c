@@ -36,6 +36,7 @@
 #include "stm32f1xx_it.h"
 #include "cmsis_os.h"
 
+#include "Board.h"
 /* USER CODE BEGIN 0 */
 
 #include "GUI.h"
@@ -48,7 +49,7 @@ extern PCD_HandleTypeDef hpcd_USB_FS;
 extern TIM_HandleTypeDef htim3;
 
 /******************************************************************************/
-/*            Cortex-M3 Processor Interruption and Exception Handlers         */ 
+/*            Cortex-M3 Processor Interruption and Exception Handlers         */
 /******************************************************************************/
 
 /**
@@ -186,7 +187,7 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
 
 /**
 * @brief This function handles TIM3 global interrupt.
-*/
+ */
 void TIM3_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM3_IRQn 0 */
@@ -197,6 +198,20 @@ void TIM3_IRQHandler(void)
   /* USER CODE END TIM3_IRQn 1 */
 }
 
+void EXTI15_10_IRQHandler(void) {
+	HAL_GPIO_EXTI_IRQHandler(KP_R0_PIN);
+	HAL_GPIO_EXTI_IRQHandler(KP_R1_PIN);
+	HAL_GPIO_EXTI_IRQHandler(KP_R2_PIN);
+	HAL_GPIO_EXTI_IRQHandler(KP_R3_PIN);
+}
+
+void EXTI3_IRQHandler(void) {
+	HAL_GPIO_EXTI_IRQHandler(KEY2_BUTTON_PIN);
+}
+
+void EXTI9_5_IRQHandler(void) {
+	HAL_GPIO_EXTI_IRQHandler(KEY1_BUTTON_PIN);
+}
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */

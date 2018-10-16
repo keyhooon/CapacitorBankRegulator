@@ -119,7 +119,7 @@ static void _cbHeading(WM_MESSAGE * pMsg) {
 		//
 		// Create timer to be used to modify the battery symbol
 		//
-		WM_CreateTimer(hWin, 0, 1000, 0);
+//		WM_CreateTimer(hWin, 0, 1000, 0);
 		break;
 	case WM_TIMER:
 		//
@@ -553,7 +553,7 @@ void MainWindow(void) {
 	WM_CF_SHOW, _cbView, 0);
 	hWinHeading = WM_CreateWindowAsChild(0, 0, xSize, 60, WM_HBKWIN,
 	WM_CF_SHOW, _cbHeading, 0);
-	MainScreenShow();
+//	MainScreenShow();
 }
 
 /*************************** End of file ****************************/

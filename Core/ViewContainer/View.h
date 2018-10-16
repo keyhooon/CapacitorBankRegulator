@@ -12,31 +12,41 @@
 #include "wm.h"
 #include "dialog.h"
 
+#define DESKTOP_VIEW_ID			0
+#define MENU_VIEW_ID			1
+#define CONTACT_LIST_VIEW_ID	2
+#define CONTACT_OPTION_VIEW_ID	2
+#define CONTACT_SHOW_VIEW_ID	2
+#define CONTACT_EDIT_NAME_VIEW_ID	2
+#define CONTACT_EDIT_LAST_NAME_VIEW_ID	2
+#define CONTACT_EDIT_CALL_NUMBER_VIEW_ID	2
+
+
+
+
+
+
 typedef enum {
 	Ok, Cancel, Error,
 } ViewStatus_Typedef;
 
 
 
-typedef struct {
-	void * States;
-	void (*OnStateChanged)(int StateNumber);
 
-} ViewState_Typedef;
-
-typedef void * ViewParam_Typedef;
 
 typedef struct {
 	uint8_t id;
 	const char *name;
 	const char *shortName;
 	GUI_CONST_STORAGE GUI_BITMAP *icon;
-	void (*show)(void);
-	uint8_t (*hide)(void);
-	void (*okCallback)(void);
-	void (*backCallback)(void);
-	const ViewParam_Typedef * param;
-	ViewState_Typedef * state;
+	GUI_HWIN (*show)(void);
+	uint8_t (*hide)(GUI_HWIN hWin);
+	const char* firstButtonText;
+	const char* SecondButtonText;
+	void (*firstButtonCallback)(void);
+	void (*SecondButtonCallback)(void);
+	const void * param;
+	void * state;
 } View_Typedef;
 
 

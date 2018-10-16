@@ -34,6 +34,9 @@
 								<option id="gnu.c.compiler.option.debugging.level.159713254" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.391949687" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="../Core/Inc"/>
+									<listOptionValue builtIn="false" value="../Core/DataModel"/>
+									<listOptionValue builtIn="false" value="../Core/DataAccess"/>
+									<listOptionValue builtIn="false" value="../Core/ViewContainer"/>
 									<listOptionValue builtIn="false" value="../Middlewares/STemWin/inc"/>
 									<listOptionValue builtIn="false" value="../Middlewares/STemWin/Config"/>
 									<listOptionValue builtIn="false" value="../Drivers/BSP/Board"/>
@@ -119,7 +122,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Src/tim.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
+						<entry excluding="SmallWindow/C/ContactOptionDLG.c|SmallWindow/C/ContactListManualDialDLG.c|SmallWindow/C/ContactListDLG.c|SmallWindow/C/ContactDLG.c|ViewContainer/InfoView.c|ViewContainer/NotificationView.c|Src/tim.c|ViewContainer/EditView.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
 						<entry excluding="STemWin/Config/GUI_X.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="USB_DEVICE"/>
@@ -242,7 +245,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Src/tim.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
+						<entry excluding="SmallWindow/C/ContactOptionDLG.c|SmallWindow/C/ContactListManualDialDLG.c|SmallWindow/C/ContactListDLG.c|SmallWindow/C/ContactDLG.c|ViewContainer/InfoView.c|ViewContainer/NotificationView.c|Src/tim.c|ViewContainer/EditView.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
 						<entry excluding="STemWin/Config/GUI_X.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="USB_DEVICE"/>

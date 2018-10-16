@@ -190,11 +190,13 @@ void DefaultProc(void const * argument)
 {
 
   /* USER CODE BEGIN DefaultProc */
+
 	osTimerStart(StatusTimerHandle, 100);
   /* Infinite loop */
   for(;;)
   {
-		osDelay(1000);
+		KEYPAD_Process();
+		osDelay(10);
   }
   /* USER CODE END DefaultProc */
 }
@@ -208,8 +210,8 @@ void GuiProc(void const * argument)
 	GUI_Init();
 	/* Activate the use of memory device feature */
 	WM_SetCreateFlags(WM_CF_MEMDEV);
-	GUI_SelectLayer(0);
-	MainWindow();
+//	GUI_SelectLayer(0);
+//	MainWindow();
 	GUI_SelectLayer(1);
 	ShowSmallDesktopWindow();
 

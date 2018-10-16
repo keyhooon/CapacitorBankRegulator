@@ -105,6 +105,13 @@ const uint16_t BUTTON_IRQn[BUTTONn] = {WAKEUP_BUTTON_EXTI_IRQn,
 KEY1_BUTTON_EXTI_IRQn,
 KEY2_BUTTON_EXTI_IRQn };
 
+uint16_t KP_C_PINs[4] = { KP_C0_PIN, KP_C1_PIN, KP_C2_PIN, KP_C3_PIN };
+uint16_t KP_R_PINs[4] = { KP_R0_PIN, KP_R1_PIN, KP_R2_PIN, KP_R3_PIN };
+GPIO_TypeDef * KP_C_Ports[4] = { KP_C0_PORT, KP_C1_PORT, KP_C2_PORT,
+KP_C3_PORT };
+GPIO_TypeDef * KP_R_Ports[4] = { KP_R0_PORT, KP_R1_PORT, KP_R2_PORT,
+KP_R3_PORT };
+
 /**
  * @brief COM variables
  */
@@ -352,17 +359,17 @@ void BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef Button_Mode)
     if(Button != BUTTON_WAKEUP)
     {
       /* Configure Joystick Button pin as input with External interrupt, falling edge */
-      gpioinitstruct.Mode = GPIO_MODE_IT_FALLING;
+			gpioinitstruct.Mode = GPIO_MODE_IT_RISING_FALLING;
     }
     else
     {
       /* Configure Key Push Button pin as input with External interrupt, rising edge */
-      gpioinitstruct.Mode = GPIO_MODE_IT_RISING;
+			gpioinitstruct.Mode = GPIO_MODE_IT_RISING;
     }
     HAL_GPIO_Init(BUTTON_PORT[Button], &gpioinitstruct);
 
     /* Enable and set Button EXTI Interrupt to the lowest priority */
-    HAL_NVIC_SetPriority((IRQn_Type)(BUTTON_IRQn[Button]), 0x0F, 0);
+		HAL_NVIC_SetPriority((IRQn_Type) (BUTTON_IRQn[Button]), 0x0A, 0);
     HAL_NVIC_EnableIRQ((IRQn_Type)(BUTTON_IRQn[Button]));
   }
 }
@@ -383,7 +390,62 @@ uint32_t BSP_PB_GetState(Button_TypeDef Button)
 
 #endif /*HAL_I2C_MODULE_ENABLED*/
 
+void KEYPAD_IO_Init(void) {
 
+	GPIO_InitTypeDef GPIO_InitStruct;
+
+	/* GPIO Ports Clock Enable */
+	KP_R_GPIO_CLK_ENABLE();
+	KP_C_GPIO_CLK_ENABLE();
+
+	/*Configure GPIO pin : PtPin */
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_PULLUP;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+	GPIO_InitStruct.Pin = KP_C0_PIN;
+	HAL_GPIO_Init(KP_C0_PORT, &GPIO_InitStruct);
+	GPIO_InitStruct.Pin = KP_C1_PIN;
+	HAL_GPIO_Init(KP_C1_PORT, &GPIO_InitStruct);
+	GPIO_InitStruct.Pin = KP_C2_PIN;
+	HAL_GPIO_Init(KP_C2_PORT, &GPIO_InitStruct);
+	GPIO_InitStruct.Pin = KP_C3_PIN;
+	HAL_GPIO_Init(KP_C3_PORT, &GPIO_InitStruct);
+
+	HAL_GPIO_WritePin(KP_C_Ports[0], KP_C_PINs[0], GPIO_PIN_SET);
+	HAL_GPIO_WritePin(KP_C_Ports[1], KP_C_PINs[1], GPIO_PIN_SET);
+	HAL_GPIO_WritePin(KP_C_Ports[2], KP_C_PINs[2], GPIO_PIN_SET);
+	HAL_GPIO_WritePin(KP_C_Ports[3], KP_C_PINs[3], GPIO_PIN_SET);
+
+	GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
+	GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	GPIO_InitStruct.Pin = KP_R0_PIN;
+	HAL_GPIO_Init(KP_R0_PORT, &GPIO_InitStruct);
+	GPIO_InitStruct.Pin = KP_R1_PIN;
+	HAL_GPIO_Init(KP_R1_PORT, &GPIO_InitStruct);
+	GPIO_InitStruct.Pin = KP_R2_PIN;
+	HAL_GPIO_Init(KP_R2_PORT, &GPIO_InitStruct);
+	GPIO_InitStruct.Pin = KP_R3_PIN;
+	HAL_GPIO_Init(KP_R3_PORT, &GPIO_InitStruct);
+
+	HAL_NVIC_SetPriority(KP_R_EXTI_IRQn, 0x0A, 0x00);
+	HAL_NVIC_EnableIRQ(KP_R_EXTI_IRQn);
+
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+	if (GPIO_Pin == GPIO_PIN_11 || GPIO_Pin == GPIO_PIN_13
+			|| GPIO_Pin == GPIO_PIN_14 || GPIO_Pin == GPIO_PIN_15)
+		KEYPAD_EXTI_Callback(GPIO_Pin);
+	if (GPIO_Pin == BUTTON_PIN[2])
+		BSP_PB_EXTI_Callback(BUTTON_KEY1,
+				HAL_GPIO_ReadPin(BUTTON_PORT[2], BUTTON_PIN[2]));
+	if (GPIO_Pin == BUTTON_PIN[3])
+		BSP_PB_EXTI_Callback(BUTTON_KEY2,
+				HAL_GPIO_ReadPin(BUTTON_PORT[3], BUTTON_PIN[3]));
+
+
+}
 
 /**
   * @}
@@ -1837,6 +1899,8 @@ HAL_StatusTypeDef EEPROM_I2C_IO_IsDeviceReady(uint16_t DevAddress, uint32_t Tria
 }
 
 #endif /* HAL_I2C_MODULE_ENABLED */
+
+
 
 /**
   * @}
