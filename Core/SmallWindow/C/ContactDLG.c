@@ -22,7 +22,13 @@
 // USER END
 
 #include "ViewNavigator.h"
+#include "WM.h"
+#include "DIALOG.h"
 #include "Contact.h"
+#include "ListView.h"
+
+
+
 
 
 
@@ -35,54 +41,93 @@
 #define ID_WINDOW_02     (GUI_ID_USER + 0x10)
 #define ID_LISTBOX_0     (GUI_ID_USER + 0x11)
 
+GUI_HWIN CurrentWidget;
 
-extern GUI_HWIN ListViewShow(void);
-extern uint8_t ListVIewHide(GUI_HWIN hWin);
-
-Contact_List_Typedef SelectedContact = NULL;
-
-static void okCallback(void);
+static void cancelCallCallback(void);
+static void okContactOptionCallback(void);
+static void okContactListCallback(void);
 static void backCallback(void);
+static void Call(void);
 
-const View_Typedef ContactView =
+static GUI_HWIN CallViewShow(ListViewOption_typedef ListViewOption,
+		CustomFunctionList_Typedef FunctionList);
+
+static uint32_t CallViewHide(ListViewOption_typedef ListViewOption,
+		CustomFunctionList_Typedef FunctionList, GUI_HWIN hwin);
+
+const char* FunctionDisplay[1] = { (const char*) "Call" };
+const void (*Functions[1])(void) = {Call };
+
+const CustomFunctionList_Typedef ContactFunctionList = { 1, FunctionDisplay,
+		Functions };
+const ListViewOption_typedef ContactListViewOption = { 1, 1, 1 };
+
+typedef enum {
+	EditContactState_Name,
+	EditContactState_LastName,
+	EditContactState_CallNumber,
+	EditContactState_Finished,
+} EditContactState_Typedef;
+/*********************************************************************
+ *
+ *       _cbDialog
+ */
+static void _cb(WM_MESSAGE * pMsg) {
+	int xSize, ySize, xPos;
+	WM_HWIN hWin;
+
+	hWin = pMsg->hWin;
+	switch (pMsg->MsgId) {
+	case WM_CREATE:
+		break;
+	case WM_PAINT:
+		//
+		// Get window dimension
+		//
+		xSize = WM_GetWindowSizeX(hWin);
+		ySize = WM_GetWindowSizeY(hWin);
+		//
+		// Draw logo, battery and clock
+		//
+		//GUI_DrawBitmap(&bmsepah, 0, 0);
+		break;
+	default:
+		WM_DefaultProc(pMsg);
+	}
+}
+
+
+
+SHOW_LIST_PROTOTYPES(Contact)
+
+const View_Typedef ContactListView =
 {
 	CONTACT_LIST_VIEW_ID, "Contact List",
-	"Contact",
+	"List",
 	(void *) NULL,
-	ListViewShow,
-		ListVIewHide, (const char*) "Back", (const char*) "Option",
+		ContactListViewShow, ContactListViewHide, (const char*) "Back",
+		(const char*) "Option",
 		backCallback,
-		okCallback, NULL, &SelectedContact };
+		okContactListCallback, NULL, 0 };
 
-// USER END
+const View_Typedef ContactOptionView = {
+CONTACT_OPTION_VIEW_ID, "Contact Option", "Opt", (void *) NULL,
+		ContactOptionListViewShow, ContactOptionListViewHide,
+		(const char*) "Back",
+		(const char*) "OK", backCallback, okContactOptionCallback, NULL, 0 };
 
-/*********************************************************************
-*
-*       Static data
-*
-**********************************************************************
-*/
+const View_Typedef CallView = {
+		CONTACT_CALL_VIEW_ID, "Contact Call", "Call",
+		(void *) NULL, CallViewShow, CallViewHide,
+		NULL, (const char*) "OK", NULL, cancelCallCallback, NULL, 0 };
 
-// USER START (Optionally insert additional static data)
-// USER END
+const View_Typedef ContactEditView = { CONTACT_EDIT_VIEW_ID, "Contact Edit",
+		"Edit", (void *) NULL, EditViewShow, ContactEditViewHide,
+		NULL, (const char*) "OK", NULL, cancelCallCallback, NULL, 0 };
 
-/*********************************************************************
-*
-*       _aDialogCreate
-*/
-static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
-  { WINDOW_CreateIndirect, "Contact", ID_WINDOW_02, 0, 0, 160, 84, 0, 0x0, 0 },
-  { LISTBOX_CreateIndirect, "ContactList", ID_LISTBOX_0, 1, 1, 158, 82, 0, 0x0, 0 },
-  // USER START (Optionally insert additional widgets)
-  // USER END
-};
 
-/*********************************************************************
-*
-*       Static code
-*
-**********************************************************************
-*/
+
+
 
 // USER START (Optionally insert additional static code)
 // USER END
@@ -92,9 +137,92 @@ static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 *       _cbDialog
 */
 
-static void okCallback(void) {
+SHOW_LIST_FUNCTIONS(Contact)
+
+static void Call(void) {
+	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &CallView);
+}
+static void cancelCallCallback(void) {
 
 }
+	static GUI_HWIN CallViewShow() {
+	int xSize, ySize;
+	WM_HWIN hwin = WINDOW_CreateEx(0, 0, 128, 115, NULL, WM_CF_SHOW, 0x0,
+	GUI_ID_USER, _cb);
+	return hwin;
+}
+	static uint32_t CallViewHide(GUI_HWIN hwin) {
+//	vPortFree(DisplayArray);
+	return 1;
+}
+	Contact_Typedef * contact;
+
+	static GUI_HWIN EditViewShow() {
+		int xSize, ySize;
+		contact = pvPortMalloc(
+				sizeof(Contact_Typedef) + sizeof(EditContactState_Typedef));
+		EditContactState_Typedef *state = contact + sizeof(Contact_Typedef);
+		*state = 0;
+		WM_HWIN hwin = WINDOW_CreateEx(0, 0, 128, 115, NULL, WM_CF_SHOW, 0x0,
+		GUI_ID_USER, _cb);
+		TEXT_CreateAsChild(5, 20, 118, 40, hwin, GUI_ID_TEXT0, WM_CF_SHOW,
+				"",
+				TEXT_CF_TOP | TEXT_CF_HCENTER);
+		WM_SetFocus(EDIT_CreateAsChild(5, 65, 118, 40, hwin, GUI_ID_EDIT0,
+		WM_CF_SHOW, 15));
+		CurrentWidget = hwin;
+		ContactEditProcess();
+		return hwin;
+	}
+	uint8_t EditViewHide(GUI_HWIN hWin) {
+		vPortFree(contact);
+	}
+	static void OkContactEditCallback() {
+		EditContactState_Typedef *state = contact + sizeof(Contact_Typedef);
+		if (*state == EditContactState_Name) {
+			TEXT_SetText(WM_GetDialogItem(CurrentWidget, GUI_ID_TEXT0), "Name");
+			EDIT_SetText(WM_GetDialogItem(CurrentWidget, GUI_ID_EDIT0),
+					(contact)->Name);
+			*state = EditContactState_LastName;
+		} else if (*state == EditContactState_LastName) {
+			EDIT_GetText(WM_GetDialogItem(CurrentWidget, GUI_ID_EDIT0),
+					(contact)->Name,
+					15);
+			TEXT_SetText(WM_GetDialogItem(CurrentWidget, GUI_ID_TEXT0),
+					"Last Name");
+			EDIT_SetText(WM_GetDialogItem(CurrentWidget, GUI_ID_EDIT0),
+					(contact)->LastName);
+			*state = EditContactState_CallNumber;
+		} else if (*state == EditContactState_CallNumber) {
+			EDIT_GetText(WM_GetDialogItem(CurrentWidget, GUI_ID_EDIT0),
+					(contact)->LastName, 15);
+			TEXT_SetText(WM_GetDialogItem(CurrentWidget, GUI_ID_TEXT0),
+					"Call Number");
+			EDIT_SetText(WM_GetDialogItem(CurrentWidget, GUI_ID_EDIT0),
+					(contact)->CallNumber);
+			*state = EditContactState_Finished;
+		} else if (*state == EditContactState_Finished) {
+			EDIT_GetText(WM_GetDialogItem(CurrentWidget, GUI_ID_EDIT0),
+					(contact)->CallNumber, 15);
+			memcpy(&ContactList->current_item, contact,
+					sizeof(Contact_Typedef));
+
+			ViewNavigator_GoBackView(&DefaultViewNavigator);
+			ViewNavigator_GoBackView(&DefaultViewNavigator);
+	}
+	}
+
+
+
+static void okContactOptionCallback(void) {
+
+}
+static void okContactListCallback(void) {
+	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &ContactOptionView);
+
+}
+
+
 static void backCallback(void) {
 	ViewNavigator_GoBackView(&DefaultViewNavigator);
 }

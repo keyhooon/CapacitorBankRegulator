@@ -15,6 +15,8 @@
 #include "ViewNavigator.h"
 #include "Board.h"
 
+#include "cmsis_os.h"
+
 /*********************************************************************
  *
  *       Defines
@@ -54,7 +56,7 @@ WM_HWIN hWinHeading;  // Heading window
 WM_HWIN hWin;     // Menu window moveable within viewport window
 WM_HWIN hWinToolbar;
 
-
+extern osThreadId EventTaskHandle;
 
 /*********************************************************************
  *
@@ -62,6 +64,9 @@ WM_HWIN hWinToolbar;
  *
  **********************************************************************
  */
+void ToolbarFirstButtonProc();
+void ToolbarSecondButtonProc();
+
 static void CurrentMenuPageChanged(void);
 static void _cbHeading(WM_MESSAGE * pMsg);
 static void _cbViewPort(WM_MESSAGE * pMsg);
@@ -71,6 +76,7 @@ static GUI_HWIN show(void);
 static uint8_t hide(GUI_HWIN hWin);
 static void MenuCallback(void);
 extern void ShowSmallDesktopWindow(void);
+
 
 extern View_Typedef MenuView;
 View_Typedef DesktopView = { DESKTOP_VIEW_ID, (const char*) "Desktop",
@@ -284,17 +290,26 @@ void BSP_PB_EXTI_Callback(Button_TypeDef Button, int state) {
 	{
 		GUI_HWIN firstButton = WM_GetDialogItem(hWinToolbar, GUI_ID_BUTTON0);
 		if (state == GPIO_PIN_SET)
-			view->firstButtonCallback();
+			osSignalSet(EventTaskHandle, 1 << BUTTON_KEY1);
 		BUTTON_SetState(firstButton, !state);
 	}
 	if (Button == BUTTON_KEY2 && view->SecondButtonCallback != NULL)
 	{
 		GUI_HWIN secondButton = WM_GetDialogItem(hWinToolbar, GUI_ID_BUTTON1);
 		if (state == GPIO_PIN_SET)
-			view->SecondButtonCallback();
+			osSignalSet(EventTaskHandle, 1 << BUTTON_KEY2);
 		BUTTON_SetState(secondButton, !state);
 	}
 }
+void ToolbarFirstButtonProc() {
+	View_Typedef *view = ViewNavigator_GetCurrentView(&DefaultViewNavigator);
+	view->firstButtonCallback();
+}
+void ToolbarSecondButtonProc() {
+	View_Typedef *view = ViewNavigator_GetCurrentView(&DefaultViewNavigator);
+	view->SecondButtonCallback();
+}
+
 
 /*********************************************************************
  *

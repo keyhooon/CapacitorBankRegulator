@@ -10,51 +10,99 @@
 #include "sglib.h"
 #include "FreeRTOS.h"
 #include "string.h"
-#define DATA_ACCESS_LIST_PROTOTYPES(type, displayOperation) \
+
+#define STRING_COMPARATOR(x, y) ((strcmp(x, y)))
+
+typedef struct {
+	int (*Add)(void *value);
+	int (*Remove)(void * value);
+	char ** (*GetDisplayArray)(void);
+	void (*FreeDisplayArray)(char ** stringArray);
+	int (*SetCurrentItem)(int index);
+	int (*GetCurrentItemIndex)(void);
+} ListApiHandlers_typedef;
+#define DATA_ACCESS_LIST_PROTOTYPES(type) \
 	typedef struct type##_List_Struct { \
-		type##_Typedef current_item; \
 		struct type##_List_Struct *next_ptr; \
 		struct type##_List_Struct *prev_ptr; \
+		type##_Typedef current_item; \
 	} type##_List_Typedef; \
-	char* (*type##Display)(type##_Typedef item){	\
-		displayOperation(item);\
-	}\
 	type##_List_Typedef * type##List; \
-	void Add##type(type##_Typedef *value) ;	\
-	type##_List_Typedef * Get##type##List(uint32_t pageSize, uint32_t pageIndex) ; \
-	void Remove##type(type##_List_Typedef * value) ;
+	int Add##type(type##_Typedef *value);	\
+	char ** Get##type##DisplayArray(); \
+	void Free##type##DisplayArray(char ** stringArray); \
+	int SetCurrent##type##Item(int index); \
+	int GetCurrent##type##ItemIndex(); \
+	int Remove##type(type##_List_Typedef * value);
 
-#define DATA_ACCESS_LIST_FUNCTIONS(type, comparator) \
+#define DATA_ACCESS_LIST_FUNCTIONS(type, comparator, display) \
 	SGLIB_DEFINE_DL_LIST_PROTOTYPES(type##_List_Typedef, comparator, prev_ptr, next_ptr) \
-	SGLIB_DEFINE_DL_LIST_FUNCTIONS(type##_List_Typedef, STRING_COMPARATOR, prev_ptr, next_ptr) \
+	SGLIB_DEFINE_DL_LIST_FUNCTIONS(type##_List_Typedef, comparator, prev_ptr, next_ptr) \
+	ListApiHandlers_typedef type##ListApiHandlers = { \
+			Add##type, \
+			Remove##type, \
+			Get##type##DisplayArray, \
+			Free##type##DisplayArray, \
+			SetCurrent##type##Item, \
+			GetCurrent##type##ItemIndex, \
+	}; \
 	int Add##type(type##_Typedef *value) { \
 		type##_List_Typedef * node = pvPortMalloc(sizeof(type##_List_Typedef)); \
 		type##_List_Typedef * member;\
-		memcpy(node, value, sizeof(type##_List_Typedef)); \
-		sglib_##type##_List_add_if_not_member(&type##List, node, &member); \
-		if (member == NULL)\
-			return 1;\
-		return 0;\
+		memcpy(&(node->current_item), value, sizeof(type##_Typedef)); \
+		return (sglib_##type##_List_Typedef_add_if_not_member(&type##List, node, &member)); \
 	} \
-	char * Get##type##DisplayArray(displayOperation){\
-		struct sglib_##type##_iterator it;\
+	char ** Get##type##DisplayArray(){ \
+		char temp[23]; \
+		int itemCount = sglib_##type##_List_Typedef_len(type##List) ; \
+		char** stringArray = pvPortMalloc((itemCount + 1) *  sizeof(char *) ); \
+		char * stringItem;\
+		type##_List_Typedef *val = sglib_##type##_List_Typedef_get_first (type##List) ; \
+		 for (int i = 0; i < itemCount; i++) { \
+			display(temp, val->current_item) \
+		 	stringItem = pvPortMalloc(strlen(temp) + 1); \
+		 	strcpy(stringItem,temp); \
+			*(stringArray + i) = stringItem; \
+		 	val = val->next_ptr; \
+		 	if (val == NULL) \
+				break; \
+		 } \
+		 *(stringArray + itemCount) = NULL; \
+		 return stringArray; \
+	} \
+	void Free##type##DisplayArray(char ** stringArray){\
 		type##_List_Typedef *val; \
-		char** stringArray = pvPortMalloc(sizeof(sglib_##type##_len(type##List)) * sizeof(void*));\
-		char * stringItem = *stringArray;\
-		 for (val = type##List; val != NULL; val = type##List->next_ptr)\
-		 {\
-			char * disp = displayOperation(val->current_item) \
-		 	stringItem = pvPortMalloc(strlen(disp));\
-		 	strcpy(stringItem++,disp);\
-		 }\
-	}\
-
-	void Remove##type(type##_List_Typedef * value) { \
+		char temp[22]; \
+		vPortFree(stringArray); \
+		while(* stringArray) { \
+			vPortFree(* stringArray); \
+			stringArray ++; \
+		} \
+	} \
+	int SetCurrent##type##Item(int index) {\
+		type##_List_Typedef *val = sglib_##type##_List_Typedef_get_first (type##List); \
+		for (int i = 0; i < index && val != NULL; i++) { \
+			if (val == NULL) \
+				return 1; \
+			val = val -> next_ptr;\
+		 } \
+		 type##List = val; \
+		 return 0; \
+	} \
+	int GetCurrent##type##ItemIndex() {\
+		int i = -1; \
+		for (type##_List_Typedef *val = type##List; val != NULL; val = val->prev_ptr) { \
+			i++;\
+		 } \
+		 return i; \
+	} \
+	int Remove##type(type##_List_Typedef * value) { \
 		type##_List_Typedef * item; \
-		sglib_##type##_List_delete_if_member(&type##List, value, &item); \
-		if (member != NULL)\
-			return 1;\
-		vPortFree(item); \
+		if (sglib_##type##_List_Typedef_delete_if_member(&type##List, value, &item)) \
+		{ \
+			vPortFree(item); \
+			return 1; \
+		} \
 		return 0;\
 	}
 

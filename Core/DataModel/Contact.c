@@ -6,10 +6,15 @@
  */
 
 #include "Contact.h"
-#include "Sorted_List_Heap.h"
+#include "List_Heap.h"
+#include "string.h"
 
+#define CONTACT_COMPARATOR(x, y) STRING_COMPARATOR(x->current_item.Name, y->current_item.Name)
 
-DATA_ACCESS_SORTED_LIST_FUNCTIONS(Contact, STRING_COMPARATOR)
+#define DISPLAY_CONTACT(display, contact) \
+		sprintf(display, "%.10s, %.10s", contact.Name, contact.LastName);
+
+DATA_ACCESS_LIST_FUNCTIONS( Contact, CONTACT_COMPARATOR, DISPLAY_CONTACT)
 
 void AddContactEx(char * Name, char * LastName, char * CallNumber) {
 	Contact_Typedef contact = { 0, Name, LastName, CallNumber,
@@ -30,8 +35,5 @@ void seedContact() {
 			(const char*) "09101143144");
 	AddContactEx((const char*) "shima", (const char*) "shademan",
 			(const char*) "09354463261");
-
 }
-char* displayContact() {
 
-}

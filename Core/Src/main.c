@@ -58,6 +58,7 @@
 /* USER CODE BEGIN Includes */
 #include "Board.h"
 #include "Board_lcd.h"
+#include "Contact.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -113,6 +114,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 //	BSP_LCD_Init();
 	BSP_Config();
+	seedContact();
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */

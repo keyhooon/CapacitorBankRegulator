@@ -61,6 +61,7 @@
 osThreadId defaultTaskHandle;
 osThreadId guiTaskHandle;
 osThreadId CalculateTaskHandle;
+osThreadId EventTaskHandle;
 osTimerId StatusTimerHandle;
 osSemaphoreId CalculateNeededSemHandle;
 
@@ -73,7 +74,11 @@ uint32_t ledTimStart[4] = { 1, 2, 3, 4 };
 void DefaultProc(void const * argument);
 void GuiProc(void const * argument);
 void CalculationProc(void const * argument);
+void EventProc(void const * argument);
 void StatusShowCallback(void const * argument);
+
+extern void ToolbarFirstButtonProc();
+extern void ToolbarSecondButtonProc();
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -172,6 +177,9 @@ void MX_FREERTOS_Init(void) {
 	osThreadDef(guiTask, GuiProc, osPriorityIdle, 0, 512);
   guiTaskHandle = osThreadCreate(osThread(guiTask), NULL);
 
+	osThreadDef(eventTask, EventProc, osPriorityIdle, 0, 512);
+	EventTaskHandle = osThreadCreate(osThread(eventTask), NULL);
+
   /* definition and creation of CalculateTask */
 	osThreadDef(CalculateTask, CalculationProc, osPriorityIdle, 0, 128);
 	CalculateTaskHandle = osThreadCreate(osThread(CalculateTask), NULL);
@@ -236,6 +244,20 @@ void CalculationProc(void const * argument)
 		osDelay(1000);
   }
   /* USER CODE END CalculationProc */
+}
+
+void EventProc(void const * argument) {
+	osEvent event;
+
+	for (;;) {
+		event = osSignalWait(1 << BUTTON_KEY1 | 1 << BUTTON_KEY2,
+				osWaitForever);
+		if (event.value.signals == (1 << BUTTON_KEY1)) {
+			ToolbarFirstButtonProc();
+		} else if (event.value.signals == (1 << BUTTON_KEY2)) {
+			ToolbarSecondButtonProc();
+		}
+	}
 }
 
 /* StatusShowCallback function */

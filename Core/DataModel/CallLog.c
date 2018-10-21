@@ -7,4 +7,10 @@
 #include "CallLog.h"
 #include "List_Heap.h"
 
-DATA_ACCESS_LIST_FUNCTIONS(CallLog, CALL_LOG_COMPARATOR)
+#define CALLLOG_COMPARATOR(x, y) SGLIB_NUMERIC_COMPARATOR(x->current_item.Time, y->current_item.Time)
+
+#define DISPLAY_CALLLOG(display, callLog) \
+		sprintf(display, "%.11s, %.10s", callLog.CallNumber, callLog.Time);
+
+DATA_ACCESS_LIST_FUNCTIONS(CallLog, CALLLOG_COMPARATOR, DISPLAY_CALLLOG)
+

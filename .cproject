@@ -122,7 +122,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="SmallWindow/C/ContactOptionDLG.c|SmallWindow/C/ContactListManualDialDLG.c|SmallWindow/C/ContactListDLG.c|SmallWindow/C/ContactDLG.c|ViewContainer/InfoView.c|ViewContainer/NotificationView.c|Src/tim.c|ViewContainer/EditView.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
+						<entry excluding="DataModel/Message.c|SmallWindow/C/ContactOptionDLG.c|SmallWindow/C/ContactListManualDialDLG.c|SmallWindow/C/ContactListDLG.c|ViewContainer/InfoView.c|ViewContainer/NotificationView.c|Src/tim.c|ViewContainer/EditView.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
 						<entry excluding="STemWin/Config/GUI_X.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="USB_DEVICE"/>
@@ -245,7 +245,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="SmallWindow/C/ContactOptionDLG.c|SmallWindow/C/ContactListManualDialDLG.c|SmallWindow/C/ContactListDLG.c|SmallWindow/C/ContactDLG.c|ViewContainer/InfoView.c|ViewContainer/NotificationView.c|Src/tim.c|ViewContainer/EditView.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
+						<entry excluding="DataModel/Message.c|SmallWindow/C/ContactOptionDLG.c|SmallWindow/C/ContactListManualDialDLG.c|SmallWindow/C/ContactListDLG.c|ViewContainer/InfoView.c|ViewContainer/NotificationView.c|Src/tim.c|ViewContainer/EditView.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
 						<entry excluding="STemWin/Config/GUI_X.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="USB_DEVICE"/>
@@ -268,7 +268,7 @@
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
 		<configuration configurationName="Debug">
-			<resource resourceType="PROJECT" workspacePath="CapacitorBankRegulator"/>
+			<resource resourceType="PROJECT" workspacePath="/CapacitorBankRegulator"/>
 		</configuration>
 		<configuration configurationName="Release"/>
 	</storageModule>
