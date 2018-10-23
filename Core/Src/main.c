@@ -114,7 +114,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 //	BSP_LCD_Init();
 	BSP_Config();
-	seedContact();
+	SeedContact();
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
@@ -214,8 +214,6 @@ void BSP_Config(void) {
 
 	BSP_PB_Init(BUTTON_KEY1, BUTTON_MODE_EXTI);
 	BSP_PB_Init(BUTTON_KEY2, BUTTON_MODE_EXTI);
-
-	KEYPAD_Init();
 }
 /* USER CODE END 4 */
 

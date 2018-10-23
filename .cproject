@@ -122,7 +122,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="DataModel/Message.c|SmallWindow/C/ContactOptionDLG.c|SmallWindow/C/ContactListManualDialDLG.c|SmallWindow/C/ContactListDLG.c|ViewContainer/InfoView.c|ViewContainer/NotificationView.c|Src/tim.c|ViewContainer/EditView.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
+						<entry excluding="DataModel/CallLog.c|DataModel/Message.c|SmallWindow/C/ContactOptionDLG.c|SmallWindow/C/ContactListManualDialDLG.c|SmallWindow/C/ContactListDLG.c|ViewContainer/InfoView.c|ViewContainer/NotificationView.c|Src/tim.c|ViewContainer/EditView.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
 						<entry excluding="STemWin/Config/GUI_X.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="USB_DEVICE"/>
@@ -245,7 +245,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="DataModel/Message.c|SmallWindow/C/ContactOptionDLG.c|SmallWindow/C/ContactListManualDialDLG.c|SmallWindow/C/ContactListDLG.c|ViewContainer/InfoView.c|ViewContainer/NotificationView.c|Src/tim.c|ViewContainer/EditView.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
+						<entry excluding="DataModel/CallLog.c|DataModel/Message.c|SmallWindow/C/ContactOptionDLG.c|SmallWindow/C/ContactListManualDialDLG.c|SmallWindow/C/ContactListDLG.c|ViewContainer/InfoView.c|ViewContainer/NotificationView.c|Src/tim.c|ViewContainer/EditView.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
 						<entry excluding="STemWin/Config/GUI_X.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="USB_DEVICE"/>

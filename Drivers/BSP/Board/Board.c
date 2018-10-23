@@ -443,8 +443,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	if (GPIO_Pin == BUTTON_PIN[3])
 		BSP_PB_EXTI_Callback(BUTTON_KEY2,
 				HAL_GPIO_ReadPin(BUTTON_PORT[3], BUTTON_PIN[3]));
-
-
 }
 
 /**

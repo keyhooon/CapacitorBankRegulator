@@ -14,12 +14,15 @@
 #define STRING_COMPARATOR(x, y) ((strcmp(x, y)))
 
 typedef struct {
-	int (*Add)(void *value);
-	int (*Remove)(void * value);
+	int (*Add)(void *);
+	int (*Remove)(void);
+	int (*GetListLen)(void);
+	void (*GetDisplay)(char *);
 	char ** (*GetDisplayArray)(void);
-	void (*FreeDisplayArray)(char ** stringArray);
-	int (*SetCurrentItem)(int index);
+	void (*FreeDisplayArray)(char **);
+	int (*SetCurrentItem)(int);
 	int (*GetCurrentItemIndex)(void);
+	void * (*GetCurrentItem)(void);
 } ListApiHandlers_typedef;
 #define DATA_ACCESS_LIST_PROTOTYPES(type) \
 	typedef struct type##_List_Struct { \
@@ -28,23 +31,31 @@ typedef struct {
 		type##_Typedef current_item; \
 	} type##_List_Typedef; \
 	type##_List_Typedef * type##List; \
-	int Add##type(type##_Typedef *value);	\
-	char ** Get##type##DisplayArray(); \
+	int Add##type(type##_Typedef *value); \
+	int Remove##type(void); \
+	int Get##type##ListLen(void); \
+	char ** Get##type##DisplayArray(void); \
+	void Get##type##Display(char *); \
 	void Free##type##DisplayArray(char ** stringArray); \
 	int SetCurrent##type##Item(int index); \
-	int GetCurrent##type##ItemIndex(); \
-	int Remove##type(type##_List_Typedef * value);
+	int GetCurrent##type##ItemIndex(void); \
+	void * GetCurrent##type##Item(void); \
 
-#define DATA_ACCESS_LIST_FUNCTIONS(type, comparator, display) \
+
+
+#define DATA_ACCESS_LIST_FUNCTIONS(type, comparator, display, displayDetail) \
 	SGLIB_DEFINE_DL_LIST_PROTOTYPES(type##_List_Typedef, comparator, prev_ptr, next_ptr) \
 	SGLIB_DEFINE_DL_LIST_FUNCTIONS(type##_List_Typedef, comparator, prev_ptr, next_ptr) \
 	ListApiHandlers_typedef type##ListApiHandlers = { \
 			Add##type, \
 			Remove##type, \
+			Get##type##ListLen, \
+			Get##type##Display, \
 			Get##type##DisplayArray, \
 			Free##type##DisplayArray, \
 			SetCurrent##type##Item, \
 			GetCurrent##type##ItemIndex, \
+			GetCurrent##type##Item,\
 	}; \
 	int Add##type(type##_Typedef *value) { \
 		type##_List_Typedef * node = pvPortMalloc(sizeof(type##_List_Typedef)); \
@@ -52,6 +63,21 @@ typedef struct {
 		memcpy(&(node->current_item), value, sizeof(type##_Typedef)); \
 		return (sglib_##type##_List_Typedef_add_if_not_member(&type##List, node, &member)); \
 	} \
+	int Remove##type() { \
+		type##_List_Typedef * item; \
+		if (sglib_##type##_List_Typedef_delete_if_member(&type##List, type##List, &item)) \
+		{ \
+			vPortFree(item); \
+			return 1; \
+		} \
+		return 0;\
+	} \
+	int Get##type##ListLen() { \
+		return sglib_##type##_List_Typedef_len(type##List);\
+	} \
+	void Get##type##Display(char * text) {\
+		displayDetail(text, type##List->current_item);\
+	}\
 	char ** Get##type##DisplayArray(){ \
 		char temp[23]; \
 		int itemCount = sglib_##type##_List_Typedef_len(type##List) ; \
@@ -71,8 +97,6 @@ typedef struct {
 		 return stringArray; \
 	} \
 	void Free##type##DisplayArray(char ** stringArray){\
-		type##_List_Typedef *val; \
-		char temp[22]; \
 		vPortFree(stringArray); \
 		while(* stringArray) { \
 			vPortFree(* stringArray); \
@@ -96,14 +120,9 @@ typedef struct {
 		 } \
 		 return i; \
 	} \
-	int Remove##type(type##_List_Typedef * value) { \
-		type##_List_Typedef * item; \
-		if (sglib_##type##_List_Typedef_delete_if_member(&type##List, value, &item)) \
-		{ \
-			vPortFree(item); \
-			return 1; \
-		} \
-		return 0;\
-	}
+	void * GetCurrent##type##Item(void){\
+		return &(type##List->current_item);\
+	}\
+
 
 #endif /* LIST_HEAP_H_ */

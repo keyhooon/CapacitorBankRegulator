@@ -12,6 +12,8 @@
 #include "main.h"
 
  void KEYPAD_Init(void);
+void KeyboardProc(void const * argument);
+
 void KEYPAD_Process(void);
 
 void KEYPAD_IO_Init(void);

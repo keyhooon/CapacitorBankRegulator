@@ -47,18 +47,20 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
+#include <GUI.h>
+#include <GuiShell.h>
 #include "FreeRTOS.h"
 #include "task.h"
 #include "cmsis_os.h"
 
 /* USER CODE BEGIN Includes */
 #include "Board.h"
-#include "GUI.h"
 #include "WM.h"
+#include "Board_keypad.h"
 /* USER CODE END Includes */
 
 /* Variables -----------------------------------------------------------------*/
-osThreadId defaultTaskHandle;
+osThreadId keyboardTaskHandle;
 osThreadId guiTaskHandle;
 osThreadId CalculateTaskHandle;
 osThreadId EventTaskHandle;
@@ -71,10 +73,8 @@ uint32_t ledTimStart[4] = { 1, 2, 3, 4 };
 /* USER CODE END Variables */
 
 /* Function prototypes -------------------------------------------------------*/
-void DefaultProc(void const * argument);
-void GuiProc(void const * argument);
+
 void CalculationProc(void const * argument);
-void EventProc(void const * argument);
 void StatusShowCallback(void const * argument);
 
 extern void ToolbarFirstButtonProc();
@@ -166,19 +166,17 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_TIMERS */
   /* start timers, add new ones, ... */
+	osTimerStart(StatusTimerHandle, 100);
   /* USER CODE END RTOS_TIMERS */
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-	osThreadDef(defaultTask, DefaultProc, osPriorityNormal, 0, 128);
-	defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+	osThreadDef(keyboardTask, KeyboardProc, osPriorityNormal, 0, 128);
+	keyboardTaskHandle = osThreadCreate(osThread(keyboardTask), NULL);
 
   /* definition and creation of guiTask */
 	osThreadDef(guiTask, GuiProc, osPriorityIdle, 0, 512);
-  guiTaskHandle = osThreadCreate(osThread(guiTask), NULL);
-
-	osThreadDef(eventTask, EventProc, osPriorityIdle, 0, 512);
-	EventTaskHandle = osThreadCreate(osThread(eventTask), NULL);
+	guiTaskHandle = osThreadCreate(osThread(guiTask), NULL);
 
   /* definition and creation of CalculateTask */
 	osThreadDef(CalculateTask, CalculationProc, osPriorityIdle, 0, 128);
@@ -194,45 +192,9 @@ void MX_FREERTOS_Init(void) {
 }
 
 /* DefaultProc function */
-void DefaultProc(void const * argument)
-{
 
-  /* USER CODE BEGIN DefaultProc */
-
-	osTimerStart(StatusTimerHandle, 100);
-  /* Infinite loop */
-  for(;;)
-  {
-		KEYPAD_Process();
-		osDelay(10);
-  }
-  /* USER CODE END DefaultProc */
-}
 
 /* GuiProc function */
-void GuiProc(void const * argument)
-{
-  /* USER CODE BEGIN GuiProc */
-
-	/* Init the STemWin GUI Library */
-	GUI_Init();
-	/* Activate the use of memory device feature */
-	WM_SetCreateFlags(WM_CF_MEMDEV);
-//	GUI_SelectLayer(0);
-//	MainWindow();
-	GUI_SelectLayer(1);
-	ShowSmallDesktopWindow();
-
-
-  /* Infinite loop */
-  for(;;)
-  {
-		GUI_Exec();
-
-		osDelay(100);
-  }
-  /* USER CODE END GuiProc */
-}
 
 /* CalculationProc function */
 void CalculationProc(void const * argument)
@@ -246,19 +208,6 @@ void CalculationProc(void const * argument)
   /* USER CODE END CalculationProc */
 }
 
-void EventProc(void const * argument) {
-	osEvent event;
-
-	for (;;) {
-		event = osSignalWait(1 << BUTTON_KEY1 | 1 << BUTTON_KEY2,
-				osWaitForever);
-		if (event.value.signals == (1 << BUTTON_KEY1)) {
-			ToolbarFirstButtonProc();
-		} else if (event.value.signals == (1 << BUTTON_KEY2)) {
-			ToolbarSecondButtonProc();
-		}
-	}
-}
 
 /* StatusShowCallback function */
 void StatusShowCallback(void const * argument)

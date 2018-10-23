@@ -14,14 +14,17 @@
 #define DISPLAY_CONTACT(display, contact) \
 		sprintf(display, "%.10s, %.10s", contact.Name, contact.LastName);
 
-DATA_ACCESS_LIST_FUNCTIONS( Contact, CONTACT_COMPARATOR, DISPLAY_CONTACT)
+#define DISPLAY_CONTACT_DETAIL(display, contact) \
+		sprintf(display, "%.11s\r\n%.10s, %.10s",contact.CallNumber, contact.Name, contact.LastName);
 
-void AddContactEx(char * Name, char * LastName, char * CallNumber) {
-	Contact_Typedef contact = { 0, Name, LastName, CallNumber,
-	};
-	AddContact(&contact);
-}
-void seedContact() {
+
+DATA_ACCESS_LIST_FUNCTIONS(Contact, CONTACT_COMPARATOR, DISPLAY_CONTACT,
+		DISPLAY_CONTACT_DETAIL)
+
+static void AddContactEx(char * Name, char * LastName, char * CallNumber);
+
+
+void SeedContact() {
 
 	AddContactEx((const char*) "keyhan", (const char*) "babazadeh",
 			(const char*) "09124575442");
@@ -37,3 +40,13 @@ void seedContact() {
 			(const char*) "09354463261");
 }
 
+static void AddContactEx(char * Name, char * LastName, char * CallNumber) {
+	Contact_Typedef contact = { 0, Name, LastName, CallNumber, };
+	contact.Name = pvPortMalloc(strlen(Name));
+	strcpy(contact.Name, Name);
+	contact.LastName = pvPortMalloc(strlen(LastName));
+	strcpy(contact.LastName, LastName);
+	contact.CallNumber = pvPortMalloc(strlen(CallNumber));
+	strcpy(contact.CallNumber, CallNumber);
+	AddContact(&contact);
+}

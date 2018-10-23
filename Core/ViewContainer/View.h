@@ -12,13 +12,15 @@
 #include "wm.h"
 #include "dialog.h"
 
-#define DESKTOP_VIEW_ID			0x0
-#define MENU_VIEW_ID			0x1
-#define CONTACT_LIST_VIEW_ID	0x2
-#define CONTACT_OPTION_VIEW_ID	0x21
+#define DESKTOP_VIEW_ID			0x000
+#define LIST_VIEW_ID			0x010
+#define OPTION_VIEW_ID			0x020
+#define MENU_VIEW_ID			0x100
 #define CONTACT_CALL_VIEW_ID	0x211
 #define CONTACT_SHOW_VIEW_ID	0x212
-#define CONTACT_EDIT_VIEW_ID	0x213
+#define EDIT_VIEW_ID			0x030
+#define INFO_VIEW_ID			0x040
+
 
 
 

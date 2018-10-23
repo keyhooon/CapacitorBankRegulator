@@ -32,14 +32,14 @@ extern GUI_CONST_STORAGE GUI_BITMAP bmScan;
 extern GUI_CONST_STORAGE GUI_BITMAP bmSetting;
 extern GUI_CONST_STORAGE GUI_BITMAP bmZone;
 
-extern View_Typedef ContactListView;
-
 uint8_t SelectedItem = 0;
 
 static GUI_HWIN show(void);
 static uint8_t hide(GUI_HWIN hWin);
 static void okCallback(void);
 static void backCallback(void);
+
+extern void InitContactView(void);
 
 View_Typedef MenuView = { MENU_VIEW_ID, (const char*) "Main Menu",
 		(const char*) "Menu", (void*) 0,
@@ -150,7 +150,7 @@ static uint8_t hide(GUI_HWIN hWin) {
 static void okCallback(void) {
 	switch (SelectedItem) {
 	case 0:
-		ViewNavigator_GoToViewOf(&DefaultViewNavigator, &ContactListView);
+		InitContactView();
 	break;
 	default:
 		break;

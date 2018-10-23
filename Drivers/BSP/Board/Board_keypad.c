@@ -76,44 +76,49 @@ void KEYPAD_EXTI_Callback(uint16_t GPIO_Pin) {
 	if (KeyPressed == 1)
 	osSemaphoreRelease(keypadSemaphoreID);
 }
-void KEYPAD_Process(void) {
-	if (KeyPressed) {
-		if ((holdKey == 0)) {
-			if (CurrentKeypadBtnPressed->KeypadBtnType == Char) {
-				if (lastTimeKeyReleased + DoubleClickTime > HAL_GetTick()
-						&& lastKeypadBtnReleased == CurrentKeypadBtnPressed) {
-					GUI_StoreKeyMsg(GUI_KEY_BACKSPACE, 1);
+
+void KeyboardProc(void const * argument) {
+	KEYPAD_Init();
+	for (;;) {
+		if (KeyPressed) {
+			if ((holdKey == 0)) {
+				if (CurrentKeypadBtnPressed->KeypadBtnType == Char) {
+					if (lastTimeKeyReleased + DoubleClickTime > HAL_GetTick()
+							&& lastKeypadBtnReleased
+									== CurrentKeypadBtnPressed) {
+						GUI_SendKeyMsg(GUI_KEY_BACKSPACE, 1);
+						if (CurrentKeypadBtnPressed->Val.chars[++CountKeyPressed]
+								== '\0')
+							CountKeyPressed = 0;
+					} else
+						CountKeyPressed = 0;
+				}
+				GUI_SendKeyMsg(
+						(int) CurrentKeypadBtnPressed->Val.chars[CountKeyPressed],
+						1);
+				lastTimeKeyPressed = HAL_GetTick();
+				holdKey = 1;
+			} else if (lastTimeKeyPressed + HoldKeyTime < HAL_GetTick()) {
+				if (CurrentKeypadBtnPressed->KeypadBtnType == Char) {
+					GUI_SendKeyMsg(GUI_KEY_BACKSPACE, 1);
 					if (CurrentKeypadBtnPressed->Val.chars[++CountKeyPressed]
 							== '\0')
 						CountKeyPressed = 0;
-				} else
-					CountKeyPressed = 0;
+				}
+				GUI_SendKeyMsg(
+						(int) CurrentKeypadBtnPressed->Val.chars[CountKeyPressed],
+						1);
+				lastTimeKeyPressed = HAL_GetTick()
+						- (HoldKeyTime - HoldKeyLatencyTime);
 			}
-			GUI_SendKeyMsg(
-					(int) CurrentKeypadBtnPressed->Val.chars[CountKeyPressed],
-					1);
-			lastTimeKeyPressed = HAL_GetTick();
-			holdKey = 1;
-		} else if (lastTimeKeyPressed + HoldKeyTime < HAL_GetTick()) {
-			if (CurrentKeypadBtnPressed->KeypadBtnType == Char) {
-				GUI_StoreKeyMsg(GUI_KEY_BACKSPACE, 1);
-				if (CurrentKeypadBtnPressed->Val.chars[++CountKeyPressed]
-						== '\0')
-					CountKeyPressed = 0;
-			}
-			GUI_SendKeyMsg(
-					(int) CurrentKeypadBtnPressed->Val.chars[CountKeyPressed],
-					1);
-			lastTimeKeyPressed = HAL_GetTick()
-					- (HoldKeyTime - HoldKeyLatencyTime);
+			osDelay(KeyPadProccessTime);
+		} else {
+			holdKey = 0;
+			GUI_SendKeyMsg((int) CurrentKeypadBtnPressed->Val.chars[0], 0);
+			lastKeypadBtnReleased = CurrentKeypadBtnPressed;
+			lastTimeKeyReleased = HAL_GetTick();
+			osSemaphoreWait(keypadSemaphoreID, osWaitForever);
 		}
-		osDelay(KeyPadProccessTime);
-	} else {
-		holdKey = 0;
-		GUI_SendKeyMsg((int) CurrentKeypadBtnPressed->Val.chars[0], 0);
-		lastKeypadBtnReleased = CurrentKeypadBtnPressed;
-		lastTimeKeyReleased = HAL_GetTick();
-		osSemaphoreWait(keypadSemaphoreID, osWaitForever);
 	}
 }
 void KEYPAD_Init(void) {
