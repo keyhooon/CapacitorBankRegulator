@@ -29,7 +29,7 @@ extern osThreadId guiTaskHandle;
 extern GUI_CONST_STORAGE GUI_BITMAP bmClock_16x16_black;
 extern GUI_CONST_STORAGE GUI_BITMAP _bmBatteryEmpty_27x14;
 extern GUI_CONST_STORAGE GUI_BITMAP * _apbmCharge[];
-View_Typedef DesktopView;
+extern View_Typedef DesktopView;
 
 WM_HWIN hWinHeading;  // Heading window
 WM_HWIN hWin;     // Menu window moveable within viewport window
@@ -45,10 +45,11 @@ static void _cbToolbar(WM_MESSAGE * pMsg);
 
 
 void GuiProc(void const * argument) {
+	SeedContact();
 	/* Init the STemWin GUI Library */
 	GUI_Init();
 	/* Activate the use of memory device feature */
-	WM_SetCreateFlags(WM_CF_MEMDEV);
+	WM_SetCreateFlags(WM_CF_MEMDEV | WM_CF_MEMDEV_ON_REDRAW | WM_CF_SHOW);
 //	GUI_SelectLayer(0);
 //	MainWindow();
 	GUI_SelectLayer(1);

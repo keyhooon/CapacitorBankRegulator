@@ -97,8 +97,7 @@ static int _OwnerDraw(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo) {
 
 		GUI_COLOR aColor[4] = { GUI_BLACK, GUI_WHITE, GUI_WHITE, GUI_GRAY };
 		GUI_COLOR aBkColor[4] = { GUI_WHITE, GUI_GRAY, GUI_BLUE, 0xC0C0C0 };
-		IsDisabled = LISTBOX_GetItemDisabled(pDrawItemInfo->hWin,
-				pDrawItemInfo->ItemIndex);
+		IsDisabled = LISTBOX_GetItemDisabled(hWin, Index);
 		IsSelected = LISTBOX_GetItemSel(hWin, Index);
 		MultiSel = LISTBOX_GetMulti(hWin);
 		Sel = LISTBOX_GetSel(hWin);
@@ -123,6 +122,11 @@ static int _OwnerDraw(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo) {
 				}
 			}
 		}
+		FontDistY = GUI_GetFontDistY();
+		GUI_RECT IconRect = { pDrawItemInfo->x0 + 7, pDrawItemInfo->y0,
+				pDrawItemInfo->x1, pDrawItemInfo->y0 + FontDistY * 2 };
+		GUI_RECT TextRect = { pDrawItemInfo->x0, pDrawItemInfo->y0,
+				pDrawItemInfo->x1, pDrawItemInfo->y1 };
 		//
 		// Draw item
 		//
@@ -132,10 +136,10 @@ static int _OwnerDraw(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo) {
 				acBuffer, sizeof(acBuffer));
 		GUI_Clear();
 		if ((ColorIndex == 1) || (ColorIndex == 2)) {
-			pOldFont = GUI_SetFont(&GUI_Font13HB_1);
+			pOldFont = GUI_SetFont(&GUI_Font8x10_ASCII);
 		}
 		FontDistY = GUI_GetFontDistY();
-		GUI_DispStringAt(acBuffer,
+		GUI_DispStringInRect(acBuffer,
 				pDrawItemInfo->x0 + bmItemIndexImage.XSize + 16,
 				pDrawItemInfo->y0 + (YSize - FontDistY) / 2);
 		if (pOldFont) {

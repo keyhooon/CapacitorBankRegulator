@@ -114,7 +114,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 //	BSP_LCD_Init();
 	BSP_Config();
-	SeedContact();
+
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */

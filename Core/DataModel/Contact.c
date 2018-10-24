@@ -12,7 +12,7 @@
 #define CONTACT_COMPARATOR(x, y) STRING_COMPARATOR(x->current_item.Name, y->current_item.Name)
 
 #define DISPLAY_CONTACT(display, contact) \
-		sprintf(display, "%.10s, %.10s", contact.Name, contact.LastName);
+		sprintf(display, "%.10s\r\n %.10s", contact.Name, contact.LastName);
 
 #define DISPLAY_CONTACT_DETAIL(display, contact) \
 		sprintf(display, "%.11s\r\n%.10s, %.10s",contact.CallNumber, contact.Name, contact.LastName);
@@ -35,7 +35,7 @@ void SeedContact() {
 	AddContactEx((const char*) "mohammad", (const char*) "babazadeh",
 			(const char*) "09121015197");
 	AddContactEx((const char*) "kaveh", (const char*) "babazadeh",
-			(const char*) "09101143144");
+			(const char*) "-");
 	AddContactEx((const char*) "shima", (const char*) "shademan",
 			(const char*) "09354463261");
 }

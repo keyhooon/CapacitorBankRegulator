@@ -92,7 +92,8 @@ void KeyboardProc(void const * argument) {
 							CountKeyPressed = 0;
 					} else
 						CountKeyPressed = 0;
-				}
+				} else
+					CountKeyPressed = 0;
 				GUI_SendKeyMsg(
 						(int) CurrentKeypadBtnPressed->Val.chars[CountKeyPressed],
 						1);

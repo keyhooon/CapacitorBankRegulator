@@ -175,7 +175,7 @@ void MX_FREERTOS_Init(void) {
 	keyboardTaskHandle = osThreadCreate(osThread(keyboardTask), NULL);
 
   /* definition and creation of guiTask */
-	osThreadDef(guiTask, GuiProc, osPriorityIdle, 0, 512);
+	osThreadDef(guiTask, GuiProc, osPriorityIdle, 0, 1024);
 	guiTaskHandle = osThreadCreate(osThread(guiTask), NULL);
 
   /* definition and creation of CalculateTask */

@@ -121,6 +121,9 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="fr.ac6.managedbuild.config.gnu.cross.exe.debug.1989591506.1058346405" name="startup_stm32f103xe.s" rcbsApplicability="disable" resourcePath="startup/startup_stm32f103xe.s" toolsToInvoke="fr.ac6.managedbuild.tool.gnu.cross.assembler.670451568.620450714">
+						<tool id="fr.ac6.managedbuild.tool.gnu.cross.assembler.670451568.620450714" name="MCU GCC Assembler" superClass="fr.ac6.managedbuild.tool.gnu.cross.assembler.670451568"/>
+					</fileInfo>
 					<sourceEntries>
 						<entry excluding="DataModel/CallLog.c|DataModel/Message.c|SmallWindow/C/ContactOptionDLG.c|SmallWindow/C/ContactListManualDialDLG.c|SmallWindow/C/ContactListDLG.c|ViewContainer/InfoView.c|ViewContainer/NotificationView.c|Src/tim.c|ViewContainer/EditView.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
