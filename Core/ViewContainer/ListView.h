@@ -10,16 +10,12 @@
 
 #include"List_Heap.h"
 
-void backCallback(void);
-void ListOkCallback(void);
-void EditViewOkCallback(void);
-void OptionOkCallback(void);
 
 typedef struct {
-	uint32_t count;
-	char ** display;
-	void (**function)(void);
-} CustomFunctionList_Typedef;
+	GUI_BITMAP * Icon;
+	char * display;
+	void (*function)(void);
+} CustomFunction_Typedef;
 
 typedef struct {
 	uint32_t canAdd;
@@ -27,13 +23,13 @@ typedef struct {
 	uint32_t canRemove;
 } ListViewOption_typedef;
 
-
-
+extern CustomFunction_Typedef EditFunction;
+extern CustomFunction_Typedef DeleteFunction;
+extern CustomFunction_Typedef ViewInfoFunction;
 
 
 void ListViewInit(ListApiHandlers_typedef * apiHandlers,
-		ListViewOption_typedef option,
-		CustomFunctionList_Typedef customFunction, uint32_t sizeOfType,
+		CustomFunction_Typedef **customFunction, uint32_t sizeOfType,
 		void (*editProgress)(void));
 
 void ListViewDeInit(void);

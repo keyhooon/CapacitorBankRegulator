@@ -164,21 +164,21 @@ void MX_FREERTOS_Init(void) {
 	StatusTimerHandle = osTimerCreate(osTimer(StatusTimer), osTimerPeriodic,
 			NULL);
 
-  /* USER CODE BEGIN RTOS_TIMERS */
-  /* start timers, add new ones, ... */
+	/* USER CODE BEGIN RTOS_TIMERS */
+	/* start timers, add new ones, ... */
 	osTimerStart(StatusTimerHandle, 100);
-  /* USER CODE END RTOS_TIMERS */
+	/* USER CODE END RTOS_TIMERS */
 
-  /* Create the thread(s) */
-  /* definition and creation of defaultTask */
-	osThreadDef(keyboardTask, KeyboardProc, osPriorityNormal, 0, 128);
-	keyboardTaskHandle = osThreadCreate(osThread(keyboardTask), NULL);
-
-  /* definition and creation of guiTask */
-	osThreadDef(guiTask, GuiProc, osPriorityIdle, 0, 1024);
+	/* Create the thread(s) */
+	/* definition and creation of guiTask */
+	osThreadDef(guiTask, GuiProc, osPriorityNormal, 0, 1500);
 	guiTaskHandle = osThreadCreate(osThread(guiTask), NULL);
 
-  /* definition and creation of CalculateTask */
+	/* definition and creation of defaultTask */
+	osThreadDef(keyboardTask, KeyboardProc, osPriorityNormal, 0, 256);
+	keyboardTaskHandle = osThreadCreate(osThread(keyboardTask), NULL);
+
+	/* definition and creation of CalculateTask */
 	osThreadDef(CalculateTask, CalculationProc, osPriorityIdle, 0, 128);
 	CalculateTaskHandle = osThreadCreate(osThread(CalculateTask), NULL);
 

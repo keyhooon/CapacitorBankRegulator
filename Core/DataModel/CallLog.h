@@ -5,15 +5,14 @@
  *      Author: HP
  */
 
-#include "time.h"
+
 #ifndef DATAMODEL_CALLLOG_H_
 #define DATAMODEL_CALLLOG_H_
 
 #include "main.h"
 #include "List_Heap.h"
 #include "string.h"
-
-#define CALL_LOG_COMPARATOR(x, y) (x->current_item.Time- y->current_item.Time)
+#include "time.h"
 
 typedef struct {
 	int32_t Id;
@@ -25,4 +24,6 @@ typedef struct {
 } CallLog_Typedef;
 
 DATA_ACCESS_LIST_PROTOTYPES(CallLog)
+
+void seedCallLog();
 #endif /* DATAMODEL_CALLLOG_H_ */

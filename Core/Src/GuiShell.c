@@ -46,6 +46,7 @@ static void _cbToolbar(WM_MESSAGE * pMsg);
 
 void GuiProc(void const * argument) {
 	SeedContact();
+	SeedMessage();
 	/* Init the STemWin GUI Library */
 	GUI_Init();
 	/* Activate the use of memory device feature */

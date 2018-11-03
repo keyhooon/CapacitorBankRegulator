@@ -27,8 +27,7 @@
 
 typedef struct {
 	ListApiHandlers_typedef * ApiHandlers;
-	ListViewOption_typedef Option;
-	CustomFunctionList_Typedef CustomFunctionList;
+	CustomFunction_Typedef ** CustomFunctionList;
 	GUI_HWIN CurrentWidget;
 	int SizeOfType;
 	void (*EditProgress)(void * arg, GUI_HWIN currentWidget);
@@ -39,14 +38,30 @@ ListView_Typedef * DefaultListView;
 extern GUI_CONST_STORAGE GUI_BITMAP bmItemIndexImage;
 
 
+void backCallback(void);
+
+
+void EditFunctionCallback();
+void ViewInfoFunctionCallBcak();
+void DeleteFunctionCallback();
+CustomFunction_Typedef EditFunction = { NULL, "Edit", EditFunctionCallback };
+CustomFunction_Typedef ViewInfoFunction = { NULL, "View",
+		ViewInfoFunctionCallBcak };
+CustomFunction_Typedef DeleteFunction =
+		{ NULL, "Delete", DeleteFunctionCallback };
+
 static GUI_HWIN ListViewShow(void);
 static uint8_t ListViewHide(GUI_HWIN hWin);
+void ListBackCallback(void);
+void ListOkCallback(void);
 
 static GUI_HWIN OptionListViewShow(void);
 static uint8_t OptionListViewHide(GUI_HWIN hWin);
+void OptionOkCallback(void);
 
 static GUI_HWIN EditViewShow();
 static uint8_t EditViewHide(GUI_HWIN hWin);
+void EditViewOkCallback(void);
 
 static GUI_HWIN InfoViewShow();
 static uint8_t InfoViewHide(GUI_HWIN hWin);
@@ -57,7 +72,7 @@ const char* CommandDisplay[3] = { (const char*) "View", (const char*) "Edit",
 
 const View_Typedef ListView = {
 LIST_VIEW_ID, "List", "List", (void *) NULL, ListViewShow, ListViewHide,
-		(const char*) "Back", (const char*) "Select", backCallback,
+		(const char*) "Back", (const char*) "Select", ListBackCallback,
 		ListOkCallback, NULL, 0 };
 
 const View_Typedef ListOptionView = {
@@ -72,7 +87,7 @@ EDIT_VIEW_ID, "Edit", "Edit", (void *) NULL, EditViewShow, EditViewHide,
 
 const View_Typedef ListInfoView = {
 INFO_VIEW_ID, "View", "View", (void *) NULL, InfoViewShow, InfoViewHide,
-NULL, (const char*) "Cancel", NULL, backCallback, NULL, 0 };
+NULL, (const char*) "Back", NULL, backCallback, NULL, 0 };
 
 
 char** DisplayArray;
@@ -84,6 +99,10 @@ static int _OwnerDraw(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo) {
 	hWin = pDrawItemInfo->hWin;
 	Index = pDrawItemInfo->ItemIndex;
 	switch (pDrawItemInfo->Cmd) {
+	case WIDGET_ITEM_GET_YSIZE: {
+		//GUI_GetFontDistYLISTBOX_GetFont(hWin);
+		return GUI_GetFontDistY() * 2;
+	}
 	case WIDGET_ITEM_DRAW: {
 		int MultiSel;
 		int Sel;
@@ -123,10 +142,13 @@ static int _OwnerDraw(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo) {
 			}
 		}
 		FontDistY = GUI_GetFontDistY();
-		GUI_RECT IconRect = { pDrawItemInfo->x0 + 7, pDrawItemInfo->y0,
+
+		GUI_RECT IconRect = { pDrawItemInfo->x0 + 3, pDrawItemInfo->y0
+				+ FontDistY - bmItemIndexImage.YSize / 2, pDrawItemInfo->x0 + 7
+				+ bmItemIndexImage.XSize, pDrawItemInfo->y0 + FontDistY
+				+ bmItemIndexImage.YSize / 2 };
+		GUI_RECT TextRect = { IconRect.x1 + 3, pDrawItemInfo->y0,
 				pDrawItemInfo->x1, pDrawItemInfo->y0 + FontDistY * 2 };
-		GUI_RECT TextRect = { pDrawItemInfo->x0, pDrawItemInfo->y0,
-				pDrawItemInfo->x1, pDrawItemInfo->y1 };
 		//
 		// Draw item
 		//
@@ -138,10 +160,7 @@ static int _OwnerDraw(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo) {
 		if ((ColorIndex == 1) || (ColorIndex == 2)) {
 			pOldFont = GUI_SetFont(&GUI_Font8x10_ASCII);
 		}
-		FontDistY = GUI_GetFontDistY();
-		GUI_DispStringInRect(acBuffer,
-				pDrawItemInfo->x0 + bmItemIndexImage.XSize + 16,
-				pDrawItemInfo->y0 + (YSize - FontDistY) / 2);
+		GUI_DispStringInRect(acBuffer, &TextRect, GUI_TA_LEFT | GUI_TA_VCENTER);
 		if (pOldFont) {
 			GUI_SetFont(pOldFont);
 		}
@@ -149,24 +168,16 @@ static int _OwnerDraw(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo) {
 		//
 		// Draw bitmap
 		//
-		GUI_DrawBitmap(&bmItemIndexImage, pDrawItemInfo->x0 + 7,
-				pDrawItemInfo->y0 + (YSize - bmItemIndexImage.YSize) / 2);
+		GUI_DrawBitmap(&bmItemIndexImage, IconRect.x0 + 1, IconRect.y0 + 1);
 		//
 		// Draw index
 		//
 		GUI_SetTextMode(GUI_TEXTMODE_TRANS);
-		int CharDistX = GUI_GetCharDistX('0');
-		if (Index <= 9)
-			GUI_GotoXY(
-					pDrawItemInfo->x0 + 7
-							+ (bmItemIndexImage.XSize - CharDistX) / 2,
-					pDrawItemInfo->y0 + (YSize - FontDistY) / 2);
-		else
-			GUI_GotoXY(
-					pDrawItemInfo->x0 + 7
-							+ (bmItemIndexImage.XSize / 2 - CharDistX),
-					pDrawItemInfo->y0 + (YSize - FontDistY) / 2);
-		GUI_DispDecMin(Index);
+		char indexString[4];
+		itoa(Index, indexString, 10);
+		int indexStringDistX = GUI_GetStringDistX(indexString);
+		GUI_DispStringInRect(indexString, &IconRect,
+				GUI_TA_HCENTER | GUI_TA_VCENTER);
 		//
 		// Draw focus rectangle
 		//
@@ -198,20 +209,22 @@ void SetListBoxSkin(LISTBOX_Handle list) {
 }
 
 void ListViewInit(ListApiHandlers_typedef * apiHandlers,
-		ListViewOption_typedef option,
-		CustomFunctionList_Typedef customFunction, uint32_t sizeOfType,
+		CustomFunction_Typedef ** customFunction,
+		uint32_t sizeOfType,
 		void (*editProgress)(void)) {
+	if (DefaultListView != NULL)
+		ListViewDeInit();
 	DefaultListView = pvPortMalloc(sizeof(ListView_Typedef));
 	DefaultListView->ApiHandlers = apiHandlers;
-	memcpy(&(DefaultListView->Option), &option, sizeof(ListViewOption_typedef));
-	memcpy(&(DefaultListView->CustomFunctionList), &customFunction,
-			sizeof(CustomFunctionList_Typedef));
+	DefaultListView->CustomFunctionList = customFunction;
 	DefaultListView->SizeOfType = sizeOfType;
 	DefaultListView->EditProgress = editProgress;
 }
 
 void ListViewDeInit(void) {
-	vPortFree(DefaultListView);
+	if (DefaultListView != NULL)
+		vPortFree(DefaultListView);
+	DefaultListView = 0;
 }
 
 
@@ -227,12 +240,6 @@ static GUI_HWIN EditViewShow(void) {
 			DefaultListView->SizeOfType);
 	WM_HWIN hwin = WINDOW_CreateEx(0, 0, 128, 115, NULL, WM_CF_SHOW, 0x0,
 	GUI_ID_USER, NULL);
-	TEXT_CreateAsChild(5, 20, 118, 40, hwin, GUI_ID_TEXT0, WM_CF_SHOW, "",
-			TEXT_CF_TOP | TEXT_CF_HCENTER);
-	GUI_HWIN editHwin = EDIT_CreateAsChild(5, 65, 118, 40, hwin, GUI_ID_EDIT0,
-			WM_CF_SHOW, 15);
-	WM_SetFocus(editHwin);
-	EDIT_SetTextMode(editHwin);
 	DefaultListView->CurrentWidget = hwin;
 	DefaultListView->EditProgress(DefaultListView->EditArg,
 			DefaultListView->CurrentWidget);
@@ -244,12 +251,10 @@ static uint8_t EditViewHide(GUI_HWIN hWin) {
 }
 static GUI_HWIN ListViewShow(void) {
 	WM_HWIN hwin = WINDOW_CreateEx(0, 0, 128, 115, NULL, WM_CF_SHOW, 0x0,
-	GUI_ID_USER,
-	NULL);
+			GUI_ID_USER, NULL);
 	DisplayArray = DefaultListView->ApiHandlers->GetDisplayArray();
 	LISTBOX_Handle listbox_hwin = LISTBOX_CreateEx(0, 0, 128, 115, hwin,
-	WM_CF_SHOW, 0,
-	GUI_ID_LISTBOX0, DisplayArray);
+			WM_CF_SHOW, 0, GUI_ID_LISTBOX0, DisplayArray);
 	SetListBoxSkin(listbox_hwin);
 	DefaultListView->CurrentWidget = listbox_hwin;
 	LISTBOX_AddString(listbox_hwin, "Add New ...");
@@ -261,57 +266,6 @@ static uint8_t ListViewHide(GUI_HWIN hWin) {
 	DefaultListView->ApiHandlers->FreeDisplayArray(DisplayArray);
 	return 1;
 }
-
-
-static GUI_HWIN OptionListViewShow(void) {
-	WM_HWIN hwin = WINDOW_CreateEx(0, 0, 128, 115, NULL, WM_CF_SHOW, 0x0,
-	GUI_ID_USER,
-	NULL);
-	uint32_t itemCount = DefaultListView->CustomFunctionList.count;
-	itemCount += (DefaultListView->Option.canRemove == 1)
-			+ (DefaultListView->Option.canEdit == 1) + 1;
-	DisplayArray = pvPortMalloc((itemCount + 1) * sizeof(char*));
-	int i = DefaultListView->CustomFunctionList.count;
-	memcpy(DisplayArray, DefaultListView->CustomFunctionList.display,
-			DefaultListView->CustomFunctionList.count * sizeof(void*));
-	*(DisplayArray + i++) = CommandDisplay[0];
-	if (DefaultListView->Option.canEdit)
-		*(DisplayArray + i++) = CommandDisplay[1];
-	if (DefaultListView->Option.canRemove)
-		*(DisplayArray + i++) = CommandDisplay[2];
-	*(DisplayArray + i) = NULL;
-	LISTBOX_Handle listbox_hwin = LISTBOX_CreateEx(0, 0, 128, 115, hwin,
-	WM_CF_SHOW, 0,
-	GUI_ID_LISTBOX1, DisplayArray);
-	DefaultListView->CurrentWidget = listbox_hwin;
-
-	SetListBoxSkin(listbox_hwin);
-	return hwin;
-}
-
-static uint8_t OptionListViewHide(GUI_HWIN hWin) {
-	vPortFree(DisplayArray);
-	return 1;
-}
-
-static GUI_HWIN InfoViewShow() {
-	WM_HWIN hwin = WINDOW_CreateEx(0, 0, 128, 115, NULL, WM_CF_SHOW, 0x0,
-	GUI_ID_USER,
-	NULL);
-	char temp[33];
-	DefaultListView->ApiHandlers->GetDisplay(temp);
-	TEXT_Handle text_hwin = TEXT_CreateEx(0, 0, 128, 115, hwin,
-	WM_CF_SHOW, 0,
-	GUI_ID_LISTBOX0, temp);
-	DefaultListView->CurrentWidget = text_hwin;
-	return hwin;
-}
-
-static uint8_t InfoViewHide(GUI_HWIN hWin) {
-
-}
-
-
 void ListOkCallback(void) {
 	uint32_t selItem = LISTBOX_GetSel(DefaultListView->CurrentWidget);
 	if (selItem < DefaultListView->ApiHandlers->GetListLen()) {
@@ -324,6 +278,53 @@ void ListOkCallback(void) {
 	}
 }
 
+void ListBackCallback(void) {
+	ViewNavigator_GoBackView(&DefaultViewNavigator);
+	ListViewDeInit();
+}
+
+
+static GUI_HWIN OptionListViewShow(void) {
+	WM_HWIN hwin = WINDOW_CreateEx(0, 0, 128, 115, NULL, WM_CF_SHOW, 0x0,
+			GUI_ID_USER, NULL);
+	CustomFunction_Typedef ** t = DefaultListView->CustomFunctionList;
+	uint32_t i = 0;
+	char *MenuDisplayText[10];
+
+	while (*t != NULL)
+		MenuDisplayText[i++] = (*t++)->display;
+	MenuDisplayText[i] = 0;
+	LISTBOX_Handle listbox_hwin = LISTBOX_CreateEx(0, 0, 128, 115, hwin,
+			WM_CF_SHOW, 0, GUI_ID_LISTBOX1, MenuDisplayText);
+	DefaultListView->CurrentWidget = listbox_hwin;
+	SetListBoxSkin(listbox_hwin);
+	return hwin;
+}
+
+static uint8_t OptionListViewHide(GUI_HWIN hWin) {
+	return 1;
+}
+
+static GUI_HWIN InfoViewShow() {
+	WM_HWIN hwin = WINDOW_CreateEx(0, 0, 128, 115, NULL, WM_CF_SHOW, 0x0,
+			GUI_ID_USER, NULL);
+	char temp[33];
+	DefaultListView->ApiHandlers->GetDisplay(temp);
+	TEXT_Handle text_hwin = TEXT_CreateEx(5, 5, 118, 115, hwin, WM_CF_SHOW, 0,
+			GUI_ID_LISTBOX0, temp);
+	TEXT_SetFont(text_hwin, &GUI_Font8x10_ASCII);
+	TEXT_SetWrapMode(text_hwin, GUI_WRAPMODE_WORD);
+	DefaultListView->CurrentWidget = text_hwin;
+	return hwin;
+}
+
+static uint8_t InfoViewHide(GUI_HWIN hWin) {
+	return 1;
+}
+
+
+
+
 void EditViewOkCallback(void) {
 	DefaultListView->EditProgress(DefaultListView->EditArg,
 			DefaultListView->CurrentWidget);
@@ -331,33 +332,20 @@ void EditViewOkCallback(void) {
 
 void OptionOkCallback(void) {
 	uint32_t sel = LISTBOX_GetSel(DefaultListView->CurrentWidget);
-	if (sel < DefaultListView->CustomFunctionList.count)
-		(*(DefaultListView->CustomFunctionList.function + sel))();
-	else {
-		char selectedItemText[7];
-		LISTBOX_GetItemText(DefaultListView->CurrentWidget,
-				LISTBOX_GetSel(DefaultListView->CurrentWidget),
-				selectedItemText, 7);
-		if (strcmp(selectedItemText, CommandDisplay[0]) == 0) {
-			ViewNavigator_GoToViewOf(&DefaultViewNavigator, &ListInfoView);
-		} else if (strcmp(selectedItemText, CommandDisplay[1]) == 0) {
-			ViewNavigator_GoToViewOf(&DefaultViewNavigator, &ListEditView);
-		}
-		else if (strcmp(selectedItemText, CommandDisplay[2]) == 0) {
-			DefaultListView->ApiHandlers->Remove();
-			ViewNavigator_GoBackView(&DefaultViewNavigator);
-		}
-	}
+	(*(DefaultListView->CustomFunctionList + sel))->function();
+}
+void EditFunctionCallback() {
+	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &ListEditView);
 }
 
+void ViewInfoFunctionCallBcak() {
+	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &ListInfoView);
+}
 
-
-
-
-
-
-
-
+void DeleteFunctionCallback() {
+	DefaultListView->ApiHandlers->Remove();
+	ViewNavigator_GoBackView(&DefaultViewNavigator);
+}
 
 void backCallback(void) {
 	ViewNavigator_GoBackView(&DefaultViewNavigator);

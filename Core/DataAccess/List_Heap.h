@@ -79,7 +79,7 @@ typedef struct {
 		displayDetail(text, type##List->current_item);\
 	}\
 	char ** Get##type##DisplayArray(){ \
-		char temp[23]; \
+		char temp[100]; \
 		int itemCount = sglib_##type##_List_Typedef_len(type##List) ; \
 		char** stringArray = pvPortMalloc((itemCount + 1) *  sizeof(char *) ); \
 		char * stringItem;\

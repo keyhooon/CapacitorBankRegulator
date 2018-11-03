@@ -22,7 +22,7 @@ void KEYPAD_BUTTON_CHAR_INIT(uint32_t i, uint32_t j, const char * ch);
 
 osSemaphoreId keypadSemaphoreID;
 
-KeypadBtn_typedef KP_Btn[4][6];
+KeypadBtn_typedef KP_Btn[4][4];
 int KeyPressed = 0;
 KeypadBtn_typedef *lastKeypadBtnReleased;
 KeypadBtn_typedef *CurrentKeypadBtnPressed;
@@ -79,6 +79,7 @@ void KEYPAD_EXTI_Callback(uint16_t GPIO_Pin) {
 
 void KeyboardProc(void const * argument) {
 	KEYPAD_Init();
+
 	for (;;) {
 		if (KeyPressed) {
 			if ((holdKey == 0)) {
@@ -114,11 +115,14 @@ void KeyboardProc(void const * argument) {
 			}
 			osDelay(KeyPadProccessTime);
 		} else {
-			holdKey = 0;
-			GUI_SendKeyMsg((int) CurrentKeypadBtnPressed->Val.chars[0], 0);
-			lastKeypadBtnReleased = CurrentKeypadBtnPressed;
-			lastTimeKeyReleased = HAL_GetTick();
-			osSemaphoreWait(keypadSemaphoreID, osWaitForever);
+			if (holdKey == 1) {
+				holdKey = 0;
+				GUI_SendKeyMsg((int) CurrentKeypadBtnPressed->Val.chars[0], 0);
+				lastKeypadBtnReleased = CurrentKeypadBtnPressed;
+				lastTimeKeyReleased = HAL_GetTick();
+			}
+			osSemaphoreWait(keypadSemaphoreID, KeyPadProccessTime);
+
 		}
 	}
 }

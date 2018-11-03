@@ -51,7 +51,7 @@ static void MenuCallback(void);
 
 
 extern View_Typedef MenuView;
-View_Typedef DesktopView = { DESKTOP_VIEW_ID, (const char*) "Desktop",
+const View_Typedef DesktopView = { DESKTOP_VIEW_ID, (const char*) "Desktop",
 		(const char*) "Desk", (void*) 0, show, hide, NULL, (const char*) "Menu",
 		NULL, MenuCallback, NULL, NULL };
 

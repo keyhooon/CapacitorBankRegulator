@@ -40,8 +40,9 @@ static void okCallback(void);
 static void backCallback(void);
 
 extern void InitContactView(void);
+extern void InitMessageView(void);
 
-View_Typedef MenuView = { MENU_VIEW_ID, (const char*) "Main Menu",
+const View_Typedef MenuView = { MENU_VIEW_ID, (const char*) "Main Menu",
 		(const char*) "Menu", (void*) 0,
 	show,
 		hide, (const char*) "Back",
@@ -145,12 +146,16 @@ static GUI_HWIN show(void) {
 			_cbDialog, NULL, 0, 2);
 }
 static uint8_t hide(GUI_HWIN hWin) {
-
+	return 1;
 }
 static void okCallback(void) {
 	switch (SelectedItem) {
 	case 0:
 		InitContactView();
+		break;
+	case 1:
+		InitMessageView();
+		break;
 	break;
 	default:
 		break;

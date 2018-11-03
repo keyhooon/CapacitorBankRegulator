@@ -41,12 +41,10 @@ void SeedContact() {
 }
 
 static void AddContactEx(char * Name, char * LastName, char * CallNumber) {
-	Contact_Typedef contact = { 0, Name, LastName, CallNumber, };
-	contact.Name = pvPortMalloc(strlen(Name));
+	Contact_Typedef contact = { 0, pvPortMalloc(strlen(Name)), pvPortMalloc(
+			strlen(LastName)), pvPortMalloc(strlen(CallNumber)), };
 	strcpy(contact.Name, Name);
-	contact.LastName = pvPortMalloc(strlen(LastName));
 	strcpy(contact.LastName, LastName);
-	contact.CallNumber = pvPortMalloc(strlen(CallNumber));
 	strcpy(contact.CallNumber, CallNumber);
 	AddContact(&contact);
 }

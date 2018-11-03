@@ -48,18 +48,15 @@ static void CallCancelCallback(void);
 static GUI_HWIN CallViewShow();
 static uint32_t CallViewHide(GUI_HWIN hwin);
 
-
-void EditProgress(void * arg, GUI_HWIN currentWidget);
+CustomFunction_Typedef * ContactFunctionList[5];
+static void EditContactProgress(void * arg, GUI_HWIN currentWidget);
 
 extern ListApiHandlers_typedef ContactListApiHandlers;
 extern View_Typedef ListView;
 
-const char* FunctionDisplay[1] = { (const char*) "Call" };
-const void (*Functions[1])(void) = {Call };
+static const CustomFunction_Typedef CallFunction = {
+NULL, (const char*) "Call", Call };
 
-const CustomFunctionList_Typedef ContactFunctionList = { 1, FunctionDisplay,
-		Functions };
-const ListViewOption_typedef ContactListViewOption = { 1, 1, 1 };
 
 typedef enum {
 	EditContactState_Name,
@@ -75,8 +72,13 @@ const View_Typedef CallView = {
 
 
 void InitContactView() {
-	ListViewInit(&ContactListApiHandlers, ContactListViewOption,
-			ContactFunctionList, sizeof(Contact_Typedef), EditProgress);
+	ContactFunctionList[0] = &CallFunction;
+	ContactFunctionList[1] = &EditFunction;
+	ContactFunctionList[2] = &ViewInfoFunction;
+	ContactFunctionList[3] = &DeleteFunction;
+	ContactFunctionList[4] = NULL;
+	ListViewInit(&ContactListApiHandlers,
+			ContactFunctionList, sizeof(Contact_Typedef), EditContactProgress);
 	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &ListView);
 }
 
@@ -97,58 +99,56 @@ static uint32_t CallViewHide(GUI_HWIN hwin) {
 	return 1;
 }
 
-void EditProgress(void * arg, GUI_HWIN currentWidget) {
+static void EditContactProgress(void * arg, GUI_HWIN currentWidget) {
 	uint32_t len;
 	Contact_Typedef *contact = arg;
 	EditContactState_Typedef *state = arg + sizeof(Contact_Typedef);
 	if (*state == EditContactState_Name) {
-		TEXT_SetText(WM_GetDialogItem(currentWidget, GUI_ID_TEXT0), "Name");
+		GUI_HWIN textHwin = TEXT_CreateAsChild(5, 20, 118, 40, currentWidget,
+				GUI_ID_TEXT0, WM_CF_SHOW, "", TEXT_CF_TOP | TEXT_CF_HCENTER);
+		GUI_HWIN editHwin = EDIT_CreateAsChild(5, 65, 118, 40, currentWidget,
+				GUI_ID_EDIT0, WM_CF_SHOW, 15);
+		WM_SetFocus(editHwin);
+		EDIT_SetTextMode(editHwin);
 
-		EDIT_SetText(WM_GetDialogItem(currentWidget, GUI_ID_EDIT0),
-				(contact)->Name);
+		TEXT_SetText(textHwin, "Name");
+		EDIT_SetText(editHwin, (contact)->Name);
 
 
 		*state = EditContactState_LastName;
 	} else if (*state == EditContactState_LastName) {
-		len = EDIT_GetNumChars(WM_GetDialogItem(currentWidget, GUI_ID_EDIT0));
+		GUI_HWIN editHwin = WM_GetDialogItem(currentWidget, GUI_ID_EDIT0);
+		GUI_HWIN textHwin = WM_GetDialogItem(currentWidget, GUI_ID_TEXT0);
+		len = EDIT_GetNumChars(editHwin);
 		if (contact->Name != NULL)
 			vPortFree(contact->Name);
 		contact->Name = pvPortMalloc(len + 1);
-		EDIT_GetText(WM_GetDialogItem(currentWidget, GUI_ID_EDIT0),
-				(contact)->Name, len + 1);
+		EDIT_GetText(editHwin, (contact)->Name, len + 1);
 
-		TEXT_SetText(WM_GetDialogItem(currentWidget, GUI_ID_TEXT0),
-				"Last Name");
-
-		EDIT_SetText(WM_GetDialogItem(currentWidget, GUI_ID_EDIT0),
-				(contact)->LastName);
-
+		TEXT_SetText(textHwin, "Last Name");
+		EDIT_SetText(editHwin, (contact)->LastName);
 
 		*state = EditContactState_CallNumber;
 	} else if (*state == EditContactState_CallNumber) {
-		len = EDIT_GetNumChars(WM_GetDialogItem(currentWidget, GUI_ID_EDIT0));
+		GUI_HWIN editHwin = WM_GetDialogItem(currentWidget, GUI_ID_EDIT0);
+		GUI_HWIN textHwin = WM_GetDialogItem(currentWidget, GUI_ID_TEXT0);
+		len = EDIT_GetNumChars(editHwin);
 		if (contact->LastName != NULL)
 			vPortFree(contact->LastName);
 		contact->LastName = pvPortMalloc(len + 1);
-		EDIT_GetText(WM_GetDialogItem(currentWidget, GUI_ID_EDIT0),
-				(contact)->LastName, len + 1);
+		EDIT_GetText(editHwin, (contact)->LastName, len + 1);
 
-		TEXT_SetText(WM_GetDialogItem(currentWidget, GUI_ID_TEXT0),
-				"Call Number");
-
-		EDIT_SetText(WM_GetDialogItem(currentWidget, GUI_ID_EDIT0),
-				(contact)->CallNumber);
-
-
+		TEXT_SetText(textHwin, "Call Number");
+		EDIT_SetText(editHwin, (contact)->CallNumber);
 
 		*state = EditContactState_Finished;
 	} else if (*state == EditContactState_Finished) {
-		len = EDIT_GetNumChars(WM_GetDialogItem(currentWidget, GUI_ID_EDIT0));
+		GUI_HWIN editHwin = WM_GetDialogItem(currentWidget, GUI_ID_EDIT0);
+		len = EDIT_GetNumChars(editHwin);
 		if (contact->CallNumber != NULL)
 			vPortFree(contact->CallNumber);
 		contact->CallNumber = pvPortMalloc(len + 1);
-		EDIT_GetText(WM_GetDialogItem(currentWidget, GUI_ID_EDIT0),
-				(contact)->CallNumber, len + 1);
+		EDIT_GetText(editHwin, (contact)->CallNumber, len + 1);
 
 		memcpy(&ContactList->current_item, contact, sizeof(Contact_Typedef));
 		ViewNavigator_GoBackView(&DefaultViewNavigator);
