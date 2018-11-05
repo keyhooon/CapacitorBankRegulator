@@ -34,7 +34,6 @@ static void AddCallLogEx(char * CallNumber, time_t Time,
 
 
 void SeedCallLog() {
-
 	AddCallLogEx((const char*) "09124575442", 20000, 0, 1);
 	AddCallLogEx((const char*) "09124463992", 30000, 1, 0);
 	AddCallLogEx((const char*) "09127093902", 40000, 0, 0);
@@ -45,8 +44,7 @@ void SeedCallLog() {
 
 static void AddCallLogEx(char * CallNumber, time_t Time,
 		uint32_t IsSuccessfully, uint32_t IsIncoming) {
-	CallLog_Typedef callLog =
-			{ 0, pvPortMalloc(strlen(CallNumber)), Time,
+	CallLog_Typedef callLog = { 0, pvPortMalloc(strlen(CallNumber)), Time,
 			IsSuccessfully, IsIncoming };
 	strcpy(callLog.CallNumber, CallNumber);
 	AddCallLog(&callLog);

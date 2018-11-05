@@ -1352,67 +1352,6 @@ static void SPI2_Error(void) {
 *******************************************************************************/
 
 #ifdef HAL_I2C_MODULE_ENABLED
-/***************************** LINK IOE ***************************************/
-
-/**
-  * @brief  Initializes IOE low level.
-  */
-void IOE_Init(void)
-{
-  I2Cx_Init();
-}
-
-/**
-  * @brief  Configures IOE low level Interrupt.
-  */
-void IOE_ITConfig(void)
-{
-  I2Cx_ITConfig();
-}
-
-/**
-  * @brief  IOE writes single data.
-  * @param  Addr: I2C address
-  * @param  Reg: Reg address
-  * @param  Value: Data to be written
-  */
-void IOE_Write(uint8_t Addr, uint8_t Reg, uint8_t Value)
-{
-  I2Cx_WriteData(Addr, Reg, Value);
-}
-
-/**
-  * @brief  IOE reads single data.
-  * @param  Addr: I2C address
-  * @param  Reg: Reg address
-  * @retval Read data
-  */
-uint8_t IOE_Read(uint8_t Addr, uint8_t Reg)
-{
-  return I2Cx_ReadData(Addr, Reg);
-}
-
-/**
-  * @brief  IOE reads multiple data.
-  * @param  Addr: I2C address
-  * @param  Reg: Reg address
-  * @param  Buffer: Pointer to data buffer
-  * @param  Length: Length of the data
-  * @retval Number of read data
-  */
-uint16_t IOE_ReadMultiple(uint8_t Addr, uint8_t Reg, uint8_t *Buffer, uint16_t Length)
-{
- return I2Cx_ReadMultiple(Addr, Reg, I2C_MEMADD_SIZE_8BIT, Buffer, Length);
-}
-
-/**
-  * @brief  IOE delay.
-  * @param  Delay: Delay in ms
-  */
-void IOE_Delay(uint32_t Delay)
-{
-  HAL_Delay(Delay);
-}
 
 #endif /* HAL_I2C_MODULE_ENABLED */
 
