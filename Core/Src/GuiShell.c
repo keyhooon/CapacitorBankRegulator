@@ -6,9 +6,9 @@
  */
 
 #include <GUI.h>
+#include <keypad.h>
 #include "Board.h"
 #include "WM.h"
-#include "Board_keypad.h"
 #include "cmsis_os.h"
 #include "ViewNavigator.h"
 

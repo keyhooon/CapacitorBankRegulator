@@ -6,17 +6,23 @@
  */
 
 
-#include "Board_keypad.h"
+#include <keypad.h>
 #include "GUI.h"
 #include "cmsis_os.h"
 
-extern uint16_t KP_C_PINs[4];
-extern uint16_t KP_R_PINs[4];
-extern GPIO_TypeDef * KP_C_Ports[4];
-extern GPIO_TypeDef * KP_R_Ports[4];
+void KEYPAD_IO_Init(void);
 
 void KEYPAD_BUTTON_KeyCode_INIT(uint32_t i, uint32_t j, const char value);
 void KEYPAD_BUTTON_CHAR_INIT(uint32_t i, uint32_t j, const char * ch);
+
+uint16_t KP_C_PINs[4] = { KP_C0_PIN, KP_C1_PIN, KP_C2_PIN, KP_C3_PIN };
+uint16_t KP_R_PINs[4] = { KP_R0_PIN, KP_R1_PIN, KP_R2_PIN, KP_R3_PIN };
+GPIO_TypeDef * KP_C_Ports[4] = { KP_C0_PORT, KP_C1_PORT, KP_C2_PORT,
+KP_C3_PORT };
+GPIO_TypeDef * KP_R_Ports[4] = { KP_R0_PORT, KP_R1_PORT, KP_R2_PORT,
+KP_R3_PORT };
+
+
 
 
 
@@ -30,6 +36,50 @@ int CountKeyPressed = 0;
 int lastTimeKeyReleased = 0;
 int lastTimeKeyPressed;
 int holdKey;
+
+void KEYPAD_IO_Init(void) {
+
+	GPIO_InitTypeDef GPIO_InitStruct;
+
+	/* GPIO Ports Clock Enable */
+	KP_R_GPIO_CLK_ENABLE();
+	KP_C_GPIO_CLK_ENABLE();
+
+	/*Configure GPIO pin : PtPin */
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_PULLUP;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+	GPIO_InitStruct.Pin = KP_C0_PIN;
+	HAL_GPIO_Init(KP_C0_PORT, &GPIO_InitStruct);
+	GPIO_InitStruct.Pin = KP_C1_PIN;
+	HAL_GPIO_Init(KP_C1_PORT, &GPIO_InitStruct);
+	GPIO_InitStruct.Pin = KP_C2_PIN;
+	HAL_GPIO_Init(KP_C2_PORT, &GPIO_InitStruct);
+	GPIO_InitStruct.Pin = KP_C3_PIN;
+	HAL_GPIO_Init(KP_C3_PORT, &GPIO_InitStruct);
+
+	HAL_GPIO_WritePin(KP_C_Ports[0], KP_C_PINs[0], GPIO_PIN_SET);
+	HAL_GPIO_WritePin(KP_C_Ports[1], KP_C_PINs[1], GPIO_PIN_SET);
+	HAL_GPIO_WritePin(KP_C_Ports[2], KP_C_PINs[2], GPIO_PIN_SET);
+	HAL_GPIO_WritePin(KP_C_Ports[3], KP_C_PINs[3], GPIO_PIN_SET);
+
+	GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
+	GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	GPIO_InitStruct.Pin = KP_R0_PIN;
+	HAL_GPIO_Init(KP_R0_PORT, &GPIO_InitStruct);
+	GPIO_InitStruct.Pin = KP_R1_PIN;
+	HAL_GPIO_Init(KP_R1_PORT, &GPIO_InitStruct);
+	GPIO_InitStruct.Pin = KP_R2_PIN;
+	HAL_GPIO_Init(KP_R2_PORT, &GPIO_InitStruct);
+	GPIO_InitStruct.Pin = KP_R3_PIN;
+	HAL_GPIO_Init(KP_R3_PORT, &GPIO_InitStruct);
+
+	HAL_NVIC_SetPriority(KP_R_IRQn, 0x0A, 0x00);
+	HAL_NVIC_EnableIRQ(KP_R_IRQn);
+
+}
+
 
 void KEYPAD_EXTI_Callback(uint16_t GPIO_Pin) {
 	if (lastTimeKeyReleased + KeyPadProccessTime * 2 > HAL_GetTick())
@@ -77,7 +127,7 @@ void KEYPAD_EXTI_Callback(uint16_t GPIO_Pin) {
 	osSemaphoreRelease(keypadSemaphoreID);
 }
 
-void KeyboardProc(void const * argument) {
+void KEYPAD_Main(void const * argument) {
 	KEYPAD_Init();
 
 	for (;;) {

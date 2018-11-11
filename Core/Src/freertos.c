@@ -49,6 +49,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include <GUI.h>
 #include <GuiShell.h>
+#include <keypad.h>
 #include "FreeRTOS.h"
 #include "task.h"
 #include "cmsis_os.h"
@@ -56,7 +57,6 @@
 /* USER CODE BEGIN Includes */
 #include "Board.h"
 #include "WM.h"
-#include "Board_keypad.h"
 /* USER CODE END Includes */
 
 /* Variables -----------------------------------------------------------------*/
@@ -175,7 +175,7 @@ void MX_FREERTOS_Init(void) {
 	guiTaskHandle = osThreadCreate(osThread(guiTask), NULL);
 
 	/* definition and creation of defaultTask */
-	osThreadDef(keyboardTask, KeyboardProc, osPriorityNormal, 0, 256);
+	osThreadDef(keyboardTask, KEYPAD_Main, osPriorityNormal, 0, 256);
 	keyboardTaskHandle = osThreadCreate(osThread(keyboardTask), NULL);
 
 	/* definition and creation of CalculateTask */

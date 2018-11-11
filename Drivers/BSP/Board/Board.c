@@ -105,27 +105,49 @@ const uint16_t BUTTON_IRQn[BUTTONn] = {WAKEUP_BUTTON_EXTI_IRQn,
 KEY1_BUTTON_EXTI_IRQn,
 KEY2_BUTTON_EXTI_IRQn };
 
-uint16_t KP_C_PINs[4] = { KP_C0_PIN, KP_C1_PIN, KP_C2_PIN, KP_C3_PIN };
-uint16_t KP_R_PINs[4] = { KP_R0_PIN, KP_R1_PIN, KP_R2_PIN, KP_R3_PIN };
-GPIO_TypeDef * KP_C_Ports[4] = { KP_C0_PORT, KP_C1_PORT, KP_C2_PORT,
-KP_C3_PORT };
-GPIO_TypeDef * KP_R_Ports[4] = { KP_R0_PORT, KP_R1_PORT, KP_R2_PORT,
-KP_R3_PORT };
+
 
 /**
  * @brief COM variables
  */
-USART_TypeDef* COM_USART[COMn] = { BOARD_COM1 };
 
+UART_HandleTypeDef BOARD_COMx_HUART[COMn];
+DMA_HandleTypeDef BOARD_COMx_HDMA_RX[COMn];
+DMA_HandleTypeDef BOARD_COMx_HDMA_TX[COMn];
 
+const USART_TypeDef* BOARD_COMx_USART[COMn] = { BOARD_COM1, BOARD_COM2 };
+const GPIO_TypeDef* BOARD_COMx_PORT[COMn] = { BOARD_COM1_GPIO_PORT,
+		BOARD_COM2_GPIO_PORT };
+const uint32_t BOARD_COMx_BAUDRATE[COMn] = { BOARD_COM1_BAUDRATE,
+		BOARD_COM2_BAUDRATE };
+const uint16_t BOARD_COMx_TX_PIN[COMn] =
+		{ BOARD_COM1_TX_PIN, BOARD_COM2_TX_PIN };
+const uint16_t BOARD_COMx_RX_PIN[COMn] =
+		{ BOARD_COM1_RX_PIN, BOARD_COM2_RX_PIN };
+const DMA_Channel_TypeDef * BOARD_COMX_RX_DMA_STREAM[COMn] = {
+		BOARD_COM1_RX_DMA_STREAM, BOARD_COM2_RX_DMA_STREAM };
+const DMA_Channel_TypeDef * BOARD_COMX_TX_DMA_STREAM[COMn] = {
+		BOARD_COM1_TX_DMA_STREAM, BOARD_COM2_TX_DMA_STREAM };
+const uint32_t BOARD_COMx_IRQn[COMn] = { BOARD_COM1_IRQn,
+BOARD_COM2_IRQn };
 
-GPIO_TypeDef* COM_TX_PORT[COMn] = { BOARD_COM1_TX_GPIO_PORT };
+BufferStream_TypeDef *BOARD_COMx_BUFFER_STREAM[COMn];
 
-GPIO_TypeDef* COM_RX_PORT[COMn] = { BOARD_COM1_RX_GPIO_PORT };
+static void COMx_MspInit(COM_TypeDef COM);
+static void COMx_Init(COM_TypeDef COM);
+static void COMx_DeInit(COM_TypeDef COM);
+static void COMx_Open(COM_TypeDef COM);
+static void COMx_Close(COM_TypeDef COM);
+static void COMx_Write(COM_TypeDef COM, uint8_t *Value, uint8_t Size);
+static void COMx_Write_DMA(COM_TypeDef COM, char *buffer, uint8_t length);
+static void COMx_Read(COM_TypeDef COM, char * data, uint32_t length);
+inline static void COMx_ReadBefore(COM_TypeDef COM, char * data,
+		uint32_t length);
+inline static int COMx_Check_Chars_Equality(COM_TypeDef COM, char * data,
+		int length);
+void COMx_DataReceivedCallback(COM_TypeDef COM, uint32_t Length);
+static void COMx_Error(COM_TypeDef COM);
 
-const uint16_t COM_TX_PIN[COMn] = { BOARD_COM1_TX_PIN };
-
-const uint16_t COM_RX_PIN[COMn] = { BOARD_COM1_RX_PIN };
 
 /**
  * @brief BUS variables
@@ -390,60 +412,6 @@ uint32_t BSP_PB_GetState(Button_TypeDef Button)
 
 #endif /*HAL_I2C_MODULE_ENABLED*/
 
-void KEYPAD_IO_Init(void) {
-
-	GPIO_InitTypeDef GPIO_InitStruct;
-
-	/* GPIO Ports Clock Enable */
-	KP_R_GPIO_CLK_ENABLE();
-	KP_C_GPIO_CLK_ENABLE();
-
-	/*Configure GPIO pin : PtPin */
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_PULLUP;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	GPIO_InitStruct.Pin = KP_C0_PIN;
-	HAL_GPIO_Init(KP_C0_PORT, &GPIO_InitStruct);
-	GPIO_InitStruct.Pin = KP_C1_PIN;
-	HAL_GPIO_Init(KP_C1_PORT, &GPIO_InitStruct);
-	GPIO_InitStruct.Pin = KP_C2_PIN;
-	HAL_GPIO_Init(KP_C2_PORT, &GPIO_InitStruct);
-	GPIO_InitStruct.Pin = KP_C3_PIN;
-	HAL_GPIO_Init(KP_C3_PORT, &GPIO_InitStruct);
-
-	HAL_GPIO_WritePin(KP_C_Ports[0], KP_C_PINs[0], GPIO_PIN_SET);
-	HAL_GPIO_WritePin(KP_C_Ports[1], KP_C_PINs[1], GPIO_PIN_SET);
-	HAL_GPIO_WritePin(KP_C_Ports[2], KP_C_PINs[2], GPIO_PIN_SET);
-	HAL_GPIO_WritePin(KP_C_Ports[3], KP_C_PINs[3], GPIO_PIN_SET);
-
-	GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
-	GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-	GPIO_InitStruct.Pin = KP_R0_PIN;
-	HAL_GPIO_Init(KP_R0_PORT, &GPIO_InitStruct);
-	GPIO_InitStruct.Pin = KP_R1_PIN;
-	HAL_GPIO_Init(KP_R1_PORT, &GPIO_InitStruct);
-	GPIO_InitStruct.Pin = KP_R2_PIN;
-	HAL_GPIO_Init(KP_R2_PORT, &GPIO_InitStruct);
-	GPIO_InitStruct.Pin = KP_R3_PIN;
-	HAL_GPIO_Init(KP_R3_PORT, &GPIO_InitStruct);
-
-	HAL_NVIC_SetPriority(KP_R_EXTI_IRQn, 0x0A, 0x00);
-	HAL_NVIC_EnableIRQ(KP_R_EXTI_IRQn);
-
-}
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-	if (GPIO_Pin == GPIO_PIN_11 || GPIO_Pin == GPIO_PIN_13
-			|| GPIO_Pin == GPIO_PIN_14 || GPIO_Pin == GPIO_PIN_15)
-		KEYPAD_EXTI_Callback(GPIO_Pin);
-	if (GPIO_Pin == BUTTON_PIN[2])
-		BSP_PB_EXTI_Callback(BUTTON_KEY1,
-				HAL_GPIO_ReadPin(BUTTON_PORT[2], BUTTON_PIN[2]));
-	if (GPIO_Pin == BUTTON_PIN[3])
-		BSP_PB_EXTI_Callback(BUTTON_KEY2,
-				HAL_GPIO_ReadPin(BUTTON_PORT[3], BUTTON_PIN[3]));
-}
 
 /**
   * @}
@@ -874,32 +842,6 @@ static void I2Cx_Init(void)
   }
 }
 
-/**
-  * @brief  Configures I2C Interrupt.
-  */
-static void I2Cx_ITConfig(void)
-{
-  static uint8_t I2C_IT_Enabled = 0;
-  GPIO_InitTypeDef  gpioinitstruct = {0};
-
-  if(I2C_IT_Enabled == 0)
-  {
-    I2C_IT_Enabled = 1;
-
-    /* Enable the GPIO EXTI clock */
-    IOE_IT_GPIO_CLK_ENABLE();
-
-    gpioinitstruct.Pin   = IOE_IT_PIN;
-    gpioinitstruct.Pull  = GPIO_NOPULL;
-    gpioinitstruct.Speed = GPIO_SPEED_FREQ_HIGH;
-    gpioinitstruct.Mode  = GPIO_MODE_IT_FALLING;
-    HAL_GPIO_Init(IOE_IT_GPIO_PORT, &gpioinitstruct);
-
-    /* Set priority and Enable GPIO EXTI Interrupt */
-    HAL_NVIC_SetPriority((IRQn_Type)(IOE_IT_EXTI_IRQn), 0xE, 0);
-    HAL_NVIC_EnableIRQ((IRQn_Type)(IOE_IT_EXTI_IRQn));
-  }
-}
 
 /**
   * @brief  Reads multiple data.
@@ -1339,13 +1281,207 @@ static void SPI2_Error(void) {
 	/* Re-Initiaize the SPI communication BUS */
 	SPI2_Init();
 }
-/**
-  * @}
-  */
 
-/** @defgroup STM3210C_BOARD_LinkOperations_Functions STM3210C BOARD LinkOperations Functions
-  * @{
+/******************************* COM Routines *********************************/
+
+/**
+ * @brief  Initializes COM MSP.
+ */
+static void COMx_MspInit(COM_TypeDef COM) {
+	GPIO_InitTypeDef gpio_init_structure;
+
+	/* Enable GPIO clock of GPIO port supporting COM_TX and COM_RX pins */
+	BOARD_COMx_GPIO_CLK_ENABLE(COM);
+
+	/* Enable USART clock */
+	BOARD_COMx_CLK_ENABLE(COM);
+
+	/* Configure USART as alternate function */
+	gpio_init_structure.Pin = BOARD_COMx_TX_PIN[COM];
+	gpio_init_structure.Mode = GPIO_MODE_AF_OD;
+	gpio_init_structure.Pull = GPIO_PULLUP;
+	gpio_init_structure.Speed = GPIO_SPEED_FREQ_HIGH;
+	HAL_GPIO_Init(BOARD_COMx_PORT[COM], &gpio_init_structure);
+
+	gpio_init_structure.Pin = BOARD_COMx_RX_PIN[COM];
+	gpio_init_structure.Mode = GPIO_MODE_INPUT;
+	gpio_init_structure.Pull = GPIO_NOPULL;
+	gpio_init_structure.Speed = GPIO_SPEED_FREQ_HIGH;
+	HAL_GPIO_Init(BOARD_COMx_PORT[COM], &gpio_init_structure);
+
+	HAL_NVIC_SetPriority(BOARD_COMx_IRQn[COM], 5, 0);
+	HAL_NVIC_EnableIRQ(BOARD_COMx_IRQn[COM]);
+
+}
+
+/**
+ * @brief  Configures COM port.
+ * @param  COM: COM port to be configured.
+ *          This parameter can be one of the following values:
+ *            @arg  COM1
+ * @param  huart: Pointer to a UART_HandleTypeDef structure that contains the
+ *                configuration information for the specified USART peripheral.
+ */
+static void COMx_Init(COM_TypeDef COM) {
+	COMx_DeInit(COM);
+	BOARD_COMx_CLK_ENABLE(COM);
+	BOARD_COMx_RX_DMA_CLK_ENABLE(COM);
+	/* USART configuration */
+	BOARD_COMx_HUART[COM].Instance = BOARD_COMx_USART[COM];
+	BOARD_COMx_HUART[COM].Init.BaudRate = BOARD_COMx_BAUDRATE[COM];
+	BOARD_COMx_HUART[COM].Init.WordLength = UART_WORDLENGTH_8B;
+	BOARD_COMx_HUART[COM].Init.StopBits = UART_STOPBITS_1;
+	BOARD_COMx_HUART[COM].Init.Parity = UART_PARITY_NONE;
+	BOARD_COMx_HUART[COM].Init.Mode = UART_MODE_TX_RX;
+	BOARD_COMx_HUART[COM].Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	BOARD_COMx_HUART[COM].Init.OverSampling = UART_OVERSAMPLING_16;
+	if (HAL_UART_Init(&BOARD_COMx_HUART[COM]) != HAL_OK) {
+		COMx_Error(COM);
+	}
+	COMx_MspInit(COM);
+
+	/* USART DMA Init */
+	/* USART_RX Init */
+	BOARD_COMx_HDMA_RX[COM].Instance = BOARD_COMX_RX_DMA_STREAM[COM];
+	BOARD_COMx_HDMA_RX[COM].Init.Direction = DMA_PERIPH_TO_MEMORY;
+	BOARD_COMx_HDMA_RX[COM].Init.PeriphInc = DMA_PINC_DISABLE;
+	BOARD_COMx_HDMA_RX[COM].Init.MemInc = DMA_MINC_ENABLE;
+	BOARD_COMx_HDMA_RX[COM].Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+	BOARD_COMx_HDMA_RX[COM].Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+	BOARD_COMx_HDMA_RX[COM].Init.Mode = DMA_CIRCULAR;
+	BOARD_COMx_HDMA_RX[COM].Init.Priority = DMA_PRIORITY_LOW;
+	if (HAL_DMA_Init(&BOARD_COMx_HDMA_RX[COM]) != HAL_OK) {
+		COMx_Error(COM);
+	}
+
+	__HAL_LINKDMA(&BOARD_COMx_HUART[COM], hdmarx, BOARD_COMx_HDMA_RX[COM]);
+
+	/* USART DMA Init */
+	/* USART_TX Init */
+	BOARD_COMx_HDMA_TX[COM].Instance = BOARD_COMX_TX_DMA_STREAM[COM];
+	BOARD_COMx_HDMA_TX[COM].Init.Direction = DMA_PERIPH_TO_MEMORY;
+	BOARD_COMx_HDMA_TX[COM].Init.PeriphInc = DMA_PINC_DISABLE;
+	BOARD_COMx_HDMA_TX[COM].Init.MemInc = DMA_MINC_ENABLE;
+	BOARD_COMx_HDMA_TX[COM].Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+	BOARD_COMx_HDMA_TX[COM].Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+	BOARD_COMx_HDMA_TX[COM].Init.Mode = DMA_CIRCULAR;
+	BOARD_COMx_HDMA_TX[COM].Init.Priority = DMA_PRIORITY_LOW;
+	if (HAL_DMA_Init(&BOARD_COMx_HDMA_TX[COM]) != HAL_OK) {
+		COMx_Error(COM);
+	}
+
+	__HAL_LINKDMA(&BOARD_COMx_HUART[COM], hdmatx, BOARD_COMx_HDMA_TX[COM]);
+
+	/* DMA interrupt init */
+	/* DMA_Stream_IRQn interrupt configuration */
+//	  HAL_NVIC_SetPriority(BOARD_COMx_RX_DMA_IRQ[COM], 5, 0);
+//	  HAL_NVIC_EnableIRQ(BOARD_COMx_RX_DMA_IRQ[COM]);
+}
+
+/**
+ * @brief  DeInit COM port.
+ * @param  COM: COM port to be configured.
+ *          This parameter can be one of the following values:
+ *            @arg  COM1
+ * @param  huart: Pointer to a UART_HandleTypeDef structure that contains the
+ *                configuration information for the specified USART peripheral.
+ */
+static void COMx_DeInit(COM_TypeDef COM) {
+	/* USART configuration */
+	UART_HandleTypeDef huart;
+	huart.Instance = BOARD_COMx_USART[COM];
+	HAL_UART_DeInit(&huart);
+
+	/* Enable USART clock */
+	BOARD_COMx_CLK_DISABLE(COM);
+
+}
+
+static void COMx_Open(COM_TypeDef COM) {
+	BOARD_COMx_BUFFER_STREAM[COM] = BufferStreamInit(DEFAULT_BUFFER_LENGTH);
+	if (HAL_UART_Receive_DMA(&BOARD_COMx_HUART[COM],
+			BOARD_COMx_BUFFER_STREAM[COM]->buffer,
+			BOARD_COMx_BUFFER_STREAM[COM]->length) != HAL_OK)
+		COMx_Error(COM);
+	__HAL_UART_ENABLE_IT(&BOARD_COMx_HUART[COM], UART_IT_IDLE);
+}
+
+static void COMx_Close(COM_TypeDef COM) {
+	BufferStreamDeinit(BOARD_COMx_BUFFER_STREAM[COM]);
+	if (HAL_UART_AbortReceive(&BOARD_COMx_HUART[COM]) != HAL_OK)
+		COMx_Error(COM);
+	__HAL_UART_DISABLE_IT(&BOARD_COMx_HUART[COM], UART_IT_IDLE);
+}
+
+/**
+ * @brief  Writes data.
+ * @param  COM: Com address
+ * @param  Value *: Data to be written
+ * @param  Size: Register address
+ * @retval HAL status
+ */
+static void COMx_Write_DMA(COM_TypeDef COM, char *buffer, uint8_t length) {
+	if (HAL_UART_Transmit_DMA(&BOARD_COMx_HUART[COM], (uint8_t*) buffer,
+			(uint8_t) length) != HAL_OK)
+		COMx_Error(COM);
+}
+
+/**
+ * @brief  Reads data.
+ * @param  COM: Com address
+ * @param  * Value: Pointer to first data Address
+ * @param  Size: Size of Buffer
   */
+static void COMx_Read(COM_TypeDef COM, char * data, uint32_t length) {
+	BufferStreamRead(BOARD_COMx_BUFFER_STREAM[COM], data, length);
+}
+
+inline static char * COMx_Read_Char(COM_TypeDef COM) {
+	return BufferStreamReadChar(BOARD_COMx_BUFFER_STREAM[COM]);
+}
+
+/**
+ * @brief  Callback raise when data received from COMx
+ * @param  COM: Com address
+ * @param  * Value: Pointer to first data Address
+ * @param  Size: Size of Buffer
+ */
+__weak void COMx_DataReceivedCallback(COM_TypeDef COM, uint32_t Length) {
+
+}
+
+/**
+ * @brief  Manages error callback by re-initializing I2C.
+ * @param  Addr: I2C Address
+  */
+static void COMx_Error(COM_TypeDef COM) {
+	/* De-initialize the COM comunication bus */
+	HAL_UART_DeInit(&BOARD_COMx_HUART[COM]);
+
+	/* Re-Initiaize the COM comunication bus */
+	COMx_Init(COM);
+}
+
+void BSP_UART_IRQHandler(COM_TypeDef COM) {
+	if (__HAL_UART_GET_IT_SOURCE(&BOARD_COMx_HUART[COM], UART_IT_IDLE)) {
+		__HAL_UART_CLEAR_IDLEFLAG(&BOARD_COMx_HUART[COM]);
+		uint32_t rxBufferHead = BOARD_COMx_BUFFER_STREAM[COM]->length
+				- (__HAL_DMA_GET_COUNTER((BOARD_COMx_HUART[COM]).hdmarx));
+		int32_t count = rxBufferHead - BOARD_COMx_BUFFER_STREAM[COM]->head;
+		if (count < 0)
+			count += BOARD_COMx_BUFFER_STREAM[COM]->length;
+		BOARD_COMx_BUFFER_STREAM[COM]->head = rxBufferHead;
+		COMx_DataReceivedCallback(COM, count);
+		switch (COM) {
+		case GSM_COM:
+			GSM_DataReceivedCallback(count);
+			break;
+		default:
+			break;
+		}
+
+	}
+}
 
 /*******************************************************************************
                             LINK OPERATIONS
@@ -1838,6 +1974,55 @@ HAL_StatusTypeDef EEPROM_I2C_IO_IsDeviceReady(uint16_t DevAddress, uint32_t Tria
 #endif /* HAL_I2C_MODULE_ENABLED */
 
 
+/********************************* LINK GSM ***********************************/
+
+/**
+ * @brief  Initializes GSM low level.
+ * @retval None
+ */
+void GSM_IO_Init(void) {
+	COMx_Init(GSM_COM);
+	COMx_Open(GSM_COM);
+}
+
+/**
+ * @brief  DeInitializes GSM low level.
+ * @retval None
+ */
+void GSM_IO_DeInit(void) {
+	COMx_Close(GSM_COM);
+	COMx_DeInit(GSM_COM);
+}
+
+/**
+ * @brief  GSM delay
+ * @param  Delay: Delay in ms
+ * @retval None
+ */
+void GSM_IO_Delay(uint32_t Delay) {
+	osDelay(Delay);
+}
+
+/**
+ * @brief  GSM writes data.
+ * @param  Buffer: Pointer to data buffer
+ * @param  Length: Length of the data
+ */
+void GSM_IO_Write(char * buffer, uint32_t length) {
+	COMx_Write_DMA(GSM_COM, buffer, length);
+}
+
+void GSM_IO_Read(char * data, uint32_t length) {
+	COMx_Read(GSM_COM, data, length);
+}
+
+char* GSM_IO_Read_Char() {
+	return COMx_Read_Char(GSM_COM);
+}
+
+__weak void GSM_DataReceivedCallback(uint32_t Length) {
+
+}
 
 /**
   * @}

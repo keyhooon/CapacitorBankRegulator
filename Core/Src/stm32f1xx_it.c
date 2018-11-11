@@ -31,14 +31,13 @@
   ******************************************************************************
   */
 /* Includes ------------------------------------------------------------------*/
+#include <keypad.h>
 #include "stm32f1xx_hal.h"
 #include "stm32f1xx.h"
 #include "stm32f1xx_it.h"
 #include "cmsis_os.h"
 
 #include "Board.h"
-/* USER CODE BEGIN 0 */
-
 #include "GUI.h"
 void prvGetRegistersFromStack(uint32_t *pulFaultStackAddress);
 
@@ -188,13 +187,7 @@ void SysTick_Handler(void)
 */
 void USB_LP_CAN1_RX0_IRQHandler(void)
 {
-  /* USER CODE BEGIN USB_LP_CAN1_RX0_IRQn 0 */
-
-  /* USER CODE END USB_LP_CAN1_RX0_IRQn 0 */
   HAL_PCD_IRQHandler(&hpcd_USB_FS);
-  /* USER CODE BEGIN USB_LP_CAN1_RX0_IRQn 1 */
-
-  /* USER CODE END USB_LP_CAN1_RX0_IRQn 1 */
 }
 
 /**
@@ -202,12 +195,7 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
  */
 void TIM3_IRQHandler(void)
 {
-  /* USER CODE BEGIN TIM3_IRQn 0 */
-
-  /* USER CODE END TIM3_IRQn 0 */
   HAL_TIM_IRQHandler(&htim3);
-  /* USER CODE BEGIN TIM3_IRQn 1 */
-  /* USER CODE END TIM3_IRQn 1 */
 }
 
 void EXTI15_10_IRQHandler(void) {
@@ -224,7 +212,39 @@ void EXTI3_IRQHandler(void) {
 void EXTI9_5_IRQHandler(void) {
 	HAL_GPIO_EXTI_IRQHandler(KEY1_BUTTON_PIN);
 }
-/* USER CODE BEGIN 1 */
+
+void BOARD_COM1_RX_DMA_IRQHandler(void) {
+	HAL_DMA_IRQHandler(&BOARD_COMx_HDMA_RX[COM1]);
+}
+
+void BOARD_COM1_TX_DMA_IRQHandler(void) {
+	HAL_DMA_IRQHandler(&BOARD_COMx_HDMA_TX[COM1]);
+}
+
+void BOARD_COM2_RX_DMA_IRQHandler(void) {
+	HAL_DMA_IRQHandler(&BOARD_COMx_HDMA_RX[COM2]);
+}
+
+
+void BOARD_COM2_TX_DMA_IRQHandler(void) {
+	HAL_DMA_IRQHandler(&BOARD_COMx_HDMA_TX[COM2]);
+}
+
+/**
+ * @brief This function handles USART1 global interrupt.
+ */
+void BOARD_COM1_IRQHANDLER(void) {
+
+	BSP_UART_IRQHandler(COM1);
+	HAL_UART_IRQHandler(&BOARD_COMx_HUART[COM1]);
+
+}
+
+void BOARD_COM2_IRQHANDLER(void) {
+	BSP_UART_IRQHandler(COM2);
+	HAL_UART_IRQHandler(&BOARD_COMx_HUART[COM2]);
+}
+
 void prvGetRegistersFromStack(uint32_t *pulFaultStackAddress) {
 	/* These are volatile to try and prevent the compiler/linker optimising them
 	 away as the variables never actually get used.  If the debugger won't show the
@@ -254,5 +274,4 @@ void prvGetRegistersFromStack(uint32_t *pulFaultStackAddress) {
 		;
 }
 
-/* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

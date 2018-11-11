@@ -96,35 +96,7 @@ typedef enum
   BUTTON_MODE_EXTI = 1
 } ButtonMode_TypeDef;
 
-/**
- * @brief JOYSTICK Types Definition
- */
-typedef enum
-{
-  JOY_SEL   = 0,
-  JOY_LEFT  = 1,
-  JOY_RIGHT = 2,
-  JOY_DOWN  = 3,
-  JOY_UP    = 4,
-  JOY_NONE  = 5
 
-}JOYState_TypeDef;
-
-typedef enum
-{
-  JOY_MODE_GPIO = 0,
-  JOY_MODE_EXTI = 1
-
-}JOYMode_TypeDef;
-
-/**
- * @brief COM Types Definition
- */
-typedef enum
-{
-  COM1 = 0,
-  COM2 = 1
-} COM_TypeDef;
 /**
   * @}
   */
@@ -226,106 +198,105 @@ typedef enum
 												((__BUTTON__) == BUTTON_KEY2) KEY2_BUTTON_GPIO_CLK_DISABLE()  :\
                                                  ((__BUTTON__) == BUTTON_WAKEUP) WAKEUP_BUTTON_GPIO_CLK_DISABLE()  : 0 )
 
-#define KP_R0_PIN							GPIO_PIN_11
-#define KP_R1_PIN							GPIO_PIN_13
-#define KP_R2_PIN							GPIO_PIN_14
-#define KP_R3_PIN							GPIO_PIN_15
-#define KP_R0_PORT							GPIOG
-#define KP_R1_PORT							GPIOG
-#define KP_R2_PORT							GPIOG
-#define KP_R3_PORT							GPIOG
 
-#define KP_C0_PIN							GPIO_PIN_2
-#define KP_C1_PIN							GPIO_PIN_3
-#define KP_C2_PIN							GPIO_PIN_4
-#define KP_C3_PIN							GPIO_PIN_5
-#define KP_C0_PORT							GPIOE
-#define KP_C1_PORT							GPIOE
-#define KP_C2_PORT							GPIOE
-#define KP_C3_PORT							GPIOE
-
-#define KP_R_EXTI_IRQn                		EXTI15_10_IRQn
-
-#define KP_R_GPIO_CLK_ENABLE()           	__HAL_RCC_GPIOE_CLK_ENABLE()
-#define KP_R_GPIO_CLK_DISABLE()         	__HAL_RCC_GPIOE_CLK_DISABLE()
-#define KP_C_GPIO_CLK_ENABLE()           	__HAL_RCC_GPIOG_CLK_ENABLE()
-#define KP_C_GPIO_CLK_DISABLE()          	__HAL_RCC_GPIOG_CLK_DISABLE()
 
 /**
   * @brief IO Pins definition
   */
 
-#define AUDIO_RESET_PIN              (IO2_PIN_2) /* IO_Expander_2 */ /* Output */
-#define MII_INT_PIN                  (IO2_PIN_0) /* IO_Expander_2 */ /* Output */
-#define VBAT_DIV_PIN                 (IO1_PIN_0) /* IO_Expander_1 */ /* Output */
+typedef struct {
+	uint32_t index;
+	uint32_t length;
+} COM_DataRecv_TypeDef;
+
+typedef enum {
+	COM1 = 0, COM2 = 1, GSM_COM = COM1, GPS_COM = COM2
+} COM_TypeDef;
+
+#define DEFAULT_BUFFER_LENGTH		1024
+#define DEFAULT_QUEUE_LENGTH		5
+
+
+
+typedef void (*COM_DataRecv_Callback_TypeDef)(COM_DataRecv_TypeDef DataRecv);
 
 /**
-  * @}
-  */
-
-/** @addtogroup STM3210C_BOARD_COM STM3210C BOARD COM
-  * @{
-  */
-#define COMn                             1
-
-/**
- * @brief Definition for COM port1, connected to USART2
+ * @brief Definition for COM
  */
-#define BOARD_COM1                        USART2
-#define BOARD_COM1_CLK_ENABLE()           __HAL_RCC_USART2_CLK_ENABLE()
-#define BOARD_COM1_CLK_DISABLE()          __HAL_RCC_USART2_CLK_DISABLE()
 
-#define AFIOCOM1_CLK_ENABLE()            __HAL_RCC_AFIO_CLK_ENABLE()
-#define AFIOCOM1_CLK_DISABLE()           __HAL_RCC_AFIO_CLK_DISABLE()
+#define COMn                             ((uint8_t)2)
 
-#define BOARD_COM1_TX_PIN                 GPIO_PIN_5             /* PD.05*/
-#define BOARD_COM1_TX_GPIO_PORT           GPIOD
-#define BOARD_COM1_TX_GPIO_CLK_ENABLE()   __HAL_RCC_GPIOD_CLK_ENABLE()
-#define BOARD_COM1_TX_GPIO_CLK_DISABLE()  __HAL_RCC_GPIOD_CLK_DISABLE()
+#define BOARD_COM1                          USART1
+#define BOARD_COM1_CLK_ENABLE()             __HAL_RCC_USART1_CLK_ENABLE()
+#define BOARD_COM1_CLK_DISABLE()            __HAL_RCC_USART1_CLK_DISABLE()
+#define BOARD_COM1_IRQn                     USART1_IRQn
+#define BOARD_COM1_IRQHANDLER             	USART1_IRQHandler
 
-#define BOARD_COM1_RX_PIN                 GPIO_PIN_6             /* PD.06*/
-#define BOARD_COM1_RX_GPIO_PORT           GPIOD
-#define BOARD_COM1_RX_GPIO_CLK_ENABLE()   __HAL_RCC_GPIOD_CLK_ENABLE()
-#define BOARD_COM1_RX_GPIO_CLK_DISABLE()  __HAL_RCC_GPIOD_CLK_DISABLE()
+#define BOARD_COM1_BAUDRATE					115200
 
-#define BOARD_COM1_IRQn                   USART2_IRQn
+#define BOARD_COM1_GPIO_PORT            	 GPIOA
+#define BOARD_COM1_GPIO_CLK_ENABLE()     	__HAL_RCC_GPIOA_CLK_ENABLE()
+#define BOARD_COM1_GPIO_CLK_DISABLE()    	__HAL_RCC_GPIOA_CLK_DISABLE()
 
-#define COMx_CLK_ENABLE(__INDEX__)              do { if((__INDEX__) == COM1) BOARD_COM1_CLK_ENABLE();} while(0)
-#define COMx_CLK_DISABLE(__INDEX__)             (((__INDEX__) == COM1) ? BOARD_COM1_CLK_DISABLE() : 0)
+#define BOARD_COM1_TX_PIN                   GPIO_PIN_9
+#define BOARD_COM1_TX_DMA_STREAM			DMA1_Channel4
+#define BOARD_COM1_TX_DMA_IRQ  				DMA1_Channel4_IRQn
+#define BOARD_COM1_TX_DMA_IRQHandler		DMA1_Channel4_IRQHandler
+#define BOARD_COM1_TX_DMA_CLK_ENABLE()		__HAL_RCC_DMA1_CLK_ENABLE()
 
-#define AFIOCOMx_CLK_ENABLE(__INDEX__)          do { if((__INDEX__) == COM1) AFIOCOM1_CLK_ENABLE();} while(0)
-#define AFIOCOMx_CLK_DISABLE(__INDEX__)         (((__INDEX__) == COM1) ? AFIOCOM1_CLK_DISABLE() : 0)
+#define BOARD_COM1_RX_PIN                   GPIO_PIN_10
+#define BOARD_COM1_RX_DMA_STREAM			DMA1_Channel5
+#define BOARD_COM1_RX_DMA_IRQ  				DMA1_Channel5_IRQn
+#define BOARD_COM1_RX_DMA_IRQHandler		DMA1_Channel5_IRQHandler
+#define BOARD_COM1_RX_DMA_CLK_ENABLE()		__HAL_RCC_DMA1_CLK_ENABLE()
 
-#define AFIOCOMx_REMAP(__INDEX__)               (((__INDEX__) == COM1) ? (AFIO->MAPR |= (AFIO_MAPR_USART2_REMAP)) : 0)
+#define BOARD_COM2                          USART2
+#define BOARD_COM2_BAUDRATE					9600
+#define BOARD_COM2_CLK_ENABLE()             __HAL_RCC_USART3_CLK_ENABLE()
+#define BOARD_COM2_CLK_DISABLE()            __HAL_RCC_USART3_CLK_DISABLE()
+#define BOARD_COM2_IRQn                     USART3_IRQn
+#define BOARD_COM2_IRQHANDLER             	USART3_IRQHandler
 
-#define COMx_TX_GPIO_CLK_ENABLE(__INDEX__)      do { if((__INDEX__) == COM1) BOARD_COM1_TX_GPIO_CLK_ENABLE();} while(0)
-#define COMx_TX_GPIO_CLK_DISABLE(__INDEX__)     (((__INDEX__) == COM1) ? BOARD_COM1_TX_GPIO_CLK_DISABLE() : 0)
+#define BOARD_COM2_GPIO_PORT             	GPIOA
+#define BOARD_COM2_GPIO_CLK_ENABLE()     	__HAL_RCC_GPIOB_CLK_ENABLE()
+#define BOARD_COM2_GPIO_CLK_DISABLE()    	__HAL_RCC_GPIOB_CLK_DISABLE()
 
-#define COMx_RX_GPIO_CLK_ENABLE(__INDEX__)      do { if((__INDEX__) == COM1) BOARD_COM1_RX_GPIO_CLK_ENABLE();} while(0)
-#define COMx_RX_GPIO_CLK_DISABLE(__INDEX__)     (((__INDEX__) == COM1) ? BOARD_COM1_RX_GPIO_CLK_DISABLE() : 0)
+#define BOARD_COM2_TX_PIN                   GPIO_PIN_2
+#define BOARD_COM2_TX_DMA_STREAM			DMA1_Channel7
+#define BOARD_COM2_TX_DMA_IRQ  				DMA1_Channel7_IRQn
+#define BOARD_COM2_TX_DMA_IRQHandler		DMA1_Channel7_IRQHandler
+#define BOARD_COM2_TX_DMA_CLK_ENABLE()		__HAL_RCC_DMA1_CLK_ENABLE()
 
-/**
-  * @}
-  */
+#define BOARD_COM2_RX_PIN                   GPIO_PIN_3
+#define BOARD_COM2_RX_DMA_STREAM			DMA1_Channel6
+#define BOARD_COM2_RX_DMA_IRQ  				DMA1_Channel6_IRQn
+#define BOARD_COM2_RX_DMA_IRQHandler		DMA1_Channel6_IRQHandler
+#define BOARD_COM2_RX_DMA_CLK_ENABLE()		__HAL_RCC_DMA1_CLK_ENABLE()
 
-/** @addtogroup STM3210C_BOARD_BUS STM3210C BOARD BUS
-  * @{
-  */
+#define BOARD_COMx_CLK_ENABLE(__INDEX__)    	  do { 	if((__INDEX__) == COM1) BOARD_COM1_CLK_ENABLE(); else\
+																					BOARD_COM2_CLK_ENABLE(); } while(0)
+#define BOARD_COMx_CLK_DISABLE(__INDEX__)    	  do { 	if((__INDEX__) == COM1) BOARD_COM1_CLK_DISABLE(); else\
+																					BOARD_COM2_CLK_DISABLE(); } while(0)
+#define BOARD_COMx_GPIO_CLK_ENABLE(__INDEX__)  do { 	if((__INDEX__) == COM1) BOARD_COM1_GPIO_CLK_ENABLE(); else\
+																					BOARD_COM2_GPIO_CLK_ENABLE();} while(0)
+#define BOARD_COMx_GPIO_CLK_DISABLE(__INDEX__) do { 	if((__INDEX__) == COM1) BOARD_COM1_RX_TX_GPIO_CLK_DISABLE(); else\
+																					BOARD_COM2_RX_TX_GPIO_CLK_DISABLE(); } while(0)
+#define BOARD_COMx_RX_DMA_CLK_ENABLE(__INDEX__)  do { 	if((__INDEX__) == COM1) BOARD_COM1_RX_DMA_CLK_ENABLE(); else\
+																					BOARD_COM2_RX_DMA_CLK_ENABLE(); } while(0)
 
-/**
-  * @brief  IO Expander Interrupt line on EXTI
-  */
-#define IOE_IT_PIN                       GPIO_PIN_14
-#define IOE_IT_GPIO_PORT                 GPIOB
-#define IOE_IT_GPIO_CLK_ENABLE()         __HAL_RCC_GPIOB_CLK_ENABLE()
-#define IOE_IT_GPIO_CLK_DISABLE()        __HAL_RCC_GPIOB_CLK_DISABLE()
-#define IOE_IT_EXTI_IRQn                 EXTI15_10_IRQn
-#define IOE_IT_EXTI_IRQHANDLER           EXTI15_10_IRQHandler
 
-/* Exported constant IO ------------------------------------------------------*/
-#define IO1_I2C_ADDRESS                       0x82
-#define IO2_I2C_ADDRESS                       0x88
-#define TS_I2C_ADDRESS                        0x82
+void BSP_UART_IRQHandler(COM_TypeDef COM);
+void GSM_IO_Init(void);
+void GSM_IO_DeInit(void);
+void GSM_IO_Delay(uint32_t Delay);
+void GSM_IO_Write(char * buffer, uint32_t length);
+void GSM_IO_Read(char * data, uint32_t length);
+void GSM_IO_ReadBefore(char * data, uint32_t length);
+char * GSM_IO_Read_Char();
+int GSM_IO_Check_Chars_Equality(char *data, int length);
+BufferStream_TypeDef * GSM_IO_GetBuffer();
+
+void GSM_DataReceivedCallback(uint32_t Length);
 
 /*The Slave ADdress (SAD) associated to the LIS302DL is 001110xb. SDO pad can be used
 to modify less significant bit of the device address. If SDO pad is connected to voltage
@@ -566,13 +537,8 @@ void                    BSP_LED_Toggle(Led_TypeDef Led);
 void                    BSP_PB_Init(Button_TypeDef Button, ButtonMode_TypeDef Button_Mode);
 uint32_t                BSP_PB_GetState(Button_TypeDef Button);
 void BSP_PB_EXTI_Callback(Button_TypeDef Button, int state);
-#ifdef HAL_UART_MODULE_ENABLED
-void                    BSP_COM_Init(COM_TypeDef COM, UART_HandleTypeDef* huart);
-#endif /* HAL_UART_MODULE_ENABLED */
-#ifdef HAL_I2C_MODULE_ENABLED
-uint8_t                 BSP_JOY_Init(JOYMode_TypeDef Joy_Mode);
-JOYState_TypeDef        BSP_JOY_GetState(void);
-#endif /* HAL_I2C_MODULE_ENABLED */
+
+
 
 
 /**
