@@ -49,6 +49,10 @@ extern PCD_HandleTypeDef hpcd_USB_FS;
 
 extern TIM_HandleTypeDef htim3;
 
+extern UART_HandleTypeDef BOARD_COMx_HUART[COMn];
+extern DMA_HandleTypeDef BOARD_COMx_HDMA_RX[COMn];
+extern DMA_HandleTypeDef BOARD_COMx_HDMA_TX[COMn];
+
 /******************************************************************************/
 /*            Cortex-M3 Processor Interruption and Exception Handlers         */
 /******************************************************************************/
@@ -199,17 +203,39 @@ void TIM3_IRQHandler(void)
 }
 
 void EXTI15_10_IRQHandler(void) {
-	HAL_GPIO_EXTI_IRQHandler(KP_R0_PIN);
-	HAL_GPIO_EXTI_IRQHandler(KP_R1_PIN);
-	HAL_GPIO_EXTI_IRQHandler(KP_R2_PIN);
-	HAL_GPIO_EXTI_IRQHandler(KP_R3_PIN);
+	if (__HAL_GPIO_EXTI_GET_IT(KP_R0_PIN))
+	{
+		KEYPAD_EXTI_Callback(KP_R0_PIN);
+		HAL_GPIO_EXTI_IRQHandler(KP_R0_PIN);
+	}
+	if (__HAL_GPIO_EXTI_GET_IT(KP_R1_PIN))
+	{
+		KEYPAD_EXTI_Callback(KP_R1_PIN);
+		HAL_GPIO_EXTI_IRQHandler(KP_R1_PIN);
+	}
+	if (__HAL_GPIO_EXTI_GET_IT(KP_R2_PIN))
+	{
+		KEYPAD_EXTI_Callback(KP_R2_PIN);
+		HAL_GPIO_EXTI_IRQHandler(KP_R2_PIN);
+	}
+	if (__HAL_GPIO_EXTI_GET_IT(KP_R3_PIN))
+	{
+		KEYPAD_EXTI_Callback(KP_R3_PIN);
+		HAL_GPIO_EXTI_IRQHandler(KP_R3_PIN);
+	}
 }
 
-void EXTI3_IRQHandler(void) {
+void KEY2_BUTTON_EXTI_IRQHandler(void) {
+	BSP_PB_EXTI_Callback(BUTTON_KEY2,
+			HAL_GPIO_ReadPin(BUTTON_PORT[BUTTON_KEY2],
+					BUTTON_PIN[BUTTON_KEY2]));
 	HAL_GPIO_EXTI_IRQHandler(KEY2_BUTTON_PIN);
 }
 
-void EXTI9_5_IRQHandler(void) {
+void KEY1_BUTTON_EXTI_IRQHandler(void) {
+	BSP_PB_EXTI_Callback(BUTTON_KEY1,
+			HAL_GPIO_ReadPin(BUTTON_PORT[BUTTON_KEY1],
+					BUTTON_PIN[BUTTON_KEY1]));
 	HAL_GPIO_EXTI_IRQHandler(KEY1_BUTTON_PIN);
 }
 

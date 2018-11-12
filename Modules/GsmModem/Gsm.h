@@ -23,23 +23,28 @@
 typedef struct Gsm_Struct {
 	CommandExecuter_TypeDef * commandExecuter;
 	CommandTokenizer_TypeDef * commandTokenizer;
-	osThreadId taskHandle;
 } Gsm_TypeDef;
 
-extern Gsm_TypeDef *GsmModem;
+typedef struct {
+	BufferStream_TypeDef *inputBuffer;
+	void (*Write)(char *, uint32_t);
+} GsmModem_initParam_typeDef;
+
+extern Gsm_TypeDef GsmModem;
 #define DefaultRetriesCount		5
 
 #define CHECK_RESPONSE(response) ((response).status == ResponseStatusOk && (response).resultNumber == RESULT_NUMBER_OK)
 
-#define EXECUTE_COMMAND(command, response) ({ \
-	uint32_t register r = DefaultRetriesCount; \
+#define EXECUTE_COMMAND(command, response)  ({ \
+	int register r = DefaultRetriesCount; \
 	while (r--) { \
-		*response = CommandExecuter_Execute(GsmModem->commandExecuter, command); \
+		*response = CommandExecuter_Execute(*GsmModem.commandExecuter, command); \
 		if (CHECK_RESPONSE(*response)) \
 			break; \
 	} \
-	return r; \
+	r; \
 })
+
 #define EXECUTE_COMMAND_EX(commandType, action, parameters, response) ({ \
 		Command_TypeDef command = {commandType, action, parameters}; \
 		EXECUTE_COMMAND(command, response); \
@@ -48,21 +53,21 @@ extern Gsm_TypeDef *GsmModem;
 
 #define EXECUTE_COMMAND_RESPONSELESS(command) ({ \
 	uint32_t register r = DefaultRetriesCount; \
-	Response_TypeDef res \
+	Response_TypeDef res ;\
 	while (r--) { \
-		res = CommandExecuter_Execute(GsmModem->commandExecuter, command); \
+		res = CommandExecuter_Execute(*GsmModem.commandExecuter, command); \
 		if (CHECK_RESPONSE(res)) \
 			break; \
 	} \
 	CommandTokenizer_FreeTokenList(res.Tokens); \
-	return r; \
+	r; \
 })
 
 #define EXECUTE_COMMAND_RESPONSELESS_EX(commandType, action, parameters) ({ \
 		Command_TypeDef command = {commandType, action, parameters}; \
-		EXECUTE_COMMAND_EX(command); \
+		EXECUTE_COMMAND_RESPONSELESS(command); \
 })
 
 
-
+void GSM_Main(void const * argument);
 #endif /* GSMMODEM_GSM_H_ */

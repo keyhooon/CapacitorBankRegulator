@@ -17,7 +17,7 @@ Response_TypeDef ResponseParse(CommandTokenizer_TypeDef tokenizer,
 	if (tokensList.ResultIndex != -1) {
 		register char* string = *(tokensList.Items + tokensList.ResultIndex);
 		register unsigned int digit;
-		while (*string != NULL) {
+		while (*string != 0) {
 			digit = *string++ - '0';
 			if (digit < 0 || digit > 9) {
 				result.resultNumber = -1;

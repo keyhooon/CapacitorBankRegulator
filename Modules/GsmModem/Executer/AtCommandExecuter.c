@@ -7,17 +7,19 @@
 
 #include "AtCommandExecuter.h"
 #include "cmsis_os.h"
+#include "string.h"
 
 void GetCommandString(char* commandText,
 		CommandExecuter_TypeDef commandExecuter, Command_TypeDef command);
 
 CommandExecuter_TypeDef * CommandExecuter_Init(osMessageQId messageId,
-		char * commandLineTermination) {
+		void (*Write)(char *, uint32_t), char * commandLineTermination) {
 	CommandExecuter_TypeDef * commandExecuter = pvPortMalloc(
 			sizeof(CommandExecuter_TypeDef));
 
 	commandExecuter->commandLineTerminationChar =
 			commandLineTermination;
+	commandExecuter->Write = Write;
 	osMutexDef_t mutex = { 0 };
 	commandExecuter->mutexId = osMutexCreate(&mutex);
 	commandExecuter->semaphoreId = osSemaphoreCreate(NULL, 1);
@@ -26,25 +28,25 @@ CommandExecuter_TypeDef * CommandExecuter_Init(osMessageQId messageId,
 }
 void CommandExecuter_DeInit(CommandExecuter_TypeDef *commandExecuter) {
 	osMutexDelete(commandExecuter->mutexId);
-	AtTokenizerDeInit();
+	osSemaphoreDelete(commandExecuter->semaphoreId);
 	vPortFree(commandExecuter);
 }
 
 Response_TypeDef CommandExecuter_Execute(
 		CommandExecuter_TypeDef commandExecuter, Command_TypeDef command) {
-	osMutexWait(commandExecuter.mutexId, osWaitForever);
 	char commandString[40];
-	GetCommandString(commandString, commandExecuter, command);
-	GSM_IO_Write(commandString, strlen(commandString));
-	osEvent event = osSemaphoreWait(commandExecuter.semaphoreId,
-			command.type.maximumResponseTime);
 	Response_TypeDef result;
+	osMutexWait(commandExecuter.mutexId, osWaitForever);
+	GetCommandString(commandString, commandExecuter, command);
+	commandExecuter.Write(commandString, strlen(commandString));
+	if (osSemaphoreWait(commandExecuter.semaphoreId,
+			command.type.maximumResponseTime == 0 ?
+					1000 : command.type.maximumResponseTime) == osOK)
+		result = commandExecuter.LastResponse;
+	else
 
-	if (event.status == osEventMessage)
-		result = ResponseParse(commandExecuter, event.value.v);
-	else {
-		result->status = ResponseStatusError_Timeout;
-	}
+		result.status = ResponseStatusError_Timeout;
+
 	osMutexRelease(commandExecuter.mutexId);
 	return result;
 }
@@ -52,24 +54,28 @@ void GetCommandString(char* commandText,
 		CommandExecuter_TypeDef commandExecuter, Command_TypeDef command) {
 	switch (command.type.syntax) {
 	case basic:
-		sprintf(commandText, "at%s%d%c", command.type.text,
-				*(int *) (command.parameters),
-				commandExecuter.commandLineTerminationChar);
+		if (command.parameters != NULL)
+			sprintf(commandText, "at%s%d%c", command.type.text,
+					*(int *) (command.parameters),
+					*commandExecuter.commandLineTerminationChar);
+		else
+			sprintf(commandText, "at%s%c", command.type.text,
+					*commandExecuter.commandLineTerminationChar);
 		break;
 	case sParameter:
 		sprintf(commandText, "ats%d=%d%c", *(int *) (command.parameters),
 				*((int *) (command.parameters) + 1),
-				commandExecuter.commandLineTerminationChar);
+				*commandExecuter.commandLineTerminationChar);
 		break;
 	case extended:
 		switch (command.action) {
 		case Test:
 			sprintf(commandText, "at+%s=?%c", command.type.text,
-					commandExecuter.commandLineTerminationChar);
+					*commandExecuter.commandLineTerminationChar);
 			break;
 		case Read:
 			sprintf(commandText, "at+%s?%c", command.type.text,
-					commandExecuter.commandLineTerminationChar);
+					*commandExecuter.commandLineTerminationChar);
 			break;
 		case Write:
 			sprintf(commandText, "at+%s=", command.type.text);
@@ -83,12 +89,12 @@ void GetCommandString(char* commandText,
 				(command.parameters)++;
 			}
 			index--;
-			commandText[index++] = commandExecuter.commandLineTerminationChar;
+			commandText[index++] = *commandExecuter.commandLineTerminationChar;
 			commandText[index++] = 0;
 			break;
 		case Execute:
 			sprintf(commandText, "at+%s%c", command.type.text,
-					commandExecuter.commandLineTerminationChar);
+					*commandExecuter.commandLineTerminationChar);
 			break;
 		default:
 			break;

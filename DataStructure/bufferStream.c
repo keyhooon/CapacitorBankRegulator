@@ -7,7 +7,7 @@
 
 #include "bufferStream.h"
 
-BufferStream_TypeDef * BufferStreamInit(uint32_t bufferLenght)
+BufferStream_TypeDef * BufferStreamInit(unsigned int bufferLenght)
 {
 	BufferStream_TypeDef * bufferStream = pvPortMalloc(
 			sizeof(BufferStream_TypeDef));
@@ -27,7 +27,7 @@ void BufferStreamDeinit(BufferStream_TypeDef * bufferStream)
 
 void BufferStreamRead(BufferStream_TypeDef * bufferStream, char *data,
 		unsigned int count) {
-	int32_t c1 = bufferStream->length - bufferStream->tail;
+	int c1 = bufferStream->length - bufferStream->tail;
 	if (c1 < count) {
 		memcpy(data, bufferStream->buffer + bufferStream->tail, c1);
 		count -= c1;
@@ -69,7 +69,7 @@ inline int BufferStreamCheckEndOfFile(BufferStream_TypeDef * bufferStream){
 
 inline void BufferStreamReadBefore(BufferStream_TypeDef * bufferStream,
 		char *data, unsigned int count) {
-	int32_t c1 = count - bufferStream->tail;
+	int c1 = count - bufferStream->tail;
 	if (c1 > 0) {
 		memcpy(data, bufferStream->buffer + bufferStream->length - c1, c1);
 		count -= c1;

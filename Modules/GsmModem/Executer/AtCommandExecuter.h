@@ -13,6 +13,7 @@
 
 typedef struct AtCommandExecuter_Struct {
 	char * commandLineTerminationChar;			// s3
+	void (*Write)(char *, uint32_t);
 	Response_TypeDef LastResponse;
 	osMutexId mutexId;
 	osSemaphoreId semaphoreId;
@@ -40,7 +41,7 @@ typedef struct {
 } Command_TypeDef;
 
 CommandExecuter_TypeDef * CommandExecuter_Init(osMessageQId messageId,
-		char * commandLineTermination);
+		void (*Write)(char *, uint32_t), char * commandLineTermination);
 void CommandExecuter_DeInit(CommandExecuter_TypeDef *commandExecuter);
 Response_TypeDef CommandExecuter_Execute(
 		CommandExecuter_TypeDef commandExecuter, Command_TypeDef command);

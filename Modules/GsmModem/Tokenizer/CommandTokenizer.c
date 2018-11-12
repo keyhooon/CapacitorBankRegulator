@@ -7,7 +7,8 @@
 
 #include "Tokenizer/CommandTokenizer.h"
 CommandTokenizer_TypeDef * CommandTokenizer_Init(BufferStream_TypeDef *bufferStream,
-		char * separator, char * footer) {
+		const char * separator,
+		const char * footer) {
 	CommandTokenizer_TypeDef * tokenizer = pvPortMalloc(sizeof(CommandTokenizer_TypeDef));
 	tokenizer->bufferStream = bufferStream;
 	tokenizer->Footer = footer;

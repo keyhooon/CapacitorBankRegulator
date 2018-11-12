@@ -48,15 +48,19 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include <GUI.h>
-#include <GuiShell.h>
-#include <keypad.h>
+#include "Board.h"
+#include "WM.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "cmsis_os.h"
 
 /* USER CODE BEGIN Includes */
-#include "Board.h"
-#include "WM.h"
+
+#include <GuiShell.h>
+#include <keypad.h>
+#include <Gsm.h>
+
+#include "Api/V25TER.h"
 /* USER CODE END Includes */
 
 /* Variables -----------------------------------------------------------------*/
@@ -77,8 +81,8 @@ uint32_t ledTimStart[4] = { 1, 2, 3, 4 };
 void CalculationProc(void const * argument);
 void StatusShowCallback(void const * argument);
 
-extern void ToolbarFirstButtonProc();
-extern void ToolbarSecondButtonProc();
+extern BufferStream_TypeDef *BOARD_COMx_BUFFER_STREAM[COMn];
+GsmModem_initParam_typeDef modem_initParam;
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -171,12 +175,17 @@ void MX_FREERTOS_Init(void) {
 
 	/* Create the thread(s) */
 	/* definition and creation of guiTask */
-	osThreadDef(guiTask, GuiProc, osPriorityNormal, 0, 1500);
+	osThreadDef(guiTask, GUI_Main, osPriorityNormal, 0, 1500);
 	guiTaskHandle = osThreadCreate(osThread(guiTask), NULL);
 
 	/* definition and creation of defaultTask */
 	osThreadDef(keyboardTask, KEYPAD_Main, osPriorityNormal, 0, 256);
 	keyboardTaskHandle = osThreadCreate(osThread(keyboardTask), NULL);
+
+	modem_initParam.inputBuffer = BOARD_COMx_BUFFER_STREAM[GSM_COM];
+	modem_initParam.Write = GSM_IO_Write;
+	osThreadDef(ModemTask, GSM_Main, osPriorityNormal, 0, 256);
+	keyboardTaskHandle = osThreadCreate(osThread(ModemTask), &modem_initParam);
 
 	/* definition and creation of CalculateTask */
 	osThreadDef(CalculateTask, CalculationProc, osPriorityIdle, 0, 128);
@@ -204,6 +213,8 @@ void CalculationProc(void const * argument)
   for(;;)
   {
 		osDelay(1000);
+		char id[40];
+		GSM_DISPLAY_PRODUCT_IDENTIFICATION_INFORMATION(id);
   }
   /* USER CODE END CalculationProc */
 }

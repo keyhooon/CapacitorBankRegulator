@@ -501,19 +501,6 @@ static void _CreateSelected(int Index, WM_HWIN hWin) {
 	WM_DeleteWindow(hWinSelected);
 }
 
-/*********************************************************************
- *
- *       _cbDummy
- *
- * Purpose:
- *   Required for base window and viewport window to make sure WM_DefaultProc() is called.
- */
-static void _cbDummy(WM_MESSAGE * pMsg) {
-	switch (pMsg->MsgId) {
-	default:
-		WM_DefaultProc(pMsg);
-	}
-}
 
 /*********************************************************************
  *

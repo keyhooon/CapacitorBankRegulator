@@ -38,6 +38,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "Board.h"
+#include "bufferStream.h"
 
 
 typedef struct
@@ -78,32 +79,22 @@ typedef struct
 /**
  * @brief LED variables
  */
-GPIO_TypeDef* LED_PORT[LEDn] = {LED1_GPIO_PORT,
-                                LED2_GPIO_PORT,
-                                LED3_GPIO_PORT,
-                                LED4_GPIO_PORT};
+GPIO_TypeDef* LED_PORT[LEDn] = { LED1_GPIO_PORT, LED2_GPIO_PORT, LED3_GPIO_PORT,
+		LED4_GPIO_PORT };
 
-const uint16_t LED_PIN[LEDn] = {LED1_PIN,
-                                LED2_PIN,
-                                LED3_PIN,
-                                LED4_PIN};
+const uint16_t LED_PIN[LEDn] = { LED1_PIN, LED2_PIN, LED3_PIN, LED4_PIN };
 
 /**
  * @brief BUTTON variables
  */
-GPIO_TypeDef* BUTTON_PORT[BUTTONn] = {WAKEUP_BUTTON_GPIO_PORT,
-                                      TAMPER_BUTTON_GPIO_PORT,
-KEY1_BUTTON_GPIO_PORT, KEY2_BUTTON_GPIO_PORT };
+GPIO_TypeDef* BUTTON_PORT[BUTTONn] = { WAKEUP_BUTTON_GPIO_PORT,
+		TAMPER_BUTTON_GPIO_PORT, KEY1_BUTTON_GPIO_PORT, KEY2_BUTTON_GPIO_PORT };
 
-const uint16_t BUTTON_PIN[BUTTONn] = {WAKEUP_BUTTON_PIN,
-                                      TAMPER_BUTTON_PIN,
-KEY1_BUTTON_PIN,
-KEY2_BUTTON_PIN };
+const uint16_t BUTTON_PIN[BUTTONn] = { WAKEUP_BUTTON_PIN, TAMPER_BUTTON_PIN,
+		KEY1_BUTTON_PIN, KEY2_BUTTON_PIN };
 
-const uint16_t BUTTON_IRQn[BUTTONn] = {WAKEUP_BUTTON_EXTI_IRQn,
-                                       TAMPER_BUTTON_EXTI_IRQn,
-KEY1_BUTTON_EXTI_IRQn,
-KEY2_BUTTON_EXTI_IRQn };
+const uint16_t BUTTON_IRQn[BUTTONn] = { WAKEUP_BUTTON_EXTI_IRQn,
+		TAMPER_BUTTON_EXTI_IRQn, KEY1_BUTTON_EXTI_IRQn, KEY2_BUTTON_EXTI_IRQn };
 
 
 
@@ -133,20 +124,7 @@ BOARD_COM2_IRQn };
 
 BufferStream_TypeDef *BOARD_COMx_BUFFER_STREAM[COMn];
 
-static void COMx_MspInit(COM_TypeDef COM);
-static void COMx_Init(COM_TypeDef COM);
-static void COMx_DeInit(COM_TypeDef COM);
-static void COMx_Open(COM_TypeDef COM);
-static void COMx_Close(COM_TypeDef COM);
-static void COMx_Write(COM_TypeDef COM, uint8_t *Value, uint8_t Size);
-static void COMx_Write_DMA(COM_TypeDef COM, char *buffer, uint8_t length);
-static void COMx_Read(COM_TypeDef COM, char * data, uint32_t length);
-inline static void COMx_ReadBefore(COM_TypeDef COM, char * data,
-		uint32_t length);
-inline static int COMx_Check_Chars_Equality(COM_TypeDef COM, char * data,
-		int length);
-void COMx_DataReceivedCallback(COM_TypeDef COM, uint32_t Length);
-static void COMx_Error(COM_TypeDef COM);
+
 
 
 /**
@@ -172,11 +150,20 @@ TIM_HandleTypeDef htim5;
 TIM_HandleTypeDef htim1;
 
 
+
+static void COMx_MspInit(COM_TypeDef COM);
+static void COMx_Init(COM_TypeDef COM);
+static void COMx_DeInit(COM_TypeDef COM);
+static void COMx_Open(COM_TypeDef COM);
+static void COMx_Close(COM_TypeDef COM);
+static void COMx_Write_DMA(COM_TypeDef COM, char *buffer, uint8_t length);
+static void COMx_Read(COM_TypeDef COM, char * data, uint32_t length);
+void COMx_DataReceivedCallback(COM_TypeDef COM, uint32_t Length);
+static void COMx_Error(COM_TypeDef COM);
 /* I2Cx bus function */
 #ifdef HAL_I2C_MODULE_ENABLED
 /* Link function for I2C EEPROM peripheral */
 static void I2Cx_Init(void);
-static void I2Cx_ITConfig(void);
 static HAL_StatusTypeDef I2Cx_ReadMultiple(uint8_t Addr, uint16_t Reg,
 		uint16_t MemAddress, uint8_t *Buffer, uint16_t Length);
 static HAL_StatusTypeDef I2Cx_ReadBuffer(uint16_t Addr, uint8_t Reg,
@@ -1421,8 +1408,8 @@ static void COMx_Close(COM_TypeDef COM) {
  * @retval HAL status
  */
 static void COMx_Write_DMA(COM_TypeDef COM, char *buffer, uint8_t length) {
-	if (HAL_UART_Transmit_DMA(&BOARD_COMx_HUART[COM], (uint8_t*) buffer,
-			(uint8_t) length) != HAL_OK)
+	if (HAL_UART_Transmit(&BOARD_COMx_HUART[COM], (uint8_t*) buffer,
+			(uint8_t) length, 1000) != HAL_OK)
 		COMx_Error(COM);
 }
 

@@ -7,6 +7,7 @@
 
 #include "V25TER.h"
 #include "Gsm.h"
+#include "string.h"
 
 const CommandType_TypeDef REISSUES_THE_LAST_COMMAND_GIVEN = { "A/", 0, basic };
 const CommandType_TypeDef ANSWER_AN_INCOMING_CALL = { "A", 20000, basic };
@@ -111,7 +112,7 @@ int GSM_DISPLAY_PRODUCT_IDENTIFICATION_INFORMATION(char * data) {
 	Response_TypeDef response;
 	int result = EXECUTE_COMMAND_EX(DISPLAY_PRODUCT_IDENTIFICATION_INFORMATION,
 			Execute, 0, &response);
-	strcpy(data, response.Tokens[0]);
+	strcpy(data, response.Tokens.Items[0]);
 	CommandTokenizer_FreeTokenList(response.Tokens);
 	return result;
 }
@@ -121,7 +122,7 @@ int GSM_REQUEST_MANUFACTURER_IDENTIFICATION(char * data) {
 	int result = EXECUTE_COMMAND_EX(REQUEST_MANUFACTURER_IDENTIFICATION,
 			Execute, 0,
 			&response);
-	strcpy(data, response.Tokens[0]);
+	strcpy(data, response.Tokens.Items[0]);
 	CommandTokenizer_FreeTokenList(response.Tokens);
 	return result;
 }
@@ -130,7 +131,7 @@ int GSM_REQUEST_TA_MODEL_IDENTIFICATION(char * data) {
 	Response_TypeDef response;
 	int result = EXECUTE_COMMAND_EX(REQUEST_TA_MODEL_IDENTIFICATION, Execute, 0,
 			&response);
-	strcpy(data, response.Tokens[0]);
+	strcpy(data, response.Tokens.Items[0]);
 	CommandTokenizer_FreeTokenList(response.Tokens);
 	return result;
 }
@@ -140,7 +141,7 @@ int GSM_REQUEST_TA_REVISION_IDENTIFICATION_OF_SOFTWARE_RELEASE(char * data) {
 	int result = EXECUTE_COMMAND_EX(
 			REQUEST_TA_REVISION_IDENTIFICATION_OF_SOFTWARE_RELEASE, Execute, 0,
 			&response);
-	strcpy(data, response.Tokens[0]);
+	strcpy(data, response.Tokens.Items[0]);
 	CommandTokenizer_FreeTokenList(response.Tokens);
 	return result;
 }
@@ -149,7 +150,7 @@ int GSM_REQUEST_GLOBAL_OBJECT_IDENTIFICATION(char * data) {
 	int result = EXECUTE_COMMAND_EX(REQUEST_GLOBAL_OBJECT_IDENTIFICATION,
 			Execute, 0,
 			&response);
-	strcpy(data, response.Tokens[0]);
+	strcpy(data, response.Tokens.Items[0]);
 	CommandTokenizer_FreeTokenList(response.Tokens);
 	return result;
 }
@@ -159,7 +160,7 @@ int GSM_REQUEST_TA_SERIAL_NUMBER_IDENTIFICATION(char * data) {
 	int result = EXECUTE_COMMAND_EX(REQUEST_TA_SERIAL_NUMBER_IDENTIFICATION,
 			Execute,
 			0, &response);
-	strcpy(data, response.Tokens[0]);
+	strcpy(data, response.Tokens.Items[0]);
 	CommandTokenizer_FreeTokenList(response.Tokens);
 	return result;
 }

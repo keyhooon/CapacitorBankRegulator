@@ -290,7 +290,7 @@ static void PageShow(ViewNavigatorTypedef *viewNavigator,
 	if (view->show == NULL)
 		return;
 	GUI_HWIN hWin = view->show();
-	if (hWin != NULL) {
+	if (hWin != 0) {
 		WM_AttachWindow(hWin, viewNavigator->view_container_hWin);
 		WM_SetFocus(hWin);
 

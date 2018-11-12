@@ -44,7 +44,7 @@ static void _cbViewPort(WM_MESSAGE * pMsg);
 static void _cbToolbar(WM_MESSAGE * pMsg);
 
 
-void GuiProc(void const * argument) {
+void GUI_Main(void const * argument) {
 	SeedContact();
 	SeedMessage();
 	/* Init the STemWin GUI Library */

@@ -172,12 +172,15 @@ typedef enum
 #define KEY1_BUTTON_GPIO_CLK_ENABLE()        __HAL_RCC_GPIOA_CLK_ENABLE()
 #define KEY1_BUTTON_GPIO_CLK_DISABLE()       __HAL_RCC_GPIOA_CLK_DISABLE()
 #define KEY1_BUTTON_EXTI_IRQn                EXTI9_5_IRQn
+#define KEY1_BUTTON_EXTI_IRQHandler          EXTI9_5_IRQHandler
 
 #define KEY2_BUTTON_PIN                      GPIO_PIN_3             /* PD.3*/
 #define KEY2_BUTTON_GPIO_PORT                GPIOD
 #define KEY2_BUTTON_GPIO_CLK_ENABLE()        __HAL_RCC_GPIOD_CLK_ENABLE()
 #define KEY2_BUTTON_GPIO_CLK_DISABLE()       __HAL_RCC_GPIOD_CLK_DISABLE()
 #define KEY2_BUTTON_EXTI_IRQn                EXTI3_IRQn
+#define KEY2_BUTTON_EXTI_IRQHandler          EXTI3_IRQHandler
+
 
 /**
  * @brief Wake-up push-button
@@ -294,7 +297,6 @@ void GSM_IO_Read(char * data, uint32_t length);
 void GSM_IO_ReadBefore(char * data, uint32_t length);
 char * GSM_IO_Read_Char();
 int GSM_IO_Check_Chars_Equality(char *data, int length);
-BufferStream_TypeDef * GSM_IO_GetBuffer();
 
 void GSM_DataReceivedCallback(uint32_t Length);
 
@@ -519,7 +521,9 @@ supply LSb is ‘1’ (address 0011101b) else if SDO pad is connected to ground LSb 
 /**
   * @}
   */
+extern GPIO_TypeDef* BUTTON_PORT[BUTTONn];
 
+extern const uint16_t BUTTON_PIN[BUTTONn];
 /**
   * @}
   */

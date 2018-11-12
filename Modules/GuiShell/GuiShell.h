@@ -8,6 +8,6 @@
 #ifndef INC_GUISHELL_H_
 #define INC_GUISHELL_H_
 
-void GuiProc(void const * argument);
+void GUI_Main(void const * argument);
 
 #endif /* INC_GUISHELL_H_ */

@@ -72,11 +72,8 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 void MX_FREERTOS_Init(void);
-
-extern void LCD_IO_ReadReg(uint8_t Reg, uint8_t *Data, uint16_t DataLength);
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
-void BSP_Background(void);
 static void BSP_Config(void);
 /* USER CODE END PFP */
 
@@ -237,17 +234,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE BEGIN Callback 1 */
 
   /* USER CODE END Callback 1 */
-}
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-	if (GPIO_Pin == KP_R0_PIN || GPIO_Pin == KP_R1_PIN || GPIO_Pin == KP_R2_PIN
-			|| GPIO_Pin == KP_R3_PIN)
-		KEYPAD_EXTI_Callback(GPIO_Pin);
-	if (GPIO_Pin == BUTTON_PIN[2])
-		BSP_PB_EXTI_Callback(BUTTON_KEY1,
-				HAL_GPIO_ReadPin(BUTTON_PORT[2], BUTTON_PIN[2]));
-	if (GPIO_Pin == BUTTON_PIN[3])
-		BSP_PB_EXTI_Callback(BUTTON_KEY2,
-				HAL_GPIO_ReadPin(BUTTON_PORT[3], BUTTON_PIN[3]));
 }
 
 /**
