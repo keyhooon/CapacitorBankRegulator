@@ -24,6 +24,7 @@ CommandExecuter_TypeDef * CommandExecuter_Init(osMessageQId messageId,
 	commandExecuter->mutexId = osMutexCreate(&mutex);
 	commandExecuter->semaphoreId = osSemaphoreCreate(NULL, 1);
 	commandExecuter->messageId = messageId;
+	osSemaphoreWait(commandExecuter->semaphoreId, 0);
 	return commandExecuter;
 }
 void CommandExecuter_DeInit(CommandExecuter_TypeDef *commandExecuter) {
@@ -39,12 +40,12 @@ Response_TypeDef CommandExecuter_Execute(
 	osMutexWait(commandExecuter.mutexId, osWaitForever);
 	GetCommandString(commandString, commandExecuter, command);
 	commandExecuter.Write(commandString, strlen(commandString));
-	if (osSemaphoreWait(commandExecuter.semaphoreId,
-			command.type.maximumResponseTime == 0 ?
-					1000 : command.type.maximumResponseTime) == osOK)
+	int maxResponseTime = command.type.maximumResponseTime;
+	if (maxResponseTime == 0)
+		maxResponseTime = 1000;
+	if (osSemaphoreWait(commandExecuter.semaphoreId, maxResponseTime) == osOK)
 		result = commandExecuter.LastResponse;
 	else
-
 		result.status = ResponseStatusError_Timeout;
 
 	osMutexRelease(commandExecuter.mutexId);

@@ -8,30 +8,32 @@
 #include <Parser/AtCommandParser.h>
 #include "Gsm.h"
 #include "cmsis_os.h"
+#include "Board.h"
 
 const char *ATCOMMAND_SEPERATOR = "\r\n";
 const char *ATCOMMAND_FOOTER = "\r";
 
 
-
+extern BufferStream_TypeDef *BOARD_COMx_BUFFER_STREAM[COMn];
 
 Gsm_TypeDef GsmModem;
-void Gsm_Init(BufferStream_TypeDef *inputBuffer,
-		void (*Write)(char *, uint32_t))
+void Gsm_Init(osMessageQId GSMMessageQHandle)
 {
-	osMessageQDef(Gsm, 1, unsigned int);
-	GsmModem.commandExecuter = CommandExecuter_Init(
-			osMessageCreate(osMessageQ(Gsm), NULL), Write,
-			COMMAND_LINE_TERMINATION_CAHR_DEFAULT);
-	GsmModem.commandTokenizer = CommandTokenizer_Init(inputBuffer,
-			ATCOMMAND_SEPERATOR, ATCOMMAND_FOOTER);
 	GSM_IO_Init();
+	osMessageQDef(Gsm, 1, unsigned int);
+	GsmModem.commandExecuter = CommandExecuter_Init(GSMMessageQHandle,
+			GSM_IO_Write,
+			COMMAND_LINE_TERMINATION_CAHR_DEFAULT);
+	GsmModem.commandTokenizer = CommandTokenizer_Init(
+			BOARD_COMx_BUFFER_STREAM[GSM_COM], ATCOMMAND_SEPERATOR,
+			ATCOMMAND_FOOTER);
+
 }
 
 void GSM_Main(void const * argument)
 {
-	const GsmModem_initParam_typeDef *param = argument;
-	Gsm_Init(param->inputBuffer, param->Write);
+	osMessageQId GSMMessageQHandle = *(osMessageQId*) argument;
+	Gsm_Init(GSMMessageQHandle);
 	Response_TypeDef response;
 	while(1)
 	{
@@ -50,7 +52,7 @@ void GSM_Main(void const * argument)
 		}
 	}
 }
-
+extern osMessageQId GSMMessageQHandle;
 void GSM_DataReceivedCallback(uint32_t Length) {
-	osMessagePut(GsmModem.commandExecuter->messageId, Length, osWaitForever);
+	osMessagePut(GSMMessageQHandle, Length, osWaitForever);
 }

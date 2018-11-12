@@ -65,11 +65,12 @@
 
 /* Variables -----------------------------------------------------------------*/
 osThreadId keyboardTaskHandle;
+osThreadId ModemTaskHandle;
 osThreadId guiTaskHandle;
 osThreadId CalculateTaskHandle;
-osThreadId EventTaskHandle;
 osTimerId StatusTimerHandle;
 osSemaphoreId CalculateNeededSemHandle;
+osMessageQId GSMMessageQHandle;
 
 /* USER CODE BEGIN Variables */
 uint32_t ledTim[4];
@@ -82,7 +83,6 @@ void CalculationProc(void const * argument);
 void StatusShowCallback(void const * argument);
 
 extern BufferStream_TypeDef *BOARD_COMx_BUFFER_STREAM[COMn];
-GsmModem_initParam_typeDef modem_initParam;
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -158,6 +158,8 @@ void MX_FREERTOS_Init(void) {
 	CalculateNeededSemHandle = osSemaphoreCreate(
 			osSemaphore(CalculateNeededSem), 1);
 
+	osMessageQDef(Gsm, 1, unsigned int);
+	GSMMessageQHandle = osMessageCreate(osMessageQ(Gsm), NULL);
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
@@ -182,13 +184,12 @@ void MX_FREERTOS_Init(void) {
 	osThreadDef(keyboardTask, KEYPAD_Main, osPriorityNormal, 0, 256);
 	keyboardTaskHandle = osThreadCreate(osThread(keyboardTask), NULL);
 
-	modem_initParam.inputBuffer = BOARD_COMx_BUFFER_STREAM[GSM_COM];
-	modem_initParam.Write = GSM_IO_Write;
-	osThreadDef(ModemTask, GSM_Main, osPriorityNormal, 0, 256);
-	keyboardTaskHandle = osThreadCreate(osThread(ModemTask), &modem_initParam);
+
+	osThreadDef(ModemTask, GSM_Main, osPriorityAboveNormal, 0, 256);
+	ModemTaskHandle = osThreadCreate(osThread(ModemTask), &GSMMessageQHandle);
 
 	/* definition and creation of CalculateTask */
-	osThreadDef(CalculateTask, CalculationProc, osPriorityIdle, 0, 128);
+	osThreadDef(CalculateTask, CalculationProc, osPriorityIdle, 0, 256);
 	CalculateTaskHandle = osThreadCreate(osThread(CalculateTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */

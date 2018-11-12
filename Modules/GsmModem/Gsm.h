@@ -25,10 +25,6 @@ typedef struct Gsm_Struct {
 	CommandTokenizer_TypeDef * commandTokenizer;
 } Gsm_TypeDef;
 
-typedef struct {
-	BufferStream_TypeDef *inputBuffer;
-	void (*Write)(char *, uint32_t);
-} GsmModem_initParam_typeDef;
 
 extern Gsm_TypeDef GsmModem;
 #define DefaultRetriesCount		5
