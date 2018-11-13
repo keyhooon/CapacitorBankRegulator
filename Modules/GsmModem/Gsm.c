@@ -19,8 +19,9 @@ extern BufferStream_TypeDef *BOARD_COMx_BUFFER_STREAM[COMn];
 Gsm_TypeDef GsmModem;
 void Gsm_Init(osMessageQId GSMMessageQHandle)
 {
-	GSM_IO_Init();
 	osMessageQDef(Gsm, 1, unsigned int);
+	GSM_IO_Init();
+
 	GsmModem.commandExecuter = CommandExecuter_Init(GSMMessageQHandle,
 			GSM_IO_Write,
 			COMMAND_LINE_TERMINATION_CAHR_DEFAULT);
