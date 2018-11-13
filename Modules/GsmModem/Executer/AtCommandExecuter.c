@@ -46,7 +46,13 @@ Response_TypeDef CommandExecuter_Execute(
 	if (osSemaphoreWait(commandExecuter.semaphoreId, maxResponseTime) == osOK)
 		result = commandExecuter.LastResponse;
 	else
+	{
+		result.Tokens.Items = NULL;
+		result.Tokens.IndexNeedToBeReleased = -1;
+		result.Tokens.ResultIndex = -1;
 		result.status = ResponseStatusError_Timeout;
+		result.resultNumber = -1;
+	}
 
 	osMutexRelease(commandExecuter.mutexId);
 	return result;

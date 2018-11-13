@@ -31,39 +31,22 @@ extern Gsm_TypeDef GsmModem;
 
 #define CHECK_RESPONSE(response) ((response).status == ResponseStatusOk && (response).resultNumber == RESULT_NUMBER_OK)
 
-#define EXECUTE_COMMAND(command, response)  ({ \
+
+#define EXECUTE_COMMAND(type, action, parameters)  ({ \
 	int register r = DefaultRetriesCount; \
+	Command_TypeDef command = {typr, action, parameters}; \
+	Response_TypeDef response ; \
 	while (r--) { \
-		*response = CommandExecuter_Execute(*GsmModem.commandExecuter, command); \
-		if (CHECK_RESPONSE(*response)) \
+		response = CommandExecuter_Execute(*GsmModem.commandExecuter, command); \
+		if (CHECK_RESPONSE(response)) \
+		{ \
+			CommandTokenizer_FreeTokenList(response->Tokens); \
 			break; \
+		} \
+		CommandTokenizer_FreeTokenList(response->Tokens); \
 	} \
 	r; \
 })
-
-#define EXECUTE_COMMAND_EX(commandType, action, parameters, response) ({ \
-		Command_TypeDef command = {commandType, action, parameters}; \
-		EXECUTE_COMMAND(command, response); \
-})
-
-
-#define EXECUTE_COMMAND_RESPONSELESS(command) ({ \
-	uint32_t register r = DefaultRetriesCount; \
-	Response_TypeDef res ;\
-	while (r--) { \
-		res = CommandExecuter_Execute(*GsmModem.commandExecuter, command); \
-		if (CHECK_RESPONSE(res)) \
-			break; \
-	} \
-	CommandTokenizer_FreeTokenList(res.Tokens); \
-	r; \
-})
-
-#define EXECUTE_COMMAND_RESPONSELESS_EX(commandType, action, parameters) ({ \
-		Command_TypeDef command = {commandType, action, parameters}; \
-		EXECUTE_COMMAND_RESPONSELESS(command); \
-})
-
 
 void GSM_Main(void const * argument);
 #endif /* GSMMODEM_GSM_H_ */

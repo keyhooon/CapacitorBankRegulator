@@ -58,5 +58,6 @@ void CommandTokenizer_FreeTokenList(CommandTokensList_TypeDef commandTokenList) 
 	if (commandTokenList.IndexNeedToBeReleased != -1)
 		vPortFree(
 				commandTokenList.Items[commandTokenList.IndexNeedToBeReleased]);
-	vPortFree(commandTokenList.Items);
+	if (commandTokenList.Items != (void*) 0)
+		vPortFree(commandTokenList.Items);
 }
