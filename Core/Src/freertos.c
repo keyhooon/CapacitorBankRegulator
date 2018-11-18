@@ -215,6 +215,7 @@ void CalculationProc(void const * argument)
   {
 		osDelay(1000);
 		char id[40];
+		int s[2] = { 4, 12 };
 		GSM_TA_RESPONSE_FORMAT(0);
 		GSM_SET_COMMAND_ECHO_MODE(0);
 		GSM_DISPLAY_PRODUCT_IDENTIFICATION_INFORMATION(id);

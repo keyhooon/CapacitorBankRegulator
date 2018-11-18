@@ -18,6 +18,10 @@ bufToken_TypeDef BufTok(BufferStream_TypeDef * bufferStream, char * delimiter, i
 	for (int i = 0; i < bufferStreamMaxLength; i++) {
 		if (*(bufferStream->buffer + currentIndex) == *(delimiter + delimiterFoundCount))
 			delimiterFoundCount++;
+		else if (*(bufferStream->buffer + currentIndex) == *(delimiter))
+			delimiterFoundCount = 1;
+		else
+			delimiterFoundCount = 0;
 		if (delimiterLength == delimiterFoundCount) {
 			*(bufferStream->buffer + currentIndex - delimiterLength + 1) = 0;
 			int length = currentIndex - bufferStream->tail - delimiterLength + 1;

@@ -26,27 +26,17 @@ typedef struct Gsm_Struct {
 } Gsm_TypeDef;
 
 
-extern Gsm_TypeDef GsmModem;
 #define DefaultRetriesCount		5
 
 #define CHECK_RESPONSE(response) ((response).status == ResponseStatusOk && (response).resultNumber == RESULT_NUMBER_OK)
 
 
-#define EXECUTE_COMMAND(type, action, parameters)  ({ \
-	int register r = DefaultRetriesCount; \
-	Command_TypeDef command = {typr, action, parameters}; \
-	Response_TypeDef response ; \
-	while (r--) { \
-		response = CommandExecuter_Execute(*GsmModem.commandExecuter, command); \
-		if (CHECK_RESPONSE(response)) \
-		{ \
-			CommandTokenizer_FreeTokenList(response->Tokens); \
-			break; \
-		} \
-		CommandTokenizer_FreeTokenList(response->Tokens); \
-	} \
-	r; \
-})
+
 
 void GSM_Main(void const * argument);
+int Gsm_ExecuteCommand(CommandType_TypeDef type, CommandAction_TypeDef action,
+		void * parameters);
+int Gsm_ExecuteCommand_Ex(CommandType_TypeDef type,
+		CommandAction_TypeDef action, void * parameters, char* response);
+
 #endif /* GSMMODEM_GSM_H_ */

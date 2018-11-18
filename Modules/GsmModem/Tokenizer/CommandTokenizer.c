@@ -38,17 +38,17 @@ CommandTokensList_TypeDef CommandTokenizer_tokenize(
 		currentBuffToken = BufTok(tokenizer.bufferStream, tokenizer.Separator,
 				commandLength);
 	}
-
-	currentBuffToken = BufTok(tokenizer.bufferStream, tokenizer.Footer,
-			commandLength);
-	if (currentBuffToken.item != 0) {
-		if (currentBuffToken.needTobeRealesed)
-			result.IndexNeedToBeReleased = tokenCount;
-		result.ResultIndex = tokenCount;
-		TokenizedItems[tokenCount++] = currentBuffToken.item;
-		commandLength -= currentBuffToken.length
-				+ strlen(tokenizer.Separator);
-	}
+	result.ResultIndex = tokenCount - 1;
+//	currentBuffToken = BufTok(tokenizer.bufferStream, tokenizer.Footer,
+//			commandLength);
+//	if (currentBuffToken.item != 0) {
+//		if (currentBuffToken.needTobeRealesed)
+//			result.IndexNeedToBeReleased = tokenCount;
+//		result.ResultIndex = tokenCount;
+//		TokenizedItems[tokenCount++] = currentBuffToken.item;
+//		commandLength -= currentBuffToken.length
+//				+ strlen(tokenizer.Separator);
+//	}
 	TokenizedItems[tokenCount++] = 0;
 	result.Items = pvPortMalloc(sizeof(char *) * tokenCount);
 	memcpy(result.Items, TokenizedItems, sizeof(char *) * tokenCount);

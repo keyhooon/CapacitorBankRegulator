@@ -44,7 +44,7 @@ Response_TypeDef CommandExecuter_Execute(
 	if (maxResponseTime == 0)
 		maxResponseTime = 1000;
 	if (osSemaphoreWait(commandExecuter.semaphoreId, maxResponseTime) == osOK)
-		result = commandExecuter.LastResponse;
+		result = *(commandExecuter.LastResponse);
 	else
 	{
 		result.Tokens.Items = NULL;

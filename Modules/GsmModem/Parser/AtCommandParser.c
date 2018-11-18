@@ -11,7 +11,7 @@ Response_TypeDef ResponseParse(CommandTokenizer_TypeDef tokenizer,
 		unsigned int length) {
 	CommandTokensList_TypeDef tokensList = CommandTokenizer_tokenize(tokenizer,
 			length);
-	Response_TypeDef result = { -1, ResponseStatusOk, tokensList };
+	Response_TypeDef result = { 0, ResponseStatusOk, tokensList };
 	if (tokensList.ResultIndex != -1) {
 		register char* string = *(tokensList.Items + tokensList.ResultIndex);
 		register unsigned int digit;
