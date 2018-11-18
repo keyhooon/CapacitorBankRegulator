@@ -34,16 +34,19 @@ static uint8_t ForwardViewHide(GUI_HWIN hWin);
 static void ForwardOkCallback(void);
 static void backCallback(void);
 
+extern GUI_CONST_STORAGE GUI_BITMAP bmmessageforward;
+extern GUI_CONST_STORAGE GUI_BITMAP bmmessagereply;
+
 CustomFunction_Typedef * MessageFunctionList[5];
 static void EditMessageProgress(void * arg, GUI_HWIN currentWidget);
 
 extern ListApiHandlers_typedef MessageListApiHandlers;
 extern View_Typedef ListView;
 
-static const CustomFunction_Typedef ForwardFunction = {
-NULL, (const char*) "Forward", Forward };
-static const CustomFunction_Typedef ReplyFunction = {
-NULL, (const char*) "Reply", Reply };
+static const CustomFunction_Typedef ForwardFunction = { &bmmessageforward,
+		(const char*) "Forward", Forward };
+static const CustomFunction_Typedef ReplyFunction = { &bmmessagereply,
+		(const char*) "Reply", Reply };
 
 GUI_HWIN currentWidget;
 

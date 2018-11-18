@@ -41,6 +41,8 @@
 #define ID_WINDOW_02     (GUI_ID_USER + 0x10)
 #define ID_LISTBOX_0     (GUI_ID_USER + 0x11)
 
+extern GUI_CONST_STORAGE GUI_BITMAP bmphonecall;
+
 void InitContactView(void);
 
 static void Call(void);
@@ -54,8 +56,8 @@ static void EditContactProgress(void * arg, GUI_HWIN currentWidget);
 extern ListApiHandlers_typedef ContactListApiHandlers;
 extern View_Typedef ListView;
 
-static const CustomFunction_Typedef CallFunction = {
-NULL, (const char*) "Call", Call };
+static const CustomFunction_Typedef CallFunction = { &bmphonecall,
+		(const char*) "Call", Call };
 
 
 typedef enum {
