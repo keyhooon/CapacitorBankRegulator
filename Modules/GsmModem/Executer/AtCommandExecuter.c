@@ -62,9 +62,15 @@ void GetCommandString(char* commandText,
 	switch (command.type.syntax) {
 	case basic:
 		if (command.parameters != NULL)
-			sprintf(commandText, "at%s%d%c", command.type.text,
+			if (command.properties.parameterType == string) {
+				sprintf(commandText, "at%s%s%c", command.type.text,
+						(char *) (command.parameters),
+						*commandExecuter.commandLineTerminationChar);
+			} else if (command.properties.parameterType == integer) {
+				sprintf(commandText, "at%s%d%c", command.type.text,
 					*(int *) (command.parameters),
 					*commandExecuter.commandLineTerminationChar);
+			}
 		else
 			sprintf(commandText, "at%s%c", command.type.text,
 					*commandExecuter.commandLineTerminationChar);
@@ -75,7 +81,7 @@ void GetCommandString(char* commandText,
 				*commandExecuter.commandLineTerminationChar);
 		break;
 	case extended:
-		switch (command.action) {
+		switch (command.properties.action) {
 		case Test:
 			sprintf(commandText, "at+%s=?%c", command.type.text,
 					*commandExecuter.commandLineTerminationChar);

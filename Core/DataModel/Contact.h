@@ -20,7 +20,7 @@ typedef struct {
 	char * CallNumber;
 } Contact_Typedef;
 
-DATA_ACCESS_LIST_PROTOTYPES( Contact)
+DATA_ACCESS_LIST_PROTOTYPES(Contact)
 
 void seedContact();
 #endif /* DATAMODEL_CONTACT_H_ */

@@ -34,7 +34,7 @@ typedef struct Gsm_Struct {
 
 
 void GSM_Main(void const * argument);
-int Gsm_ExecuteCommand(CommandType_TypeDef type, CommandAction_TypeDef action,
+int Gsm_ExecuteCommand_RetryUntillOk(CommandType_TypeDef type, CommandAction_TypeDef action,
 		void * parameters);
 int Gsm_ExecuteCommand_Ex(CommandType_TypeDef type,
 		CommandAction_TypeDef action, void * parameters, char* response);

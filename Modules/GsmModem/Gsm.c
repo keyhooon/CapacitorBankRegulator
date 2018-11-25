@@ -18,24 +18,49 @@ extern BufferStream_TypeDef *BOARD_COMx_BUFFER_STREAM[COMn];
 
 Gsm_TypeDef GsmModem;
 
+
+
 int Gsm_ExecuteCommand(CommandType_TypeDef type, CommandAction_TypeDef action,
 		void * parameters) {
-	int register r = DefaultRetriesCount;
 	Command_TypeDef command = { type, action, parameters };
 	Response_TypeDef response;
+	response = CommandExecuter_Execute(*(GsmModem.commandExecuter), command);
+	CommandTokenizer_FreeTokenList(response.Tokens);
+	return response.resultNumber;
+}
+int Gsm_ExecuteCommand_Ex(CommandType_TypeDef type,
+		CommandAction_TypeDef action, void * parameters, char* response) {
+	Command_TypeDef command = { type, action, parameters };
+	Response_TypeDef res;
+	res = CommandExecuter_Execute(*(GsmModem.commandExecuter), command);
+	if (CHECK_RESPONSE(res))
+		strcpy(response, res.Tokens.Items[0]);
+	else
+		*response = 0;
+	CommandTokenizer_FreeTokenList(res.Tokens);
+	return res.resultNumber;
+}
+
+
+int Gsm_ExecuteCommand_RetryUntillOk(CommandType_TypeDef type, CommandAction_TypeDef action,
+		void * parameters) {
+	int register r = DefaultRetriesCount;
+	Response_TypeDef response;
 	while (r--) {
+		Command_TypeDef command = { type, action, parameters };
+
 		response = CommandExecuter_Execute(*(GsmModem.commandExecuter),
 				command);
+		CommandTokenizer_FreeTokenList(response.Tokens);
 		if (CHECK_RESPONSE(response)) {
-			CommandTokenizer_FreeTokenList(response.Tokens);
-			return 1;
+			break;
 		}
 		CommandTokenizer_FreeTokenList(response.Tokens);
 	}
-	return 0;
+	return response.resultNumber;
 }
 
-int Gsm_ExecuteCommand_Ex(CommandType_TypeDef type,
+int Gsm_ExecuteCommand_RetryUntillOk_Ex(CommandType_TypeDef type,
 		CommandAction_TypeDef action,
 		void * parameters, char* response) {
 	int register r = DefaultRetriesCount;
@@ -47,12 +72,12 @@ int Gsm_ExecuteCommand_Ex(CommandType_TypeDef type,
 		if (CHECK_RESPONSE(res)) {
 			strcpy(response, res.Tokens.Items[0]);
 			CommandTokenizer_FreeTokenList(res.Tokens);
-			return 1;
+			return res.resultNumber;
 		}
 		CommandTokenizer_FreeTokenList(res.Tokens);
 	}
 	*response = 0;
-	return 0;
+	return res.resultNumber;
 }
 void Gsm_Init(osMessageQId GSMMessageQHandle)
 {

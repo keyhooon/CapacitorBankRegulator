@@ -28,6 +28,10 @@ typedef enum {
 	Test, Read, Write, Execute
 } CommandAction_TypeDef;
 
+typedef enum {
+	string, integer
+} CommandParameterType_TypeDef;
+
 typedef struct {
 	const char * text;
 	uint32_t maximumResponseTime;
@@ -36,7 +40,10 @@ typedef struct {
 
 typedef struct {
 	CommandType_TypeDef type;
-	CommandAction_TypeDef action;
+	union {
+		CommandAction_TypeDef action;
+		CommandParameterType_TypeDef parameterType;
+	} properties;
 	void * parameters;
 } Command_TypeDef;
 

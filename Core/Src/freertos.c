@@ -59,8 +59,8 @@
 #include <GuiShell.h>
 #include <keypad.h>
 #include <Gsm.h>
+#include <api/V25TER.h>
 
-#include "Api/V25TER.h"
 /* USER CODE END Includes */
 
 /* Variables -----------------------------------------------------------------*/
@@ -211,14 +211,14 @@ void CalculationProc(void const * argument)
 {
   /* USER CODE BEGIN CalculationProc */
   /* Infinite loop */
+	char id[40];
+	GSM_TA_RESPONSE_FORMAT(0);
+	GSM_SET_COMMAND_ECHO_MODE(0);
+	GSM_DISPLAY_PRODUCT_IDENTIFICATION_INFORMATION(id);
   for(;;)
   {
 		osDelay(1000);
-		char id[40];
-		int s[2] = { 4, 12 };
-		GSM_TA_RESPONSE_FORMAT(0);
-		GSM_SET_COMMAND_ECHO_MODE(0);
-		GSM_DISPLAY_PRODUCT_IDENTIFICATION_INFORMATION(id);
+
   }
   /* USER CODE END CalculationProc */
 }

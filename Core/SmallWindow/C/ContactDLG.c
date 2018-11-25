@@ -26,9 +26,19 @@
 #include "DIALOG.h"
 #include "Contact.h"
 #include "ListView.h"
+#include "Api/V25TER.h"
 
 
+typedef enum {
+	Initiate, Dialing, Ringing, Answered, Busy, HangOut
+} CallState_TypeDef;
 
+typedef struct {
+	CallState_TypeDef state;
+	char Number[12];
+	Contact_Typedef * contact;
+	unsigned int time;
+} Call_TypeDef;
 
 
 
@@ -42,6 +52,8 @@
 #define ID_LISTBOX_0     (GUI_ID_USER + 0x11)
 
 extern GUI_CONST_STORAGE GUI_BITMAP bmphonecall;
+extern GUI_CONST_STORAGE GUI_BITMAP bmcalling0;
+extern GUI_CONST_STORAGE GUI_BITMAP * _abmcalling[];
 
 void InitContactView(void);
 
@@ -50,6 +62,7 @@ static void CallCancelCallback(void);
 static GUI_HWIN CallViewShow();
 static uint32_t CallViewHide(GUI_HWIN hwin);
 
+Call_TypeDef * call;
 CustomFunction_Typedef * ContactFunctionList[5];
 static void EditContactProgress(void * arg, GUI_HWIN currentWidget);
 
@@ -85,19 +98,89 @@ void InitContactView() {
 }
 
 
+static void _cbCallView(WM_MESSAGE * pMsg) {
+	int xSize, xPos;
+	WM_HWIN hWin;
+	hWin = pMsg->hWin;
+	switch (pMsg->MsgId) {
+	case WM_CREATE:
+		//
+		// Create timer to be used to modify the battery symbol
+		//
+		WM_CreateTimer(hWin, 0, 1000, 0);
+		break;
+	case WM_TIMER:
+		//
+		// Modify battery symbol on timer message
+		//
+		call->time++;
+		WM_InvalidateWindow(hWin);
+		WM_RestartTimer(pMsg->Data.v, 0);
+		break;
+	case WM_PAINT:
+		//
+		// Get window dimension
+		//
+		xSize = WM_GetWindowSizeX(hWin);
+		xPos = (xSize - bmcalling0.XSize) / 2;
+		GUI_SetBkColor(WM_GetBkColor(hWin));
+		GUI_SetTextMode(GUI_TEXTMODE_XOR);
+		GUI_Clear();
+		GUI_DrawBitmap(&bmcalling0, xPos, 10);
+		if (call->contact == NULL)
+			GUI_DispStringHCenterAt(call->Number, xSize / 2, 80);
+		else {
+			GUI_DispStringHCenterAt(call->contact->LastName, xSize / 2, 80);
+			GUI_DispStringHCenterAt(call->contact->Name, xSize / 2, 90);
+		}
+		switch (call->state) {
+		case Initiate:
+
+			if (GSM_CALL_TO_DIAL_A_NUMBER(call->Number))
+			break;
+		case Dialing:
+			for (int i = 0; i < (call->time & 3); i++)
+				GUI_DrawBitmap(_abmcalling[i], xPos, 10);
+			GUI_DispStringHCenterAt("Dialing...", xSize / 2, 0);
+			break;
+		case Ringing:
+			for (int i = 0; i < (call->time & 3); i++)
+				GUI_DrawBitmap(_abmcalling[i], xPos, 10);
+			GUI_DispStringHCenterAt("Ringing...", xSize / 2, 0);
+			break;
+		default:
+			break;
+
+	}
+
+		break;
+	default:
+		WM_DefaultProc(pMsg);
+	}
+}
+
 
 static void Call(void) {
 	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &CallView);
+
 }
 static void CallCancelCallback(void) {
+	GSM_DISCONNECT_EXISTING_CONNECTION();
 	ViewNavigator_GoHomeView(&DefaultViewNavigator);
 }
 static GUI_HWIN CallViewShow() {
-	WM_HWIN hwin = WINDOW_CreateEx(0, 0, 128, 115, NULL, WM_CF_SHOW, 0x0,
-	GUI_ID_USER, NULL);
+	call = pvPortMalloc(sizeof(Call_TypeDef));
+	call->time = 0;
+	call->state = Initiate;
+	call->contact = ContactListApiHandlers.GetCurrentItem();
+	strcpy(call->Number, call->contact->CallNumber);
+	WM_HWIN hwin = WM_CreateWindowAsChild(0, 10, 128, 115, NULL, WM_CF_SHOW,
+			_cbCallView, 0);
+
 	return hwin;
 }
 static uint32_t CallViewHide(GUI_HWIN hwin) {
+	vPortFree(call);
 	return 1;
 }
 
