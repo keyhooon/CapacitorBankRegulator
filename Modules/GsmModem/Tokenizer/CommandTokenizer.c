@@ -6,19 +6,6 @@
  */
 
 #include "Tokenizer/CommandTokenizer.h"
-CommandTokenizer_TypeDef * CommandTokenizer_Init(BufferStream_TypeDef *bufferStream,
-		const char * separator,
-		const char * footer) {
-	CommandTokenizer_TypeDef * tokenizer = pvPortMalloc(sizeof(CommandTokenizer_TypeDef));
-	tokenizer->bufferStream = bufferStream;
-	tokenizer->Footer = footer;
-	tokenizer->Separator = separator;
-	return tokenizer;
-}
-
-void CommandTokenizer_DeInit(CommandTokenizer_TypeDef * tokenizer) {
-	vPortFree(tokenizer);
-}
 
 CommandTokensList_TypeDef CommandTokenizer_tokenize(
 		CommandTokenizer_TypeDef tokenizer, unsigned int commandLength) {

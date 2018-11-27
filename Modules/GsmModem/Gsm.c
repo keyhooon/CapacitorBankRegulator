@@ -15,16 +15,29 @@ const char *ATCOMMAND_FOOTER = "\r";
 
 
 extern BufferStream_TypeDef *BOARD_COMx_BUFFER_STREAM[COMn];
+CommandExecuter_TypeDef *GsmCommandExecuter;
 
-Gsm_TypeDef GsmModem;
+void Gsm_GetResponse_Async_End(Response_TypeDef response);
+void (*Callback_GetResponse)(Response_TypeDef response);
 
-
-
+void Gsm_GetResponse_Async(int timeout,
+		void (*Callback)(Response_TypeDef response)) {
+	Callback_GetResponse = Callback;
+	CommandExecuter_GetResponse_Async(GsmCommandExecuter, timeout,
+			Gsm_GetResponse_Async_End);
+}
+void Gsm_GetResponse_Async_Cancel() {
+	CommandExecuter_GetResponse_Async_Cancel(GsmCommandExecuter);
+}
+void Gsm_GetResponse_Async_End(Response_TypeDef response) {
+	Callback_GetResponse(response);
+	CommandTokenizer_FreeTokenList(response.Tokens);
+}
 int Gsm_ExecuteCommand(CommandType_TypeDef type, CommandAction_TypeDef action,
 		void * parameters) {
 	Command_TypeDef command = { type, action, parameters };
 	Response_TypeDef response;
-	response = CommandExecuter_Execute(*(GsmModem.commandExecuter), command);
+	response = CommandExecuter_Execute(GsmCommandExecuter, command);
 	CommandTokenizer_FreeTokenList(response.Tokens);
 	return response.resultNumber;
 }
@@ -32,11 +45,32 @@ int Gsm_ExecuteCommand_Ex(CommandType_TypeDef type,
 		CommandAction_TypeDef action, void * parameters, char* response) {
 	Command_TypeDef command = { type, action, parameters };
 	Response_TypeDef res;
-	res = CommandExecuter_Execute(*(GsmModem.commandExecuter), command);
+	res = CommandExecuter_Execute(GsmCommandExecuter, command);
 	if (CHECK_RESPONSE(res))
 		strcpy(response, res.Tokens.Items[0]);
 	else
 		*response = 0;
+	CommandTokenizer_FreeTokenList(res.Tokens);
+	return res.resultNumber;
+}
+int Gsm_ExecuteCommand_Ex2(CommandType_TypeDef type,
+		CommandAction_TypeDef action, void * parameters, char* response,
+		char* response2) {
+	Command_TypeDef command = { type, action, parameters };
+	Response_TypeDef res;
+	res = CommandExecuter_Execute(GsmCommandExecuter, command);
+	if (CHECK_RESPONSE(res))
+	{
+		if (response != NULL)
+			strcpy(response, res.Tokens.Items[0]);
+		if (response2 != NULL)
+			strcpy(response2, res.Tokens.Items[1]);
+	}
+	else
+	{
+		*response = 0;
+		*response2 = 0;
+	}
 	CommandTokenizer_FreeTokenList(res.Tokens);
 	return res.resultNumber;
 }
@@ -48,9 +82,7 @@ int Gsm_ExecuteCommand_RetryUntillOk(CommandType_TypeDef type, CommandAction_Typ
 	Response_TypeDef response;
 	while (r--) {
 		Command_TypeDef command = { type, action, parameters };
-
-		response = CommandExecuter_Execute(*(GsmModem.commandExecuter),
-				command);
+		response = CommandExecuter_Execute(GsmCommandExecuter, command);
 		CommandTokenizer_FreeTokenList(response.Tokens);
 		if (CHECK_RESPONSE(response)) {
 			break;
@@ -67,8 +99,7 @@ int Gsm_ExecuteCommand_RetryUntillOk_Ex(CommandType_TypeDef type,
 	Command_TypeDef command = { type, action, parameters };
 	Response_TypeDef res;
 	while (r--) {
-		res = CommandExecuter_Execute(*(GsmModem.commandExecuter),
-				command);
+		res = CommandExecuter_Execute(GsmCommandExecuter, command);
 		if (CHECK_RESPONSE(res)) {
 			strcpy(response, res.Tokens.Items[0]);
 			CommandTokenizer_FreeTokenList(res.Tokens);
@@ -79,41 +110,18 @@ int Gsm_ExecuteCommand_RetryUntillOk_Ex(CommandType_TypeDef type,
 	*response = 0;
 	return res.resultNumber;
 }
-void Gsm_Init(osMessageQId GSMMessageQHandle)
+
+void Gsm_Init()
 {
-	osMessageQDef(Gsm, 1, unsigned int);
 	GSM_IO_Init();
-
-	GsmModem.commandExecuter = CommandExecuter_Init(GSMMessageQHandle,
-			GSM_IO_Write,
+	CommandTokenizer_TypeDef tokenizer = { BOARD_COMx_BUFFER_STREAM[GSM_COM],
+			ATCOMMAND_SEPERATOR, ATCOMMAND_FOOTER };
+	GsmCommandExecuter = CommandExecuter_Init(GSM_IO_Write, tokenizer,
 			COMMAND_LINE_TERMINATION_CAHR_DEFAULT);
-	GsmModem.commandTokenizer = CommandTokenizer_Init(
-			BOARD_COMx_BUFFER_STREAM[GSM_COM], ATCOMMAND_SEPERATOR,
-			ATCOMMAND_FOOTER);
 
 }
 
-void GSM_Main(void const * argument)
-{
-	osMessageQId GSMMessageQHandle = *(osMessageQId*) argument;
-	Gsm_Init(GSMMessageQHandle);
-	Response_TypeDef response;
-	GsmModem.commandExecuter->LastResponse = &response;
-	while(1)
-	{
-		osEvent event = osMessageGet(GsmModem.commandExecuter->messageId,
-				osWaitForever);
-
-		if (event.status == osEventMessage)
-		{
-			response = ResponseParse(*GsmModem.commandTokenizer,
-					event.value.v);
-
-				osSemaphoreRelease(GsmModem.commandExecuter->semaphoreId);
-		}
-	}
-}
-extern osMessageQId GSMMessageQHandle;
 void GSM_DataReceivedCallback(uint32_t Length) {
-	osMessagePut(GSMMessageQHandle, Length, osWaitForever);
+	if (GsmCommandExecuter != NULL)
+	CommandExecuter_HandleReceivedResponse(GsmCommandExecuter, Length);
 }

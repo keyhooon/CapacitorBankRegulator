@@ -10,80 +10,63 @@
 #define GSMMODEM_API_3GPP_TS27_H_
 
 #include "Gsm.h"
+#include "stdlib.h"
+#include "string.h"
 
-const CommandType_TypeDef Accumulated_Call_Meter_Reset_or_Query = { "CACM", 0,
-		extended };
-const CommandType_TypeDef Accumulated_Call_Meter_Maximum_Set_or_Query = {
-		"CAMM", 0, extended };
-const CommandType_TypeDef Advice_of_Charge = { "CAOC", 0, extended };
-const CommandType_TypeDef Select_Bearer_Service_Type = { "CBST", 0, extended };
-const CommandType_TypeDef Call_Forwarding_Number_and_Conditions_Control = {
-		"CCFC", 0, extended };
-const CommandType_TypeDef Call_Waiting_Control = { "CCWA", 15000, extended };
-const CommandType_TypeDef Extended_Error_Report = { "CEER", 0, extended };
-const CommandType_TypeDef Request_Manufacturer_Identification = { "CGMI", 20000,
-		extended };
-const CommandType_TypeDef Request_Model_Identification = { "CGMM", 0, extended };
-const CommandType_TypeDef Request_TA_Revision_Identification_Software_Release =
-		{ "CGMR", 0, extended };
-const CommandType_TypeDef Request_Product_Serial_Number_Identification = {
-		"CGSN", 0, extended };
-const CommandType_TypeDef Select_TE_Character_Set = { "CSCS", 0, extended };
-const CommandType_TypeDef Select_Type_Address = { "CSTA", 0, extended };
-const CommandType_TypeDef Call_Hold_and_Multiparty = { "CHLD", 20000, extended };
-const CommandType_TypeDef Request_International_Mobile_Subscriber_Identity = {
-		"CIMI", 20000, extended };
-const CommandType_TypeDef List_Current_Calls_ME = { "CLCC", 0, extended };
-const CommandType_TypeDef Facility_Lock = { "CLCK", 0, extended };
-const CommandType_TypeDef Calling_Line_Identification_Presentation = { "CLIP",
-		15000, extended };
-const CommandType_TypeDef Calling_Line_Identification_Restriction = { "CLIR",
-		15000, extended };
-const CommandType_TypeDef Report_Mobile_Equipment_Error =
-		{ "CMEE", 0, extended };
-const CommandType_TypeDef Connected_Line_Identification_Presentation = { "COLP",
-		0, extended };
-const CommandType_TypeDef Operator_Selection = { "COPS", 12000, extended };
-const CommandType_TypeDef Phone_Activity_Status = { "CPAS", 0, extended };
-const CommandType_TypeDef Find_Phonebook_Entries = { "CPBF", 0, extended };
-const CommandType_TypeDef Read_Current_Phonebook_Entries =
-		{ "CPBR", 0, extended };
-const CommandType_TypeDef Select_Phonebook_Memory_Storage = { "CPBS", 3000,
-		extended };
-const CommandType_TypeDef Write_Phonebook_Entry = { "CPBW", 3000, extended };
-const CommandType_TypeDef SET_DCDEnter_PIN_FUNCTION_MODE =
-		{ "CPIN", 0, extended };
-const CommandType_TypeDef Change_Password = { "CPWD", 5000, extended };
-const CommandType_TypeDef Service_Reporting_Control = { "CR", 0, extended };
-const CommandType_TypeDef Set_Cellular_Result_Codes_Incoming_Call_Indication = {
-		"CRC", 0, extended };
-const CommandType_TypeDef Network_Registration = { "CREG", 0, extended };
-const CommandType_TypeDef Select_Radio_Link_Protocol_Parameters = { "CRLP", 0,
-		extended };
-const CommandType_TypeDef Restricted_SIM_Access = { "CRSM", 0, extended };
-const CommandType_TypeDef Signal_Quality_Report = { "CSQ", 0, extended };
-const CommandType_TypeDef Tone_Duration = { "VTD", 0, extended };
-const CommandType_TypeDef DTMF_Tone_Generation = { "VTS", 0, extended };
-const CommandType_TypeDef Multiplexer_Control = { "CMUX", 0, extended };
-const CommandType_TypeDef Subscriber_Number = { "CNUM", 0, extended };
-const CommandType_TypeDef Preferred_Operator_List = { "CPOL", 0, extended };
-const CommandType_TypeDef Read_Operator_Names = { "COPN", 0, extended };
-const CommandType_TypeDef Set_Phone_Functionality = { "CFUN", 10000, extended };
-const CommandType_TypeDef Clock = { "CCLK", 0, extended };
-const CommandType_TypeDef Generic_SIM_Access = { "CSIM", 0, extended };
-const CommandType_TypeDef Alert_Sound_Mode = { "CALM", 0, extended };
-const CommandType_TypeDef Alert_Sound_Select = { "CALS", 0, extended };
-const CommandType_TypeDef Ringer_Sound_Level = { "CRSL", 0, extended };
-const CommandType_TypeDef Loud_Speaker_Volume_Level = { "CLVL", 0, extended };
-const CommandType_TypeDef Mute_Control = { "CMUT", 0, extended };
-const CommandType_TypeDef Price_Per_Unit_and_Currency_Table = { "CPUC", 5000,
-		extended };
-const CommandType_TypeDef Call_Meter_Maximum_Even = { "CCWE", 0, extended };
-const CommandType_TypeDef Battery_Charge = { "CBC", 0, extended };
-const CommandType_TypeDef Unstructured_Supplementary_Service_Data = { "CUSD", 0,
-		extended };
-const CommandType_TypeDef Supplementary_Services_Notification = { "CSSN", 0,
-		extended };
+extern const CommandType_TypeDef Accumulated_Call_Meter_Reset_or_Query;
+extern const CommandType_TypeDef Accumulated_Call_Meter_Maximum_Set_or_Query;
+extern const CommandType_TypeDef Advice_of_Charge;
+extern const CommandType_TypeDef Select_Bearer_Service_Type;
+extern const CommandType_TypeDef Call_Forwarding_Number_and_Conditions_Control;
+extern const CommandType_TypeDef Call_Waiting_Control;
+extern const CommandType_TypeDef Extended_Error_Report;
+extern const CommandType_TypeDef Request_Manufacturer_Identification;
+extern const CommandType_TypeDef Request_Model_Identification;
+extern const CommandType_TypeDef Request_TA_Revision_Identification_Software_Release;
+extern const CommandType_TypeDef Request_Product_Serial_Number_Identification;
+extern const CommandType_TypeDef Select_TE_Character_Set;
+extern const CommandType_TypeDef Select_Type_Address;
+extern const CommandType_TypeDef Call_Hold_and_Multiparty;
+extern const CommandType_TypeDef Request_International_Mobile_Subscriber_Identity;
+extern const CommandType_TypeDef List_Current_Calls_ME;
+extern const CommandType_TypeDef Facility_Lock;
+extern const CommandType_TypeDef Calling_Line_Identification_Presentation;
+extern const CommandType_TypeDef Calling_Line_Identification_Restriction;
+extern const CommandType_TypeDef Report_Mobile_Equipment_Error;
+extern const CommandType_TypeDef Connected_Line_Identification_Presentation;
+extern const CommandType_TypeDef Operator_Selection;
+extern const CommandType_TypeDef Phone_Activity_Status;
+extern const CommandType_TypeDef Find_Phonebook_Entries;
+extern const CommandType_TypeDef Read_Current_Phonebook_Entries;
+extern const CommandType_TypeDef Select_Phonebook_Memory_Storage;
+extern const CommandType_TypeDef Write_Phonebook_Entry;
+extern const CommandType_TypeDef SET_DCDEnter_PIN_FUNCTION_MODE;
+extern const CommandType_TypeDef Change_Password;
+extern const CommandType_TypeDef Service_Reporting_Control;
+extern const CommandType_TypeDef Set_Cellular_Result_Codes_Incoming_Call_Indication;
+extern const CommandType_TypeDef Network_Registration;
+extern const CommandType_TypeDef Select_Radio_Link_Protocol_Parameters;
+extern const CommandType_TypeDef Restricted_SIM_Access;
+extern const CommandType_TypeDef Signal_Quality_Report;
+extern const CommandType_TypeDef Tone_Duration;
+extern const CommandType_TypeDef DTMF_Tone_Generation;
+extern const CommandType_TypeDef Multiplexer_Control;
+extern const CommandType_TypeDef Subscriber_Number;
+extern const CommandType_TypeDef Preferred_Operator_List;
+extern const CommandType_TypeDef Read_Operator_Names;
+extern const CommandType_TypeDef Set_Phone_Functionality;
+extern const CommandType_TypeDef Clock;
+extern const CommandType_TypeDef Generic_SIM_Access;
+extern const CommandType_TypeDef Alert_Sound_Mode;
+extern const CommandType_TypeDef Alert_Sound_Select;
+extern const CommandType_TypeDef Ringer_Sound_Level;
+extern const CommandType_TypeDef Loud_Speaker_Volume_Level;
+extern const CommandType_TypeDef Mute_Control;
+extern const CommandType_TypeDef Price_Per_Unit_and_Currency_Table;
+extern const CommandType_TypeDef Call_Meter_Maximum_Even;
+extern const CommandType_TypeDef Battery_Charge;
+extern const CommandType_TypeDef Unstructured_Supplementary_Service_Data;
+extern const CommandType_TypeDef Supplementary_Services_Notification;
 
 #define GSM_Accumulated_Call_Meter_Reset_or_Query()
 #define GSM_Accumulated_Call_Meter_Maximum_Set_or_Query()
@@ -119,7 +102,12 @@ const CommandType_TypeDef Supplementary_Services_Notification = { "CSSN", 0,
 #define GSM_Network_Registration()
 #define GSM_Select_Radio_Link_Protocol_Parameters()
 #define GSM_Restricted_SIM_Access()
-#define GSM_Signal_Quality_Report()
+#define GSM_Signal_Quality_Report(rssi) {\
+		char temp[20]; \
+		Gsm_ExecuteCommand_Ex(Signal_Quality_Report, Execute, NULL, temp); \
+		strtok(temp, ":"); \
+		*(rssi) = atoi(strtok(0, ",")); \
+	}
 #define GSM_Tone_Duration()
 #define GSM_DTMF_Tone_Generation()
 #define GSM_Multiplexer_Control()
@@ -136,7 +124,14 @@ const CommandType_TypeDef Supplementary_Services_Notification = { "CSSN", 0,
 #define GSM_Mute_Control()
 #define GSM_Price_Per_Unit_and_Currency_Table()
 #define GSM_Call_Meter_Maximum_Even()
-#define GSM_Battery_Charge()
+#define GSM_Battery_Charge(chargeStatus, batteryConnectionLevel){ \
+	char temp[20]; \
+	Gsm_ExecuteCommand_Ex(Battery_Charge, Execute, NULL, temp); \
+	strtok(temp, ":"); \
+	*(chargeStatus) = atoi(strtok(0, ",")); \
+	*(batteryConnectionLevel) = atoi(strtok(0, ",")); \
+}
+
 #define GSM_Unstructured_Supplementary_Service_Data()
 #define GSM_Supplementary_Services_Notification()
 

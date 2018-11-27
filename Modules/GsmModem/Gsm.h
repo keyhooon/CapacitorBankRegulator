@@ -17,14 +17,6 @@
 
 #define COMMAND_LINE_TERMINATION_CAHR_DEFAULT	CARRIAGE_RETURN_CODE
 #define RESPONSE_FORMATTING_CHAR_DEFAULT		LINE_FEED_CODE
-#define COMMAND_ECHO_DEFAULT					1
-#define RESPONSE_FORMAT_DEFAULT					1
-
-typedef struct Gsm_Struct {
-	CommandExecuter_TypeDef * commandExecuter;
-	CommandTokenizer_TypeDef * commandTokenizer;
-} Gsm_TypeDef;
-
 
 #define DefaultRetriesCount		5
 
@@ -33,10 +25,22 @@ typedef struct Gsm_Struct {
 
 
 
-void GSM_Main(void const * argument);
-int Gsm_ExecuteCommand_RetryUntillOk(CommandType_TypeDef type, CommandAction_TypeDef action,
+
+int Gsm_ExecuteCommand(CommandType_TypeDef type, CommandAction_TypeDef action,
 		void * parameters);
 int Gsm_ExecuteCommand_Ex(CommandType_TypeDef type,
 		CommandAction_TypeDef action, void * parameters, char* response);
+int Gsm_ExecuteCommand_Ex2(CommandType_TypeDef type,
+		CommandAction_TypeDef action, void * parameters, char* response,
+		char* response2);
+int Gsm_ExecuteCommand_RetryUntillOk(CommandType_TypeDef type, CommandAction_TypeDef action,
+		void * parameters);
+int Gsm_ExecuteCommand_RetryUntillOk_Ex(CommandType_TypeDef type,
+		CommandAction_TypeDef action, void * parameters, char* response);
+int Gsm_GetResponseReult(int timeout);
+void Gsm_Init();
+
+
+
 
 #endif /* GSMMODEM_GSM_H_ */

@@ -12,6 +12,7 @@
 #include "cmsis_os.h"
 #include "ViewNavigator.h"
 
+#include "Api/3GPP_TS27.h"
 
 extern osThreadId guiTaskHandle;
 
@@ -100,8 +101,6 @@ static void _cbHeading(WM_MESSAGE * pMsg) {
 	int xSize, xPos, ySize;
 	const GUI_BITMAP * pBm;
 	WM_HWIN hWin;
-	static int Index;
-	static int Antenna;
 
 	hWin = pMsg->hWin;
 	switch (pMsg->MsgId) {
@@ -109,24 +108,17 @@ static void _cbHeading(WM_MESSAGE * pMsg) {
 		//
 		// Create timer to be used to modify the battery symbol
 		//
-		WM_CreateTimer(hWin, 0, 1000, 0);
+		WM_CreateTimer(hWin, 0, 10000, 0);
 		break;
 	case WM_TIMER:
-		//
-		// Modify battery symbol on timer message
-		//
-		Index++;
-		if (Index == 5) {
-			Index = 0;
-		}
-		Antenna++;
-		if (Antenna == 5) {
-			Antenna = 0;
-		}
+
 		WM_InvalidateWindow(hWin);
-		WM_RestartTimer(pMsg->Data.v, 0);
+		WM_RestartTimer(pMsg->Data.v, 10000);
 		break;
 	case WM_PAINT:
+
+
+
 		//
 		// Get window dimension
 		//
@@ -138,29 +130,50 @@ static void _cbHeading(WM_MESSAGE * pMsg) {
 		//
 		xPos = xSize;
 		GUI_SetColor(GUI_WHITE);
+		GUI_SetTextMode(GUI_TEXTMODE_XOR);
 		GUI_FillRect(0, 0, xSize - 1, ySize);
 
-		pBm = &_bmBatteryEmpty_27x14;
-		xPos -= pBm->XSize + 5;
-		GUI_DrawBitmap(pBm, xPos, 3);
-		pBm = _apbmCharge[Index];
-		GUI_DrawBitmap(pBm, xPos, 3);
+		{
+			int batteryChargeStatus;
+			int battryLevel;
 
-		xPos -= 30;
-		GUI_SetPenSize(1);
-		GUI_POINT aPoints[] = { { 0, 0 }, { 4, 0 }, { 4, -3 }, { 0, -1 } };
-		for (int i = 1; i <= 4; i++) {
-			if (i > Antenna)
-				GUI_SetColor(GUI_GRAY_E7);
-			else
-				GUI_SetColor(GUI_BLACK);
-			GUI_FillPolygon(aPoints, GUI_COUNTOF(aPoints), xPos, 15);
+			GSM_Battery_Charge(&batteryChargeStatus, &battryLevel)
 
-			xPos += 6;
-			aPoints[2].y -= 3;
-			aPoints[3].y -= 3;
+			pBm = &_bmBatteryEmpty_27x14;
+			xPos -= pBm->XSize + 5;
+			GUI_DrawBitmap(pBm, xPos, 3);
+			pBm = _apbmCharge[battryLevel / 25];
+			GUI_DrawBitmap(pBm, xPos, 3);
+
+			xPos -= 20;
+			GUI_GotoXY(xPos, 6);
+			GUI_DispChar('%');
+			GUI_DispDecMin(battryLevel);
 		}
+		{
+			int Antenna;
+			int signalQuality;
+			GSM_Signal_Quality_Report(&signalQuality)
+			if (signalQuality < 32)
+				Antenna = signalQuality / 7;
+			else
+				Antenna = 0;
 
+			xPos = 5;
+			GUI_SetPenSize(1);
+			GUI_POINT aPoints[] = { { 0, 0 }, { 4, 0 }, { 4, -3 }, { 0, -1 } };
+			for (int i = 0; i <= 3; i++) {
+				if (i >= Antenna)
+					GUI_SetColor(GUI_GRAY_E7);
+				else
+					GUI_SetColor(GUI_BLACK);
+				GUI_FillPolygon(aPoints, GUI_COUNTOF(aPoints), xPos, 15);
+
+				xPos += 6;
+				aPoints[2].y -= 3;
+				aPoints[3].y -= 3;
+			}
+		}
 		break;
 	default:
 		WM_DefaultProc(pMsg);

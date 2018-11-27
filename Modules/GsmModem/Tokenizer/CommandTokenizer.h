@@ -20,16 +20,9 @@ typedef struct {
 typedef struct {
 	BufferStream_TypeDef * bufferStream;
 	char * Footer;
-	unsigned int FooterCount;
 	char * Separator;
-	unsigned int SeparatorCount;
 } CommandTokenizer_TypeDef;
 
-CommandTokenizer_TypeDef * CommandTokenizer_Init(BufferStream_TypeDef *bufferStream,
-		const char * separator,
-		const char * footer);
-
-void CommandTokenizer_DeInit(CommandTokenizer_TypeDef * tokenizer);
 CommandTokensList_TypeDef CommandTokenizer_tokenize(
 		CommandTokenizer_TypeDef Tokenizer, unsigned int length);
 void CommandTokenizer_FreeTokenList(CommandTokensList_TypeDef commandTokenList);

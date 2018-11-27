@@ -185,8 +185,7 @@ void MX_FREERTOS_Init(void) {
 	keyboardTaskHandle = osThreadCreate(osThread(keyboardTask), NULL);
 
 
-	osThreadDef(ModemTask, GSM_Main, osPriorityAboveNormal, 0, 256);
-	ModemTaskHandle = osThreadCreate(osThread(ModemTask), &GSMMessageQHandle);
+
 
 	/* definition and creation of CalculateTask */
 	osThreadDef(CalculateTask, CalculationProc, osPriorityIdle, 0, 256);
