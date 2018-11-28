@@ -58,7 +58,8 @@ void CommandExecuter_Task(void const * argument) {
 		if (event.status == osEventMessage) {
 			response = ResponseParse(currentCommandExecuter->commandTokenizer,
 					event.value.v);
-			if (currentCommandExecuter->ResponseReceavedCallback != NULL)
+			if (response.status)
+			if (currentCommandExecuter->ResponseReceivedCallback != NULL)
 				osSemaphoreRelease(currentCommandExecuter->semaphoreId);
 			else
 				CommandExecuter_GetResponse_Async_End(currentCommandExecuter);
@@ -111,12 +112,12 @@ void CommandExecuter_GetResponse_Async(CommandExecuter_TypeDef *commandExecuter,
 	commandExecuter->timerId = osTimerCreate(osTimer(CommandExecuter),
 			osTimerOnce, commandExecuter);
 	osTimerStart(commandExecuter->timerId, timeout);
-	commandExecuter->ResponseReceavedCallback = Callback;
+	commandExecuter->ResponseReceivedCallback = Callback;
 }
 void CommandExecuter_GetResponse_Async_Cancel(
 		CommandExecuter_TypeDef *commandExecuter) {
-	if (commandExecuter->ResponseReceavedCallback != NULL)
-		commandExecuter->ResponseReceavedCallback = NULL;
+	if (commandExecuter->ResponseReceivedCallback != NULL)
+		commandExecuter->ResponseReceivedCallback = NULL;
 	osTimerDelete(commandExecuter->timerId);
 	osRecursiveMutexRelease(commandExecuter->mutexId);
 }
@@ -126,7 +127,7 @@ void CommandExecuter_GetResponse_Async_Timeout(void *Arg) {
 }
 void CommandExecuter_GetResponse_Async_End(
 		CommandExecuter_TypeDef *commandExecuter) {
-	commandExecuter->ResponseReceavedCallback(*commandExecuter->LastResponse);
+	commandExecuter->ResponseReceivedCallback(*commandExecuter->LastResponse);
 	CommandExecuter_GetResponse_Async_Cancel(commandExecuter);
 }
 

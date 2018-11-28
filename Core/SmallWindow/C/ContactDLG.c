@@ -142,7 +142,7 @@ static void _cbCallView(WM_MESSAGE * pMsg) {
 
 		case Answered:
 			;
-			int resultf = Gsm_GetResponseReult(20000);
+			int resultf = 0;		// Gsm_GetResponseReult(20000);
 			if (resultf == 7)
 				call->state = Busy;
 			else if (resultf == 8)
@@ -196,7 +196,6 @@ static void Call(void) {
 		call->state = NoCarrier;
 	else
 		call->state = End;
-	break;
 }
 static void CallCancelCallback(void) {
 	call->state = HangOut;

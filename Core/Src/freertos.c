@@ -64,13 +64,10 @@
 /* USER CODE END Includes */
 
 /* Variables -----------------------------------------------------------------*/
-osThreadId keyboardTaskHandle;
-osThreadId ModemTaskHandle;
-osThreadId guiTaskHandle;
+
 osThreadId CalculateTaskHandle;
 osTimerId StatusTimerHandle;
 osSemaphoreId CalculateNeededSemHandle;
-osMessageQId GSMMessageQHandle;
 
 /* USER CODE BEGIN Variables */
 uint32_t ledTim[4];
@@ -158,8 +155,6 @@ void MX_FREERTOS_Init(void) {
 	CalculateNeededSemHandle = osSemaphoreCreate(
 			osSemaphore(CalculateNeededSem), 1);
 
-	osMessageQDef(Gsm, 1, unsigned int);
-	GSMMessageQHandle = osMessageCreate(osMessageQ(Gsm), NULL);
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
@@ -177,12 +172,10 @@ void MX_FREERTOS_Init(void) {
 
 	/* Create the thread(s) */
 	/* definition and creation of guiTask */
-	osThreadDef(guiTask, GUI_Main, osPriorityNormal, 0, 1500);
-	guiTaskHandle = osThreadCreate(osThread(guiTask), NULL);
+
 
 	/* definition and creation of defaultTask */
-	osThreadDef(keyboardTask, KEYPAD_Main, osPriorityNormal, 0, 256);
-	keyboardTaskHandle = osThreadCreate(osThread(keyboardTask), NULL);
+
 
 
 

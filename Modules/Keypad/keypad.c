@@ -7,6 +7,7 @@
 
 
 #include <keypad.h>
+#include <keypad_config.h>
 #include "GUI.h"
 #include "cmsis_os.h"
 
@@ -27,6 +28,7 @@ KP_R3_PORT };
 
 
 osSemaphoreId keypadSemaphoreID;
+osThreadId keyboardTaskHandle;
 
 KeypadBtn_typedef KP_Btn[4][4];
 int KeyPressed = 0;
@@ -128,8 +130,8 @@ void KEYPAD_EXTI_Callback(uint16_t GPIO_Pin) {
 }
 
 void KEYPAD_Main(void const * argument) {
-	KEYPAD_Init();
 
+	KEYPAD_IO_Init();
 	for (;;) {
 		if (KeyPressed) {
 			if ((holdKey == 0)) {
@@ -177,7 +179,13 @@ void KEYPAD_Main(void const * argument) {
 	}
 }
 void KEYPAD_Init(void) {
-	KEYPAD_IO_Init();
+
+	osThreadDef(keyboardTask, KEYPAD_Main, osPriorityNormal, 0, 256);
+	keyboardTaskHandle = osThreadCreate(osThread(keyboardTask), NULL);
+
+	osSemaphoreDef(Keypad);
+	keypadSemaphoreID = osSemaphoreCreate(osSemaphore(Keypad), 1);
+
 	KEYPAD_BUTTON_KeyCode_INIT(0, 0, GUI_KEY_UP);		// UP
 	KEYPAD_BUTTON_KeyCode_INIT(0, 1, GUI_KEY_DOWN);		// Down
 	KEYPAD_BUTTON_KeyCode_INIT(0, 2, GUI_KEY_RIGHT);	// Left
@@ -194,8 +202,7 @@ void KEYPAD_Init(void) {
 	KEYPAD_BUTTON_KeyCode_INIT(3, 3, GUI_KEY_DELETE);	// DEL
 	KEYPAD_BUTTON_CHAR_INIT(2, 3, "0 ");
 	KEYPAD_BUTTON_KeyCode_INIT(1, 3, GUI_KEY_ENTER);	// ENTER
-	osSemaphoreDef(Keypad);
-	keypadSemaphoreID = osSemaphoreCreate(osSemaphore(Keypad), 1);
+
 }
 void KEYPAD_BUTTON_KeyCode_INIT(uint32_t i, uint32_t j, const char value) {
 	KP_Btn[i][j].KeypadBtnType = KeyCode;

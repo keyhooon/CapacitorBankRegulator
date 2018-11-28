@@ -23,8 +23,9 @@
 #define CHECK_RESPONSE(response) ((response).status == ResponseStatusOk && (response).resultNumber == RESULT_NUMBER_OK)
 
 
-
-
+void Gsm_GetResponse_Async(int timeout,
+		void (*Callback)(Response_TypeDef response));
+void Gsm_GetResponse_Async_Cancel();
 
 int Gsm_ExecuteCommand(CommandType_TypeDef type, CommandAction_TypeDef action,
 		void * parameters);

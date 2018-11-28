@@ -63,13 +63,12 @@ typedef enum {
 	final, intermediate, unsolicited,
 } ResponseType_TypeDef;
 
-
-
 typedef struct {
-	const uint8_t number;
 	const char * code;
 	const ResponseType_TypeDef type;
 } ResponseResult_TypeDef;
+
+extern ResponseResult_TypeDef responseResultList[];
 
 typedef enum {
 	ResponseStatusOk,

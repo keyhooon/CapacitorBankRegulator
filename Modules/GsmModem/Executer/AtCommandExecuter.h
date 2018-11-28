@@ -14,7 +14,7 @@
 typedef struct AtCommandExecuter_Struct {
 	char * commandLineTerminationChar;			// s3
 	void (*Write)(char *, uint32_t);
-	void (*ResponseReceavedCallback)(Response_TypeDef);
+	void (*ResponseReceivedCallback)(Response_TypeDef);
 	Response_TypeDef * LastResponse;
 	CommandTokenizer_TypeDef commandTokenizer;
 	osMutexId mutexId;

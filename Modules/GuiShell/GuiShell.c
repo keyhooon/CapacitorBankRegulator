@@ -14,10 +14,7 @@
 
 #include "Api/3GPP_TS27.h"
 
-extern osThreadId guiTaskHandle;
-
-
-
+osThreadId guiTaskHandle;
 
 #define HEADER_SIZE		20
 #define DESKTOP_SIZE	115
@@ -26,8 +23,6 @@ extern osThreadId guiTaskHandle;
 #define BUTTON_WIDTH	55
 #define BUTTON_HEIGHT	20
 
-
-extern GUI_CONST_STORAGE GUI_BITMAP bmClock_16x16_black;
 extern GUI_CONST_STORAGE GUI_BITMAP _bmBatteryEmpty_27x14;
 extern GUI_CONST_STORAGE GUI_BITMAP * _apbmCharge[];
 extern View_Typedef DesktopView;
@@ -37,12 +32,19 @@ WM_HWIN hWin;     // Menu window moveable within viewport window
 WM_HWIN hWinToolbar;
 
 extern void ShowSmallDesktopWindow(void);
+void GUI_Main(void const * argument);
 
 
 static void CurrentMenuPageChanged(void);
 static void _cbHeading(WM_MESSAGE * pMsg);
 static void _cbViewPort(WM_MESSAGE * pMsg);
 static void _cbToolbar(WM_MESSAGE * pMsg);
+
+
+void GuiShell_init() {
+	osThreadDef(guiTask, GUI_Main, osPriorityNormal, 0, 1000);
+	guiTaskHandle = osThreadCreate(osThread(guiTask), NULL);
+}
 
 
 void GUI_Main(void const * argument) {
@@ -101,6 +103,9 @@ static void _cbHeading(WM_MESSAGE * pMsg) {
 	int xSize, xPos, ySize;
 	const GUI_BITMAP * pBm;
 	WM_HWIN hWin;
+	static int batteryChargeStatus;
+	static int battryLevel;
+	static int signalQuality;
 
 	hWin = pMsg->hWin;
 	switch (pMsg->MsgId) {
@@ -112,6 +117,9 @@ static void _cbHeading(WM_MESSAGE * pMsg) {
 		break;
 	case WM_TIMER:
 
+		GSM_Battery_Charge(&batteryChargeStatus, &battryLevel)
+
+		GSM_Signal_Quality_Report(&signalQuality)
 		WM_InvalidateWindow(hWin);
 		WM_RestartTimer(pMsg->Data.v, 10000);
 		break;
@@ -134,10 +142,7 @@ static void _cbHeading(WM_MESSAGE * pMsg) {
 		GUI_FillRect(0, 0, xSize - 1, ySize);
 
 		{
-			int batteryChargeStatus;
-			int battryLevel;
 
-			GSM_Battery_Charge(&batteryChargeStatus, &battryLevel)
 
 			pBm = &_bmBatteryEmpty_27x14;
 			xPos -= pBm->XSize + 5;
@@ -152,8 +157,7 @@ static void _cbHeading(WM_MESSAGE * pMsg) {
 		}
 		{
 			int Antenna;
-			int signalQuality;
-			GSM_Signal_Quality_Report(&signalQuality)
+
 			if (signalQuality < 32)
 				Antenna = signalQuality / 7;
 			else
