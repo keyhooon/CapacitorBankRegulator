@@ -118,6 +118,7 @@ void Gsm_Init()
 			ATCOMMAND_SEPERATOR, ATCOMMAND_FOOTER };
 	GsmCommandExecuter = CommandExecuter_Init(GSM_IO_Write, tokenizer,
 			COMMAND_LINE_TERMINATION_CAHR_DEFAULT);
+	Call_init(GsmCommandExecuter);
 
 }
 

@@ -9,7 +9,7 @@
 
 CommandTokensList_TypeDef CommandTokenizer_tokenize(
 		CommandTokenizer_TypeDef tokenizer, unsigned int commandLength) {
-	CommandTokensList_TypeDef result = { 0, -1, -1 };
+	CommandTokensList_TypeDef result = { 0, 0, -1 };
 	char * TokenizedItems[10];
 	bufToken_TypeDef currentBuffToken;
 	int tokenCount = 0;
@@ -25,7 +25,7 @@ CommandTokensList_TypeDef CommandTokenizer_tokenize(
 		currentBuffToken = BufTok(tokenizer.bufferStream, tokenizer.Separator,
 				commandLength);
 	}
-	result.ResultIndex = tokenCount - 1;
+	result.Count = tokenCount;
 //	currentBuffToken = BufTok(tokenizer.bufferStream, tokenizer.Footer,
 //			commandLength);
 //	if (currentBuffToken.item != 0) {

@@ -83,7 +83,12 @@ extern const CommandType_TypeDef Supplementary_Services_Notification;
 #define GSM_Select_Type_Address()
 #define GSM_Call_Hold_and_Multiparty()
 #define GSM_Request_International_Mobile_Subscriber_Identity()
-#define GSM_List_Current_Calls_ME()
+#define GSM_List_Current_Calls_ME(value) 	{ \
+		char num[2] = {value + '0',0}; \
+		char *pNum[2] = {num,0}; \
+	Gsm_ExecuteCommand(List_Current_Calls_ME, Write, num); \
+}
+
 #define GSM_Facility_Lock()
 #define GSM_Calling_Line_Identification_Presentation()
 #define GSM_Calling_Line_Identification_Restriction()

@@ -60,9 +60,8 @@ extern const CommandType_TypeDef DISCONNECT_VOICE_CALL_ONLY;
 #define GSM_CALL_TO_PHONE_NUMBER_IN_MEMORY_WHICH_NAME(name) Gsm_ExecuteCommand(ORGINATE_CALL_TO_PHONE_NUMBER_IN_MEMORY_WHICH_CORRESPONDS, string, &name)
 
 #define GSM_CALL_TO_PHONE_NUMBER_IN_MEMORY(number) { \
-	char num[10]; \
-	itoa(number,num, 10); \
-	Gsm_ExecuteCommand(ORGINATE_CALL_TO_PHONE_NUMBER_IN_CURRENT_MEMORY, integer, &num); \
+		int num = number; \
+	Gsm_ExecuteCommand(ORGINATE_CALL_TO_PHONE_NUMBER_IN_CURRENT_MEMORY, Write, &num); \
 }
 
 #define GSM_REDIAL_LAST_TELEPHONE_NUMBER_USED() Gsm_ExecuteCommand(REDIAL_LAST_TELEPHONE_NUMBER_USED, Execute, 0)
@@ -86,26 +85,26 @@ extern const CommandType_TypeDef DISCONNECT_VOICE_CALL_ONLY;
 #define GSM_REQUEST_TA_SERIAL_NUMBER_IDENTIFICATION(data) Gsm_ExecuteCommand_RetryUntillOk_Ex(REQUEST_TA_SERIAL_NUMBER_IDENTIFICATION,	Execute, 0, data)
 
 #define GSM_SET_MONITOR_SPEAKER_LOUDNESS( value) { \
-	int num = value; \
+		char num[2] = {value + '0',0}; \
 	Gsm_ExecuteCommand_RetryUntillOk(SET_MONITOR_SPEAKER_LOUDNESS, integer, &num); \
 }
 #define GSM_SET_MONITOR_SPEAKER_MODE( value) { \
-	int num = value; \
+		char num[2] = {value + '0',0}; \
 	Gsm_ExecuteCommand_RetryUntillOk(SET_MONITOR_SPEAKER_MODE, integer, &num); \
 }
 
 #define GSM_SET_COMMAND_ECHO_MODE(echo) { \
-	int num = echo; \
+		char num[2] = {echo + '0',0}; \
 	Gsm_ExecuteCommand(SET_COMMAND_ECHO_MODE, integer, &num); \
 }
 
 #define GSM_SET_RESULT_CODE_PRESENTATION_MODE(value) { \
-	int num = value; \
+		char num[2] = {value + '0',0}; \
 	Gsm_ExecuteCommand_RetryUntillOk(SET_RESULT_CODE_PRESENTATION_MODE, integer, &num); \
 }
 
 #define GSM_TA_RESPONSE_FORMAT( value) { \
-	int num = value; \
+		char num[2] = {value + '0',0}; \
 	Gsm_ExecuteCommand(TA_RESPONSE_FORMAT, integer, &num); \
 }
 

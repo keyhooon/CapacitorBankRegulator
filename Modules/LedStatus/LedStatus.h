@@ -8,6 +8,13 @@
 #ifndef LEDSTATUS_LEDSTATUS_H_
 #define LEDSTATUS_LEDSTATUS_H_
 
+#include "Board.h"
+
+#define AliveLed		LED1
+
+#define ComLed			LED2
+
+#define StatusLed		LED3
 
 
 #endif /* LEDSTATUS_LEDSTATUS_H_ */

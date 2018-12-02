@@ -13,14 +13,14 @@
 
 typedef struct {
 	char ** Items;
-	int ResultIndex;
+	int Count;
 	int IndexNeedToBeReleased;
 } CommandTokensList_TypeDef;
 
 typedef struct {
 	BufferStream_TypeDef * bufferStream;
-	char * Footer;
 	char * Separator;
+	char * Footer;
 } CommandTokenizer_TypeDef;
 
 CommandTokensList_TypeDef CommandTokenizer_tokenize(

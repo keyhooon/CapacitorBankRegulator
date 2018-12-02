@@ -117,9 +117,9 @@ static void _cbHeading(WM_MESSAGE * pMsg) {
 		break;
 	case WM_TIMER:
 
-		GSM_Battery_Charge(&batteryChargeStatus, &battryLevel)
-
-		GSM_Signal_Quality_Report(&signalQuality)
+//		GSM_Battery_Charge(&batteryChargeStatus, &battryLevel)
+//
+//		GSM_Signal_Quality_Report(&signalQuality)
 		WM_InvalidateWindow(hWin);
 		WM_RestartTimer(pMsg->Data.v, 10000);
 		break;

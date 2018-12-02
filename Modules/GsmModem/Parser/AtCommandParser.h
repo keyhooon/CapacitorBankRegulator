@@ -15,48 +15,48 @@
 /* Acknowledges execution of a Command
  * */
 #define RESULT_NUMBER_OK					0
-#define RESULT_CODE_OK						(const char *) "OK"
+#define RESULT_CODE_OK						"OK"
 
 /* A connection has been established; the DCE is moving from
  * Command state to online data state
  * */
 #define RESULT_NUMBER_CONNECT				1
-#define RESULT_CODE_CONNECT					(const char *) "CONNECT"
+#define RESULT_CODE_CONNECT					"CONNECT"
 
 /* The DCE has detected an incoming call signal from
  * network
  * */
 #define RESULT_NUMBER_RING					2
-#define RESULT_CODE_RING					(const char *) "RING"
+#define RESULT_CODE_RING					"RING"
 
 /* The connection has been terminated or the attempt to
  * establish a connection failed
  * */
 #define RESULT_NUMBER_NOCARRIER				3
-#define RESULT_CODE_NOCARRIER				(const char *) "NO CARRIER"
+#define RESULT_CODE_NOCARRIER				"NO CARRIER"
 
 /* Command not recognized, Command line maximum length
  * exceeded, parameter value invalid, or other problem with
  * processing the Command line
  * */
 #define RESULT_NUMBER_ERROR					4
-#define RESULT_CODE_ERROR					(const char *) "ERROR"
+#define RESULT_CODE_ERROR					"ERROR"
 
 /* No dial tone detected
  * */
 #define RESULT_NUMBER_NODIALTONE			6
-#define RESULT_CODE_NODIALTONE				(const char *) "NO DIALTONE"
+#define RESULT_CODE_NODIALTONE				"NO DIALTONE"
 
 /* Engaged (busy) signal detected
  * */
 #define RESULT_NUMBER_BUSY					7
-#define RESULT_CODE_BUSY					(const char *) "BUSY"
+#define RESULT_CODE_BUSY					"BUSY"
 /* "@" (Wait for Quiet Answer) dial modifier was used, but
  * remote ringing followed by five seconds of silence was not
  * detected before expiration of the connection timer (S7)
  * */
 #define RESULT_NUMBER_NOANSWER				8
-#define RESULT_CODE_NOANSWER				(const char *) "NO ANSWER"
+#define RESULT_CODE_NOANSWER				"NO ANSWER"
 
 
 typedef enum {
@@ -64,11 +64,11 @@ typedef enum {
 } ResponseType_TypeDef;
 
 typedef struct {
-	const char * code;
 	const ResponseType_TypeDef type;
+	char * code;
 } ResponseResult_TypeDef;
 
-extern ResponseResult_TypeDef responseResultList[];
+extern const ResponseResult_TypeDef responseResultList[];
 
 typedef enum {
 	ResponseStatusOk,

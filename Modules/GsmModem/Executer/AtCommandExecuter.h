@@ -11,10 +11,18 @@
 #include "cmsis_os.h"
 #include "Parser/AtCommandParser.h"
 
-typedef struct AtCommandExecuter_Struct {
-	char * commandLineTerminationChar;			// s3
-	void (*Write)(char *, uint32_t);
+#
+typedef struct ResponseReceivedCallbackList_Struct {
+	const char* ResponseName;
 	void (*ResponseReceivedCallback)(Response_TypeDef);
+	struct ResponseReceivedCallbackList_Struct * next;
+} ResponseReceivedCallbackList_typedef;
+
+typedef struct AtCommandExecuter_Struct {
+	char * commandLineTerminationChar;
+	void (*Write)(char *, uint32_t);
+	ResponseReceivedCallbackList_typedef * responseReceivedCallbacks;
+	void (*UnsolicitedResultCode)(Response_TypeDef);
 	Response_TypeDef * LastResponse;
 	CommandTokenizer_TypeDef commandTokenizer;
 	osMutexId mutexId;
@@ -44,10 +52,7 @@ typedef struct {
 
 typedef struct {
 	CommandType_TypeDef type;
-	union {
-		CommandAction_TypeDef action;
-		CommandParameterType_TypeDef parameterType;
-	} properties;
+	CommandAction_TypeDef action;
 	void * parameters;
 } Command_TypeDef;
 

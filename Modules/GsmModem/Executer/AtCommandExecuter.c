@@ -9,6 +9,7 @@
 #include "cmsis_os.h"
 #include "string.h"
 
+int strcpyl(char *dest, const char *src);
 void CommandExecuter_Task(void const * argument);
 void GetCommandString(char* commandText,
 		CommandExecuter_TypeDef *commandExecuter, Command_TypeDef command);
@@ -24,6 +25,7 @@ CommandExecuter_TypeDef * CommandExecuter_Init(void (*Write)(char *, uint32_t),
 	commandExecuter->commandLineTerminationChar = commandLineTermination;
 	commandExecuter->Write = Write;
 	commandExecuter->commandTokenizer = tokenizer;
+	commandExecuter->responseReceivedCallbacks = 0;
 	osMutexDef(CommandExecuter);
 	osMessageQDef(CommandExecuter, 5, unsigned int);
 	osSemaphoreDef(CommandExecuter);
@@ -58,11 +60,28 @@ void CommandExecuter_Task(void const * argument) {
 		if (event.status == osEventMessage) {
 			response = ResponseParse(currentCommandExecuter->commandTokenizer,
 					event.value.v);
-			if (response.status)
-			if (currentCommandExecuter->ResponseReceivedCallback != NULL)
-				osSemaphoreRelease(currentCommandExecuter->semaphoreId);
-			else
-				CommandExecuter_GetResponse_Async_End(currentCommandExecuter);
+			if (response.status == ResponseStatusOk)
+			{
+				if (response.resultNumber >= 0 && response.resultNumber <= 9) {
+					if (responseResultList[response.resultNumber].type == final)
+						osSemaphoreRelease(currentCommandExecuter->semaphoreId);
+					else if (currentCommandExecuter->UnsolicitedResultCode)
+						currentCommandExecuter->UnsolicitedResultCode(
+								response.resultNumber);
+				}
+			} else {
+				char* responseName = strtok(response.Tokens.Items[0], ":");
+				int responseNameLen = strlen(responseName);
+				ResponseReceivedCallbackList_typedef *p;
+				for (p = (currentCommandExecuter->responseReceivedCallbacks);
+						p != NULL
+								&& memcmp(p->ResponseName, responseName,
+										responseNameLen) != 0; p = p->next)
+					;
+				if (p != NULL && p->ResponseReceivedCallback)
+					p->ResponseReceivedCallback(response);
+				CommandTokenizer_FreeTokenList(response.Tokens);
+			}
 		}
 	}
 }
@@ -94,94 +113,59 @@ Response_TypeDef CommandExecuter_GetResponse(
 	if (osSemaphoreWait(commandExecuter->semaphoreId, timeout) == osOK)
 		result = *(commandExecuter->LastResponse);
 	else {
-		result.Tokens.Items = NULL;
+		result.Tokens.Items = pvPortMalloc(sizeof(char *));
+		*result.Tokens.Items = NULL;
 		result.Tokens.IndexNeedToBeReleased = -1;
-		result.Tokens.ResultIndex = -1;
+		result.Tokens.Count = 0;
 		result.status = ResponseStatusError_Timeout;
 		result.resultNumber = -1;
 	}
 	osRecursiveMutexRelease(commandExecuter->mutexId);
 	return result;
 }
-
-void CommandExecuter_GetResponse_Async(CommandExecuter_TypeDef *commandExecuter,
-		int timeout, void (*Callback)(Response_TypeDef response)) {
-	Response_TypeDef result;
-	osRecursiveMutexWait(commandExecuter->mutexId, osWaitForever);
-	osTimerDef(CommandExecuter, CommandExecuter_GetResponse_Async_Timeout);
-	commandExecuter->timerId = osTimerCreate(osTimer(CommandExecuter),
-			osTimerOnce, commandExecuter);
-	osTimerStart(commandExecuter->timerId, timeout);
-	commandExecuter->ResponseReceivedCallback = Callback;
-}
-void CommandExecuter_GetResponse_Async_Cancel(
-		CommandExecuter_TypeDef *commandExecuter) {
-	if (commandExecuter->ResponseReceivedCallback != NULL)
-		commandExecuter->ResponseReceivedCallback = NULL;
-	osTimerDelete(commandExecuter->timerId);
-	osRecursiveMutexRelease(commandExecuter->mutexId);
-}
-void CommandExecuter_GetResponse_Async_Timeout(void *Arg) {
-	CommandExecuter_TypeDef *commandExecuter = Arg;
-	CommandExecuter_GetResponse_Async_Cancel(commandExecuter);
-}
-void CommandExecuter_GetResponse_Async_End(
-		CommandExecuter_TypeDef *commandExecuter) {
-	commandExecuter->ResponseReceivedCallback(*commandExecuter->LastResponse);
-	CommandExecuter_GetResponse_Async_Cancel(commandExecuter);
-}
-
 void GetCommandString(char* commandText,
 		CommandExecuter_TypeDef *commandExecuter, Command_TypeDef command) {
+	int index = 0;
+	commandText[index++] = 'A';
+	commandText[index++] = 'T';
 	switch (command.type.syntax) {
 	case basic:
-		if (command.parameters != NULL)
-			if (command.properties.parameterType == string) {
-				sprintf(commandText, "at%s%s%c", command.type.text,
-						(char *) (command.parameters),
-						commandExecuter->commandLineTerminationChar);
-			} else if (command.properties.parameterType == integer) {
-				sprintf(commandText, "at%s%d%c", command.type.text,
-					*(int *) (command.parameters),
-						commandExecuter->commandLineTerminationChar);
-			}
-		else
-			sprintf(commandText, "at%s%c", command.type.text,
-						commandExecuter->commandLineTerminationChar);
+		index += strcpyl(&commandText[index], command.type.text);
+		index += strcpyl(&commandText[index], command.parameters);
 		break;
 	case sParameter:
-		sprintf(commandText, "ats%d=%d%c", *(int *) (command.parameters),
-				*((int *) (command.parameters) + 1),
-				commandExecuter->commandLineTerminationChar);
+		commandText[index++] = 'S';
+		char t[4];
+		int tLen;
+		itoa(*(int *) (command.parameters), t, 10);
+		index += strcpyl(&commandText[index], t);
+		commandText[index++] = '=';
+		itoa(*((int *) (command.parameters) + 1), t, 10);
+		index += strcpyl(&commandText[index], t);
 		break;
 	case extended:
-		switch (command.properties.action) {
+		commandText[index++] = '+';
+		index += strcpyl(&commandText[index], command.type.text);
+		switch (command.action) {
 		case Test:
-			sprintf(commandText, "at+%s=?%c", command.type.text,
-					commandExecuter->commandLineTerminationChar);
+			commandText[index++] = '=';
+			commandText[index++] = '?';
 			break;
 		case Read:
-			sprintf(commandText, "at+%s?%c", command.type.text,
-					commandExecuter->commandLineTerminationChar);
-			break;
-		case Write:
-			sprintf(commandText, "at+%s=", command.type.text);
-			uint32_t index = strlen(commandText);
-			while (*(char*) command.parameters) {
-				uint32_t charIndex = 0;
-				while (*(char*) command.parameters)
-					*(commandText + index++) = *((*(char**) command.parameters)
-							+ charIndex);
-				commandText[index++] = ',';
-				(command.parameters)++;
-			}
-			index--;
-			commandText[index++] = commandExecuter->commandLineTerminationChar;
-			commandText[index++] = 0;
+			commandText[index++] = '?';
 			break;
 		case Execute:
-			sprintf(commandText, "at+%s%c", command.type.text,
-					commandExecuter->commandLineTerminationChar);
+			break;
+		case Write:
+			commandText[index++] = '=';
+			index += strcpyl(&commandText[index], (char*) command.parameters);
+			(command.parameters)++;
+			while (*(char*) command.parameters) {
+				commandText[index++] = ',';
+				index += strcpyl(&commandText[index],
+						(char*) command.parameters);
+				(command.parameters)++;
+			}
 			break;
 		default:
 			break;
@@ -190,4 +174,15 @@ void GetCommandString(char* commandText,
 	default:
 		break;
 	}
+	index += strcpyl(&commandText[index],
+			commandExecuter->commandLineTerminationChar);
+}
+
+int strcpyl(char *dest, const char *src) {
+	char *d = dest;
+	const char *s = src;
+	while (*s)
+		*d++ = *s++;
+	*d = 0;
+	return s - src;
 }

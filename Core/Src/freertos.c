@@ -181,8 +181,8 @@ void MX_FREERTOS_Init(void) {
 
 
 	/* definition and creation of CalculateTask */
-	osThreadDef(CalculateTask, CalculationProc, osPriorityIdle, 0, 256);
-	CalculateTaskHandle = osThreadCreate(osThread(CalculateTask), NULL);
+//	osThreadDef(CalculateTask, CalculationProc, osPriorityIdle, 0, 256);
+//	CalculateTaskHandle = osThreadCreate(osThread(CalculateTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -203,10 +203,7 @@ void CalculationProc(void const * argument)
 {
   /* USER CODE BEGIN CalculationProc */
   /* Infinite loop */
-	char id[40];
-	GSM_TA_RESPONSE_FORMAT(0);
-	GSM_SET_COMMAND_ECHO_MODE(0);
-	GSM_DISPLAY_PRODUCT_IDENTIFICATION_INFORMATION(id);
+
   for(;;)
   {
 		osDelay(1000);
