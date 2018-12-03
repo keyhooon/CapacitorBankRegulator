@@ -113,7 +113,7 @@ static void _cbHeading(WM_MESSAGE * pMsg) {
 		//
 		// Create timer to be used to modify the battery symbol
 		//
-		WM_CreateTimer(hWin, 0, 10000, 0);
+		WM_CreateTimer(hWin, 0, 0, 0);
 		break;
 	case WM_TIMER:
 

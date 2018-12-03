@@ -27,7 +27,7 @@ ResponseReceivedCallbackList_typedef ClccCallback = { "+CLCC",
 void Call_Main(void * arg);
 
 void Call_init(CommandExecuter_TypeDef *GsmCommandExecuter) {
-	osThreadDef(callTask, Call_Main, osPriorityLow, 1, 256);
+	osThreadDef(callTask, Call_Main, osPriorityNormal, 1, 256);
 	CallThreadId = osThreadCreate(osThread(callTask), GsmCommandExecuter);
 	commandExecuter = GsmCommandExecuter;
 }
@@ -42,36 +42,50 @@ void Call_Main(void * arg) {
 
 	while (1) {
 		osEvent event;
+		char * ulNotifiedValue;
+		xTaskNotifyWait(0x00, /* Don't clear any notification bits on entry. */
+		0xffffffff, /* Reset the notification value to 0 on exit. */
+		&ulNotifiedValue, /* Notified value pass out in ulNotifiedValue. */
+		portMAX_DELAY); /* Block indefinitely. */
 		event = osSignalWait(0xff, osWaitForever);
-		if (event.value.signals & MESSAGE_CALL_RINGING)
+		if (ulNotifiedValue == NULL)
 			OnRing();
 		else {
+			volatile CallInfo_Typedef call;
+			char* ClccReceivedToken = ulNotifiedValue;
+			call.state = (ClccReceivedToken[11] - '0');
+			strtok(ClccReceivedToken, "\"");
+			call.number = strtok(0, "\"");
+			strtok(0, "\"");
+			call.Name = strtok(0, "\"");
 			OnCallStateChanged(call);
 		}
 	}
 
 }
 
+CallInfo_Typedef ClccReceivedHandler(char* ClccReceivedToken) {
+	volatile CallInfo_Typedef c;
+	c.state = (ClccReceivedToken[11] - '0');
+	strtok(ClccReceivedToken, "\"");
+	c.number = strtok(0, "\"");
+	strtok(0, "\"");
+	c.Name = strtok(0, "\"");
+}
+
 void ClccReceivedCallback(Response_TypeDef response) {
-	char * temp;
-	temp = response.Tokens.Items[0];
-	osSignalSet(CallThreadId, 1 << (temp[11] - '0'));
+	xTaskNotify(CallThreadId, response.Tokens.Items[0],
+			eSetValueWithoutOverwrite);
 }
 
 void UnsolicitedResultCallback(Response_TypeDef response) {
 	char * temp;
-	if (response.Tokens.Count == 1) {
-		if (response.resultNumber == 2)
-			osSignalSet(CallThreadId, MESSAGE_CALL_RINGING);
-	} else if (response.Tokens.Count > 1)
-	{
-		temp = response.Tokens.Items[response.Tokens.Count - 2];
-		call.state =  1 << (temp[11] - '0');
-		call.Name = " ";
-		call.number = " ";
-		osSignalSet(CallThreadId, call.state);
-	}
-
+	for (int i = 0; i < response.Tokens.Count - 1; i++)
+		if (memcmp(response.Tokens.Items[i], "+CLCC", 5))
+			xTaskNotify(CallThreadId, response.Tokens.Items[i],
+					eSetValueWithoutOverwrite);
+	if (response.resultNumber == 2)
+		osSignalSet(CallThreadId, NULL);
 }
 __weak void OnRing(void){
 

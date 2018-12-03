@@ -13,24 +13,24 @@
 
 
 
-#define MESSAGE_CALL_ACTIVE					1<<0
-#define MESSAGE_CALL_HELD					1<<1
-#define MESSAGE_CALL_DIALING				1<<2
-#define MESSAGE_CALL_ALERTING				1<<3
-#define MESSAGE_CALL_INCOMING				1<<4
-#define MESSAGE_CALL_WAITING				1<<5
-#define MESSAGE_CALL_DISCONNECT				1<<6
-#define MESSAGE_CALL_RINGING				1<<7
+#define MESSAGE_CALL_ACTIVE					0
+#define MESSAGE_CALL_HELD					1
+#define MESSAGE_CALL_DIALING				2
+#define MESSAGE_CALL_ALERTING				3
+#define MESSAGE_CALL_INCOMING				4
+#define MESSAGE_CALL_WAITING				5
+#define MESSAGE_CALL_DISCONNECT				6
+#define MESSAGE_CALL_RINGING				7
 
 
 typedef enum {
-	Active = 1 << 0,
-	Held = 1 << 1,
-	Dialing = 1 << 2,
-	Alerting = 1 << 3,
-	Incoming = 1 << 4,
-	Waiting = 1 << 5,
-	Disconnect = 1 << 6,
+	Active = 0,
+	Held = 1,
+	Dialing = 2,
+	Alerting = 3,
+	Incoming = 4,
+	Waiting = 5,
+	Disconnect = 6,
 } CallState_Typedef;
 typedef struct {
 	CallState_Typedef state;

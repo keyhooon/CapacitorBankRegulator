@@ -30,7 +30,7 @@ CommandExecuter_TypeDef * CommandExecuter_Init(void (*Write)(char *, uint32_t),
 	osMessageQDef(CommandExecuter, 5, unsigned int);
 	osSemaphoreDef(CommandExecuter);
 	osThreadDef(CommandExecuter, CommandExecuter_Task, osPriorityAboveNormal, 0,
-			256);
+			512);
 
 	commandExecuter->mutexId = osRecursiveMutexCreate(osMutex(CommandExecuter));
 	commandExecuter->semaphoreId = osSemaphoreCreate(
@@ -60,21 +60,25 @@ void CommandExecuter_Task(void const * argument) {
 		if (event.status == osEventMessage) {
 			response = ResponseParse(currentCommandExecuter->commandTokenizer,
 					event.value.v);
+			if (response.Tokens.Count == 0)
+				continue;
 			if (response.status == ResponseStatusOk)
 			{
-				if (response.resultNumber >= 0 && response.resultNumber <= 9) {
 					if (responseResultList[response.resultNumber].type == final)
 						osSemaphoreRelease(currentCommandExecuter->semaphoreId);
 					else if (currentCommandExecuter->UnsolicitedResultCode)
+					{
 						currentCommandExecuter->UnsolicitedResultCode(response);
-				}
+						CommandTokenizer_FreeTokenList(response.Tokens);
+					}
 			} else {
-				char* responseName = strtok(response.Tokens.Items[0], ":");
-				int responseNameLen = strlen(responseName);
+				char * responseToken = response.Tokens.Items[0];
+				char * responseDelim = strchr(responseToken, ':');
+				int responseNameLen = responseDelim - responseToken;
 				ResponseReceivedCallbackList_typedef *p;
 				for (p = (currentCommandExecuter->responseReceivedCallbacks);
 						p != NULL
-								&& memcmp(p->ResponseName, responseName,
+								&& memcmp(p->ResponseName, responseToken,
 										responseNameLen) != 0; p = p->next)
 					;
 				if (p != NULL && p->ResponseReceivedCallback)

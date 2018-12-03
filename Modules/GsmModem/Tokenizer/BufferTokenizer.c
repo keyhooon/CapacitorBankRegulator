@@ -11,11 +11,13 @@
 
 bufToken_TypeDef BufTok(BufferStream_TypeDef * bufferStream, char * delimiter, int bufferStreamMaxLength){
 	bufToken_TypeDef tok = { 0, 0, 0 };
+	static int maxLength = 0;
+	maxLength += bufferStreamMaxLength;
 	int currentIndex = bufferStream->tail;
 
 	int delimiterFoundCount = 0;
 	int delimiterLength = strlen(delimiter);
-	for (int i = 0; i < bufferStreamMaxLength; i++) {
+	for (int i = 0; i < maxLength; i++) {
 		if (*(bufferStream->buffer + currentIndex) == *(delimiter + delimiterFoundCount))
 			delimiterFoundCount++;
 		else if (*(bufferStream->buffer + currentIndex) == *(delimiter))
@@ -36,6 +38,7 @@ bufToken_TypeDef BufTok(BufferStream_TypeDef * bufferStream, char * delimiter, i
 				tok.item = bufferStream->buffer + bufferStream->tail;
 			bufferStream->tail = currentIndex + 1;
 			tok.length = length;
+			maxLength -= length + delimiterLength;
 			break;
 		}
 		if (currentIndex ++==bufferStream->length)
