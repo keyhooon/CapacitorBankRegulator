@@ -428,7 +428,7 @@ static GUI_HWIN InfoViewShow() {
 	char temp[33];
 	DefaultListView->ApiHandlers->GetDisplay(temp);
 	TEXT_Handle text_hwin = TEXT_CreateEx(5, 5, 118, 115, hwin, WM_CF_SHOW, 0,
-			GUI_ID_LISTBOX0, temp);
+			GUI_ID_TEXT0, temp);
 	TEXT_SetFont(text_hwin, &GUI_Font8x10_ASCII);
 	TEXT_SetWrapMode(text_hwin, GUI_WRAPMODE_WORD);
 	DefaultListView->CurrentWidget = text_hwin;

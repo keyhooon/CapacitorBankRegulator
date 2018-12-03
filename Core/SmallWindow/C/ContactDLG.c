@@ -29,16 +29,9 @@
 #include "Api/V25TER.h"
 
 
-typedef enum {
-	Dialing, NoCarrier, Answered, NoAnswered, Busy, HangOut, End
-} CallState_TypeDef;
 
-typedef struct {
-	CallState_TypeDef state;
-	char Number[12];
-	Contact_Typedef * contact;
-	int time;
-} Call_TypeDef;
+
+
 
 
 
@@ -52,18 +45,10 @@ typedef struct {
 #define ID_LISTBOX_0     (GUI_ID_USER + 0x11)
 
 extern GUI_CONST_STORAGE GUI_BITMAP bmphonecall;
-extern GUI_CONST_STORAGE GUI_BITMAP bmcalling0;
-extern GUI_CONST_STORAGE GUI_BITMAP * _abmcalling[];
+CustomFunction_Typedef * ContactFunctionList[5];
 
 void InitContactView(void);
-
 static void Call(void);
-static void CallCancelCallback(void);
-static GUI_HWIN CallViewShow();
-static uint32_t CallViewHide(GUI_HWIN hwin);
-
-Call_TypeDef * call;
-CustomFunction_Typedef * ContactFunctionList[5];
 static void EditContactProgress(void * arg, GUI_HWIN currentWidget);
 
 extern ListApiHandlers_typedef ContactListApiHandlers;
@@ -72,6 +57,14 @@ extern View_Typedef ListView;
 static const CustomFunction_Typedef CallFunction = { &bmphonecall,
 		(const char*) "Call", Call };
 
+static void Call(void) {
+	Contact_Typedef *contact = ContactListApiHandlers.GetCurrentItem();
+	char num[20];
+	strcpy(num,contact->CallNumber);
+	strcat(num,";");
+	GSM_CALL_TO_DIAL_A_NUMBER(num);
+
+}
 
 typedef enum {
 	EditContactState_Name,
@@ -79,12 +72,6 @@ typedef enum {
 	EditContactState_CallNumber,
 	EditContactState_Finished,
 } EditContactState_Typedef;
-
-const View_Typedef CallView = {
-		CONTACT_CALL_VIEW_ID, "Contact Call", "Call",
-		(void *) NULL, CallViewShow, CallViewHide,
-		NULL, (const char*) "Cancel", NULL, CallCancelCallback, NULL, 0 };
-
 
 void InitContactView() {
 	ContactFunctionList[0] = &CallFunction;
@@ -95,125 +82,6 @@ void InitContactView() {
 	ListViewInit(&ContactListApiHandlers,
 			ContactFunctionList, sizeof(Contact_Typedef), EditContactProgress);
 	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &ListView);
-}
-
-
-static void _cbCallView(WM_MESSAGE * pMsg) {
-	int xSize, xPos;
-	WM_HWIN hWin;
-	hWin = pMsg->hWin;
-	switch (pMsg->MsgId) {
-	case WM_CREATE:
-		//
-		// Create timer to be used to modify the battery symbol
-		//
-		WM_CreateTimer(hWin, 0, 1000, 0);
-		break;
-	case WM_TIMER:
-		//
-		// Modify battery symbol on timer message
-		//
-		call->time++;
-		WM_InvalidateWindow(hWin);
-		WM_RestartTimer(pMsg->Data.v, 1000);
-		break;
-	case WM_PAINT:
-		//
-		// Get window dimension
-		//
-		xSize = WM_GetWindowSizeX(hWin);
-		xPos = (xSize - bmcalling0.XSize) / 2;
-		GUI_SetBkColor(WM_GetBkColor(hWin));
-		GUI_SetTextMode(GUI_TEXTMODE_XOR);
-		GUI_Clear();
-		GUI_DrawBitmap(&bmcalling0, xPos, 0);
-		for (int i = 0; i < (call->time & 3); i++)
-			GUI_DrawBitmap(_abmcalling[i], xPos, 0);
-		if (call->contact == NULL)
-			GUI_DispStringHCenterAt(call->Number, xSize / 2, 80);
-		else {
-			GUI_DispStringHCenterAt(call->contact->LastName, xSize / 2, 80);
-			GUI_DispStringHCenterAt(call->contact->Name, xSize / 2, 90);
-		}
-		switch (call->state) {
-		case Dialing:
-			;
-
-
-		case Answered:
-			;
-			int resultf = 0;		// Gsm_GetResponseReult(20000);
-			if (resultf == 7)
-				call->state = Busy;
-			else if (resultf == 8)
-				call->state = NoAnswered;
-			else
-				call->state = End;
-			break;
-		case NoCarrier:
-			GUI_DispStringHCenterAt("No Carrier", xSize / 2, 0);
-			call->state = End;
-			break;
-		case Busy:
-			GUI_DispStringHCenterAt("Busy", xSize / 2, 0);
-			call->state = End;
-			break;
-		case HangOut:
-			GSM_DISCONNECT_EXISTING_CONNECTION();
-			GUI_DispStringHCenterAt("Hang Out", xSize / 2, 0);
-			call->state = End;
-			break;
-		case NoAnswered:
-			GUI_DispStringHCenterAt("Not Answered", xSize / 2, 0);
-			call->state = End;
-			break;
-		case End:
-			ViewNavigator_GoHomeView(&DefaultViewNavigator);
-			break;
-		default:
-			break;
-
-	}
-
-		break;
-	default:
-		WM_DefaultProc(pMsg);
-	}
-}
-
-
-static void Call(void) {
-	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &CallView);
-	char temp[15];
-	int num = strlen(call->Number);
-	strcpy(temp, call->Number);
-	temp[num] = ';';
-	temp[num + 1] = 0;
-	int result = GSM_CALL_TO_DIAL_A_NUMBER(temp);
-	if (result == 0)
-		call->state = Answered;
-	else if (result == 3)
-		call->state = NoCarrier;
-	else
-		call->state = End;
-}
-static void CallCancelCallback(void) {
-	call->state = HangOut;
-}
-static GUI_HWIN CallViewShow() {
-	call = pvPortMalloc(sizeof(Call_TypeDef));
-	call->time = -1;
-	call->state = Dialing;
-	call->contact = ContactListApiHandlers.GetCurrentItem();
-	strcpy(call->Number, call->contact->CallNumber);
-	WM_HWIN hwin = WINDOW_CreateEx(0, 0, 128, 115, NULL, WM_CF_SHOW, 0x0,
-			GUI_ID_USER, _cbCallView);
-
-	return hwin;
-}
-static uint32_t CallViewHide(GUI_HWIN hwin) {
-	vPortFree(call);
-	return 1;
 }
 
 static void EditContactProgress(void * arg, GUI_HWIN currentWidget) {
@@ -230,7 +98,6 @@ static void EditContactProgress(void * arg, GUI_HWIN currentWidget) {
 
 		TEXT_SetText(textHwin, "Name");
 		EDIT_SetText(editHwin, (contact)->Name);
-
 
 		*state = EditContactState_LastName;
 	} else if (*state == EditContactState_LastName) {

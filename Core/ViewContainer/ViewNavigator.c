@@ -39,7 +39,7 @@ static uint8_t FindViewIdxByView(ViewNavigatorTypedef *viewNavigator,
 static uint8_t FindFirstPageIdxEmpty(ViewNavigatorTypedef *viewNavigator);
 
 
-static void PageShow(ViewNavigatorTypedef *viewNavigator,
+static GUI_HWIN PageShow(ViewNavigatorTypedef *viewNavigator,
 		View_Typedef *view);
 static uint8_t PageHide(ViewNavigatorTypedef *viewNavigator,
 		View_Typedef *view);
@@ -114,20 +114,20 @@ uint8_t ViewNavigator_UnregisterView(ViewNavigatorTypedef *viewNavigator,
  * @retval Done status
  */
 
-uint8_t ViewNavigator_GoBackView(ViewNavigatorTypedef *viewNavigator) {
+GUI_HWIN ViewNavigator_GoBackView(ViewNavigatorTypedef *viewNavigator) {
 	if (viewNavigator->view_route.currentItemPos >= 0
 			&& PageHide(viewNavigator,
 					(viewNavigator->registered_view_list[viewNavigator->view_route.items[viewNavigator->view_route.currentItemPos]]))
 					!= 0) {
 		if (viewNavigator->view_route.currentItemPos > 0)
 			viewNavigator->view_route.currentItemPos--;
-		PageShow(viewNavigator,
+		GUI_HWIN hWin = PageShow(viewNavigator,
 				viewNavigator->registered_view_list[viewNavigator->view_route.items[viewNavigator->view_route.currentItemPos]]);
 		if (viewNavigator->currentViewChanged != NULL)
 			viewNavigator->currentViewChanged();
-		return viewNavigator->view_route.items[viewNavigator->view_route.currentItemPos];
+		return hWin;
 	}
-	return 255;
+	return GUI_HMEM_NULL;
 }
 /**
  * @brief  Go to Home Page.
@@ -135,19 +135,19 @@ uint8_t ViewNavigator_GoBackView(ViewNavigatorTypedef *viewNavigator) {
  * @retval Done status
  */
 
-uint8_t ViewNavigator_GoHomeView(ViewNavigatorTypedef *viewNavigator) {
+GUI_HWIN ViewNavigator_GoHomeView(ViewNavigatorTypedef *viewNavigator) {
 	if (viewNavigator->view_route.currentItemPos >= 0
 			&& PageHide(viewNavigator,
 					viewNavigator->registered_view_list[viewNavigator->view_route.items[viewNavigator->view_route.currentItemPos]])
 					!= 0) {
 		viewNavigator->view_route.currentItemPos = 0;
-		PageShow(viewNavigator,
+		GUI_HWIN hWin = PageShow(viewNavigator,
 				viewNavigator->registered_view_list[viewNavigator->view_route.items[0]]);
 		if (viewNavigator->currentViewChanged != NULL)
 			viewNavigator->currentViewChanged();
-		return 0;
+		return hWin;
 	}
-	return 255;
+	return GUI_HMEM_NULL;
 }
 /**
  * @brief  Go to Page.
@@ -156,7 +156,7 @@ uint8_t ViewNavigator_GoHomeView(ViewNavigatorTypedef *viewNavigator) {
  * @retval done status
  */
 
-uint8_t ViewNavigator_GoToViewOf(ViewNavigatorTypedef *viewNavigator,
+GUI_HWIN ViewNavigator_GoToViewOf(ViewNavigatorTypedef *viewNavigator,
 		View_Typedef * view) {
 	uint8_t viewIdx = FindViewIdxByView(viewNavigator, view);
 	if (viewIdx == 255)
@@ -170,13 +170,13 @@ uint8_t ViewNavigator_GoToViewOf(ViewNavigatorTypedef *viewNavigator,
 		viewNavigator->view_route.currentItemPos++;
 		viewNavigator->view_route.items[viewNavigator->view_route.currentItemPos] =
 				viewIdx;
-		PageShow(viewNavigator,
+		GUI_HWIN hWin = PageShow(viewNavigator,
 				viewNavigator->registered_view_list[viewIdx]);
 		if (viewNavigator->currentViewChanged != NULL)
 			viewNavigator->currentViewChanged();
-		return viewIdx;
+		return hWin;
 	}
-	return 255;
+	return GUI_HMEM_NULL;
 }
 /**
  * @brief  Go to Page.
@@ -186,7 +186,7 @@ uint8_t ViewNavigator_GoToViewOf(ViewNavigatorTypedef *viewNavigator,
  * @retval done status
  */
 
-uint8_t ViewNavigator_GoToViewOfByID(ViewNavigatorTypedef *viewNavigator,
+GUI_HWIN ViewNavigator_GoToViewOfByID(ViewNavigatorTypedef *viewNavigator,
 		uint8_t viewId) {
 	uint8_t viewIdx = FindViewIdxByID(viewNavigator, viewId);
 	if (viewIdx == 255)
@@ -198,13 +198,13 @@ uint8_t ViewNavigator_GoToViewOfByID(ViewNavigatorTypedef *viewNavigator,
 		viewNavigator->view_route.currentItemPos++;
 		viewNavigator->view_route.items[viewNavigator->view_route.currentItemPos] =
 				viewIdx;
-		PageShow(viewNavigator,
+		GUI_HWIN hWin = PageShow(viewNavigator,
 				viewNavigator->registered_view_list[viewIdx]);
 		if (viewNavigator->currentViewChanged != NULL)
 			viewNavigator->currentViewChanged();
-		return viewIdx;
+		return hWin;
 	}
-	return 255;
+	return GUI_HMEM_NULL;
 }
 /**
  * @brief  Get Current Page.
@@ -285,16 +285,16 @@ static uint8_t FindFirstPageIdxEmpty(ViewNavigatorTypedef *viewNavigator) {
 	return 255;
 }
 
-static void PageShow(ViewNavigatorTypedef *viewNavigator,
+static GUI_HWIN PageShow(ViewNavigatorTypedef *viewNavigator,
 		View_Typedef * view) {
 	if (view->show == NULL)
-		return;
+		return GUI_HMEM_NULL;
 	GUI_HWIN hWin = view->show();
 	if (hWin != 0) {
 		WM_AttachWindow(hWin, viewNavigator->view_container_hWin);
 		WM_SetFocus(hWin);
-
-}
+	}
+	return hWin;
 }
 	static uint8_t PageHide(ViewNavigatorTypedef *viewNavigator,
 			View_Typedef * view) {

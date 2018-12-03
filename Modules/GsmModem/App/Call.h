@@ -10,6 +10,9 @@
 
 #include "Executer/AtCommandExecuter.h"
 
+
+
+
 #define MESSAGE_CALL_ACTIVE					1<<0
 #define MESSAGE_CALL_HELD					1<<1
 #define MESSAGE_CALL_DIALING				1<<2
@@ -30,12 +33,15 @@ typedef enum {
 	Disconnect = 1 << 6,
 } CallState_Typedef;
 typedef struct {
-	CallState_Typedef callState;
-	CommandExecuter_TypeDef *commandExecuter;
-	void (*OnCallStateChanged)(CallState_Typedef);
-	void (*OnRing)(void);
-} Call_Typedef;
+	CallState_Typedef state;
+	char * number;
+	char * Name;
+} CallInfo_Typedef;
 
 
+extern const char *callStateTextList[7];
+
+void OnCallStateChanged(CallInfo_Typedef);
+void OnRing(void);
 void Call_init(CommandExecuter_TypeDef *GsmCommandExecuter);
 #endif /* GSMMODEM_APP_CALL_H_ */

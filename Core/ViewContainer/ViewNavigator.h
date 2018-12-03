@@ -52,11 +52,11 @@ uint8_t ViewNavigator_UnregisterView(ViewNavigatorTypedef *viewNavigator,
 		View_Typedef *view);
 uint8_t ViewNavigator_GetViewCount(ViewNavigatorTypedef *viewNavigator);
 
-uint8_t ViewNavigator_GoBackView(ViewNavigatorTypedef *viewNavigator);
-uint8_t ViewNavigator_GoHomeView(ViewNavigatorTypedef *viewNavigator);
-uint8_t ViewNavigator_GoToViewOf(ViewNavigatorTypedef *viewNavigator,
+GUI_HWIN ViewNavigator_GoBackView(ViewNavigatorTypedef *viewNavigator);
+GUI_HWIN ViewNavigator_GoHomeView(ViewNavigatorTypedef *viewNavigator);
+GUI_HWIN ViewNavigator_GoToViewOf(ViewNavigatorTypedef *viewNavigator,
 		View_Typedef *view);
-uint8_t ViewNavigator_GoToViewOfByID(ViewNavigatorTypedef *viewNavigator,
+GUI_HWIN ViewNavigator_GoToViewOfByID(ViewNavigatorTypedef *viewNavigator,
 		uint8_t viewId);
 View_Typedef * ViewNavigator_GetCurrentView(ViewNavigatorTypedef *viewNavigator);
 

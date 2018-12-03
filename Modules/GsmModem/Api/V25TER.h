@@ -55,7 +55,7 @@ extern const CommandType_TypeDef DISCONNECT_VOICE_CALL_ONLY;
 
 #define GSM_ANSWER_AN_INCOMING_CALL() Gsm_ExecuteCommand(ANSWER_AN_INCOMING_CALL, 0, 0)
 
-#define GSM_CALL_TO_DIAL_A_NUMBER(number) Gsm_ExecuteCommand(MOBILE_ORGINATE_CALL_TO_DIAL_A_NUMBER, string, &number)
+#define GSM_CALL_TO_DIAL_A_NUMBER(number) Gsm_ExecuteCommand(MOBILE_ORGINATE_CALL_TO_DIAL_A_NUMBER, 0, &number)
 
 #define GSM_CALL_TO_PHONE_NUMBER_IN_MEMORY_WHICH_NAME(name) Gsm_ExecuteCommand(ORGINATE_CALL_TO_PHONE_NUMBER_IN_MEMORY_WHICH_CORRESPONDS, string, &name)
 

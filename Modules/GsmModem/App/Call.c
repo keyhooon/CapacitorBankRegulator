@@ -15,8 +15,12 @@
 void ClccReceivedCallback(Response_TypeDef response);
 void UnsolicitedResultCallback(Response_TypeDef response);
 
-Call_Typedef call;
+const char *callStateTextList[7] = {"Active","Held","Dialing","Alerting", "Incoming","Waiting","Disconnect"};
+
+CommandExecuter_TypeDef *commandExecuter;
+CallInfo_Typedef call;
 osThreadId CallThreadId;
+
 ResponseReceivedCallbackList_typedef ClccCallback = { "+CLCC",
 		ClccReceivedCallback, 0 };
 
@@ -25,8 +29,7 @@ void Call_Main(void * arg);
 void Call_init(CommandExecuter_TypeDef *GsmCommandExecuter) {
 	osThreadDef(callTask, Call_Main, osPriorityLow, 1, 256);
 	CallThreadId = osThreadCreate(osThread(callTask), GsmCommandExecuter);
-	call.commandExecuter = GsmCommandExecuter;
-	call.callState = Disconnect;
+	commandExecuter = GsmCommandExecuter;
 }
 void Call_Main(void * arg) {
 	CommandExecuter_TypeDef *GsmCommandExecuter = arg;
@@ -41,10 +44,9 @@ void Call_Main(void * arg) {
 		osEvent event;
 		event = osSignalWait(0xff, osWaitForever);
 		if (event.value.signals & MESSAGE_CALL_RINGING)
-			call.OnRing();
+			OnRing();
 		else {
-			call.callState = event.value.signals;
-			call.OnCallStateChanged(call.callState);
+			OnCallStateChanged(call);
 		}
 	}
 
@@ -62,8 +64,19 @@ void UnsolicitedResultCallback(Response_TypeDef response) {
 		if (response.resultNumber == 2)
 			osSignalSet(CallThreadId, MESSAGE_CALL_RINGING);
 	} else if (response.Tokens.Count > 1)
+	{
 		temp = response.Tokens.Items[response.Tokens.Count - 2];
-	osSignalSet(CallThreadId, 1 << (temp[11] - '0'));
-}
+		call.state =  1 << (temp[11] - '0');
+		call.Name = " ";
+		call.number = " ";
+		osSignalSet(CallThreadId, call.state);
+	}
 
+}
+__weak void OnRing(void){
+
+}
+__weak void OnCallStateChanged(CallInfo_Typedef callInfo){
+
+}
 

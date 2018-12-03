@@ -66,8 +66,7 @@ void CommandExecuter_Task(void const * argument) {
 					if (responseResultList[response.resultNumber].type == final)
 						osSemaphoreRelease(currentCommandExecuter->semaphoreId);
 					else if (currentCommandExecuter->UnsolicitedResultCode)
-						currentCommandExecuter->UnsolicitedResultCode(
-								response.resultNumber);
+						currentCommandExecuter->UnsolicitedResultCode(response);
 				}
 			} else {
 				char* responseName = strtok(response.Tokens.Items[0], ":");
