@@ -10,8 +10,8 @@
 BufferStream_TypeDef * BufferStreamInit(unsigned int bufferLenght)
 {
 	BufferStream_TypeDef * bufferStream = pvPortMalloc(
-			sizeof(BufferStream_TypeDef));
-	bufferStream->buffer = pvPortMalloc(bufferLenght);
+			sizeof(BufferStream_TypeDef) + bufferLenght);
+	bufferStream->buffer = bufferStream + 1;
 	bufferStream->length = bufferLenght;
 	bufferStream->tail = 0;
 	bufferStream->head = 0;
@@ -21,7 +21,6 @@ BufferStream_TypeDef * BufferStreamInit(unsigned int bufferLenght)
 
 void BufferStreamDeinit(BufferStream_TypeDef * bufferStream)
 {
-	vPortFree(bufferStream->buffer);
 	vPortFree(bufferStream);
 }
 

@@ -19,23 +19,16 @@ const ResponseResult_TypeDef responseResultList[9] = {
 };
 
 Response_TypeDef ResponseParse(CommandTokenizer_TypeDef tokenizer,
-		unsigned int length) {
+		unsigned int *remainingLength) {
 	CommandTokensList_TypeDef tokensList = CommandTokenizer_tokenize(tokenizer,
-			length);
-	Response_TypeDef result = { 0, ResponseStatusOk, tokensList };
-	if (*(tokensList.Items)) {
-		register char* string = *(tokensList.Items + tokensList.Count - 1);
-		register unsigned int digit;
-		while (*string != 0) {
-			digit = *string++ - '0';
-			if (digit >= 0 && digit <= 9) {
-				result.resultNumber = result.resultNumber * 10 + digit;
-			} else {
-				result.resultNumber = -1;
-				result.status = ResponseStatusError_ResultIsntThere;
-				break;
-			}
-		}
+			remainingLength);
+	Response_TypeDef result = { -1, ResponseStatusError_ResultIsntThere,
+			tokensList };
+	if (tokensList.ResultIndex != -1) {
+		register char resultChar = **(tokensList.Items + tokensList.ResultIndex);
+		result.resultNumber = resultChar - '0';
+		result.status = ResponseStatusOk;
+
 	} else
 		result.status = ResponseStatusError_ResultIsntThere;
 	return result;

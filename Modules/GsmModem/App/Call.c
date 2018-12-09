@@ -12,15 +12,16 @@
 #include "Api/3GPP_TS27.h"
 #include "Api/V25TER.h"
 
-void ClccReceivedCallback(Response_TypeDef response);
+void ClccReceivedCallback(char* ClccReceivedToken);
 void UnsolicitedResultCallback(Response_TypeDef response);
+void ClccReceivedHandler(char* ClccReceivedToken);
 
 const char *callStateTextList[7] = {"Active","Held","Dialing","Alerting", "Incoming","Waiting","Disconnect"};
 
-CommandExecuter_TypeDef *commandExecuter;
-CallInfo_Typedef call;
-osThreadId CallThreadId;
+//CommandExecuter_TypeDef *commandExecuter;
 
+osThreadId CallThreadId;
+CallInfo_Typedef call;
 ResponseReceivedCallbackList_typedef ClccCallback = { "+CLCC",
 		ClccReceivedCallback, 0 };
 
@@ -29,7 +30,6 @@ void Call_Main(void * arg);
 void Call_init(CommandExecuter_TypeDef *GsmCommandExecuter) {
 	osThreadDef(callTask, Call_Main, osPriorityNormal, 1, 256);
 	CallThreadId = osThreadCreate(osThread(callTask), GsmCommandExecuter);
-	commandExecuter = GsmCommandExecuter;
 }
 void Call_Main(void * arg) {
 	CommandExecuter_TypeDef *GsmCommandExecuter = arg;
@@ -42,55 +42,38 @@ void Call_Main(void * arg) {
 
 	while (1) {
 		osEvent event;
-		char * ulNotifiedValue;
+		CallInfo_Typedef *call;
 		xTaskNotifyWait(0x00, /* Don't clear any notification bits on entry. */
 		0xffffffff, /* Reset the notification value to 0 on exit. */
-		&ulNotifiedValue, /* Notified value pass out in ulNotifiedValue. */
+		&call, /* Notified value pass out in ulNotifiedValue. */
 		portMAX_DELAY); /* Block indefinitely. */
-		event = osSignalWait(0xff, osWaitForever);
-		if (ulNotifiedValue == NULL)
+		if (call == NULL)
 			OnRing();
 		else {
-			volatile CallInfo_Typedef call;
-			char* ClccReceivedToken = ulNotifiedValue;
-			call.state = (ClccReceivedToken[11] - '0');
-			strtok(ClccReceivedToken, "\"");
-			call.number = strtok(0, "\"");
-			strtok(0, "\"");
-			call.Name = strtok(0, "\"");
 			OnCallStateChanged(call);
 		}
 	}
 
 }
 
-CallInfo_Typedef ClccReceivedHandler(char* ClccReceivedToken) {
-	volatile CallInfo_Typedef c;
-	c.state = (ClccReceivedToken[11] - '0');
+void ClccReceivedCallback(char* ClccReceivedToken) {
+	call.state = (ClccReceivedToken[11] - '0');
 	strtok(ClccReceivedToken, "\"");
-	c.number = strtok(0, "\"");
+	strcpy(call.number, strtok(0, "\""));
 	strtok(0, "\"");
-	c.Name = strtok(0, "\"");
-}
+	strcpy(call.Name, strtok(0, "\""));
+	xTaskNotify(CallThreadId, &call, eSetValueWithoutOverwrite);
 
-void ClccReceivedCallback(Response_TypeDef response) {
-	xTaskNotify(CallThreadId, response.Tokens.Items[0],
-			eSetValueWithoutOverwrite);
 }
 
 void UnsolicitedResultCallback(Response_TypeDef response) {
-	char * temp;
-	for (int i = 0; i < response.Tokens.Count - 1; i++)
-		if (memcmp(response.Tokens.Items[i], "+CLCC", 5))
-			xTaskNotify(CallThreadId, response.Tokens.Items[i],
-					eSetValueWithoutOverwrite);
 	if (response.resultNumber == 2)
-		osSignalSet(CallThreadId, NULL);
+		xTaskNotify(CallThreadId, NULL, eSetValueWithoutOverwrite);
 }
 __weak void OnRing(void){
 
 }
-__weak void OnCallStateChanged(CallInfo_Typedef callInfo){
+__weak void OnCallStateChanged(CallInfo_Typedef * callInfo) {
 
 }
 

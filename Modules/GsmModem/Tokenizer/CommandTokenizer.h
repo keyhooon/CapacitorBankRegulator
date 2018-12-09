@@ -13,7 +13,7 @@
 
 typedef struct {
 	char ** Items;
-	int Count;
+	int ResultIndex;
 	int IndexNeedToBeReleased;
 } CommandTokensList_TypeDef;
 
@@ -24,7 +24,7 @@ typedef struct {
 } CommandTokenizer_TypeDef;
 
 CommandTokensList_TypeDef CommandTokenizer_tokenize(
-		CommandTokenizer_TypeDef Tokenizer, unsigned int length);
+		CommandTokenizer_TypeDef Tokenizer, unsigned int *length);
 void CommandTokenizer_FreeTokenList(CommandTokensList_TypeDef commandTokenList);
 
 #endif /* GSMMODEM_TOKENIZER_COMMANDTOKENIZER_H_ */

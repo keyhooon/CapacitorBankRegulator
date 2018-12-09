@@ -10,4 +10,8 @@
 
 void GuiShell_init();
 
+void ChangeFirstButtonText(char *text);
+
+void ChangeSecondButtonText(char *text);
+
 #endif /* INC_GUISHELL_H_ */

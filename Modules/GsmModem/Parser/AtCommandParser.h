@@ -84,5 +84,5 @@ typedef struct {
 } Response_TypeDef;
 
 Response_TypeDef ResponseParse(CommandTokenizer_TypeDef tokenizer,
-		unsigned int length);
+		unsigned int *length);
 #endif /* GSMMODEM_PARSER_ATCOMMANDPARSER_COMMAND_H_ */

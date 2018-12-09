@@ -52,38 +52,52 @@ void CommandExecuter_DeInit(CommandExecuter_TypeDef *commandExecuter) {
 void CommandExecuter_Task(void const * argument) {
 	CommandExecuter_TypeDef * currentCommandExecuter = argument;
 	Response_TypeDef response;
-	currentCommandExecuter->LastResponse = &response;
 	while (1) {
 		osEvent event = osMessageGet(currentCommandExecuter->messageId,
 		osWaitForever);
 
 		if (event.status == osEventMessage) {
 			response = ResponseParse(currentCommandExecuter->commandTokenizer,
-					event.value.v);
-			if (response.Tokens.Count == 0)
-				continue;
-			if (response.status == ResponseStatusOk)
+					&event.value.v);
+			while (response.Tokens.Items != NULL)
 			{
+				for (int i = 0; *(response.Tokens.Items + i) != NULL; i++) {
+					char * responseToken = *(response.Tokens.Items + i);
+					char * responseDelim = strchr(responseToken, ':');
+					if (responseDelim == NULL)
+						continue;
+					int responseNameLen = responseDelim - responseToken;
+					ResponseReceivedCallbackList_typedef *p;
+					for (p = (currentCommandExecuter->responseReceivedCallbacks);
+							p != NULL
+									&& memcmp(p->ResponseName, responseToken,
+											responseNameLen) != 0; p = p->next)
+						;
+					if (p != NULL && p->ResponseReceivedCallback)
+						p->ResponseReceivedCallback(responseToken);
+
+				}
+
+				if (response.status == ResponseStatusOk) {
 					if (responseResultList[response.resultNumber].type == final)
-						osSemaphoreRelease(currentCommandExecuter->semaphoreId);
-					else if (currentCommandExecuter->UnsolicitedResultCode)
 					{
+						currentCommandExecuter->LastResponse = response;
+						osSemaphoreRelease(currentCommandExecuter->semaphoreId);
+					}
+					else if (currentCommandExecuter->UnsolicitedResultCode) {
 						currentCommandExecuter->UnsolicitedResultCode(response);
 						CommandTokenizer_FreeTokenList(response.Tokens);
 					}
-			} else {
-				char * responseToken = response.Tokens.Items[0];
-				char * responseDelim = strchr(responseToken, ':');
-				int responseNameLen = responseDelim - responseToken;
-				ResponseReceivedCallbackList_typedef *p;
-				for (p = (currentCommandExecuter->responseReceivedCallbacks);
-						p != NULL
-								&& memcmp(p->ResponseName, responseToken,
-										responseNameLen) != 0; p = p->next)
-					;
-				if (p != NULL && p->ResponseReceivedCallback)
-					p->ResponseReceivedCallback(response);
-				CommandTokenizer_FreeTokenList(response.Tokens);
+				} else {
+					CommandTokenizer_FreeTokenList(response.Tokens);
+				}
+
+				if (event.value.v == 0)
+					response.Tokens.Items = NULL;
+				else
+					response = ResponseParse(
+							currentCommandExecuter->commandTokenizer,
+							&event.value.v);
 			}
 		}
 	}
@@ -114,12 +128,11 @@ Response_TypeDef CommandExecuter_GetResponse(
 	osRecursiveMutexWait(commandExecuter->mutexId, osWaitForever);
 	Response_TypeDef result;
 	if (osSemaphoreWait(commandExecuter->semaphoreId, timeout) == osOK)
-		result = *(commandExecuter->LastResponse);
+		result = (commandExecuter->LastResponse);
 	else {
-		result.Tokens.Items = pvPortMalloc(sizeof(char *));
-		*result.Tokens.Items = NULL;
+		result.Tokens.Items = NULL;
 		result.Tokens.IndexNeedToBeReleased = -1;
-		result.Tokens.Count = 0;
+		result.Tokens.ResultIndex = -1;
 		result.status = ResponseStatusError_Timeout;
 		result.resultNumber = -1;
 	}

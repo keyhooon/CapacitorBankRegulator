@@ -53,7 +53,7 @@ extern const CommandType_TypeDef SET_TE_TA_LOCAL_DATA_FLOW_CONTROL;
 extern const CommandType_TypeDef SET_TE_TA_FIXED_LOCAL_RATE;
 extern const CommandType_TypeDef DISCONNECT_VOICE_CALL_ONLY;
 
-#define GSM_ANSWER_AN_INCOMING_CALL() Gsm_ExecuteCommand(ANSWER_AN_INCOMING_CALL, 0, 0)
+#define GSM_ANSWER_AN_INCOMING_CALL() Gsm_ExecuteCommand(ANSWER_AN_INCOMING_CALL, Execute, 0)
 
 #define GSM_CALL_TO_DIAL_A_NUMBER(number) Gsm_ExecuteCommand(MOBILE_ORGINATE_CALL_TO_DIAL_A_NUMBER, 0, &number)
 

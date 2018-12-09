@@ -34,14 +34,14 @@ typedef enum {
 } CallState_Typedef;
 typedef struct {
 	CallState_Typedef state;
-	char * number;
-	char * Name;
+	char number[20];
+	char Name[16];
 } CallInfo_Typedef;
 
 
 extern const char *callStateTextList[7];
 
-void OnCallStateChanged(CallInfo_Typedef);
+void OnCallStateChanged(CallInfo_Typedef *);
 void OnRing(void);
 void Call_init(CommandExecuter_TypeDef *GsmCommandExecuter);
 #endif /* GSMMODEM_APP_CALL_H_ */

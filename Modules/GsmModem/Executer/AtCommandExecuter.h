@@ -14,7 +14,7 @@
 #
 typedef struct ResponseReceivedCallbackList_Struct {
 	const char* ResponseName;
-	void (*ResponseReceivedCallback)(Response_TypeDef);
+	void (*ResponseReceivedCallback)(char*);
 	struct ResponseReceivedCallbackList_Struct * next;
 } ResponseReceivedCallbackList_typedef;
 
@@ -23,7 +23,7 @@ typedef struct AtCommandExecuter_Struct {
 	void (*Write)(char *, uint32_t);
 	ResponseReceivedCallbackList_typedef * responseReceivedCallbacks;
 	void (*UnsolicitedResultCode)(Response_TypeDef);
-	Response_TypeDef * LastResponse;
+	Response_TypeDef LastResponse;
 	CommandTokenizer_TypeDef commandTokenizer;
 	osMutexId mutexId;
 	osSemaphoreId semaphoreId;

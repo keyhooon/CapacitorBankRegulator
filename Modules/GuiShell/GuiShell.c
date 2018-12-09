@@ -313,18 +313,31 @@ static void CurrentMenuPageChanged(void) {
 	View_Typedef * CurrentView = ViewNavigator_GetCurrentView(
 			&DefaultViewNavigator);
 
-	if (CurrentView->firstButtonCallback == NULL)
+	if (CurrentView->firstButtonCallback == NULL
+			|| CurrentView->firstButtonText == NULL)
 		WM_HideWindow(firstButton);
 	else {
 		WM_ShowWindow(firstButton);
 		BUTTON_SetText(firstButton, CurrentView->firstButtonText);
 	}
-	if (CurrentView->SecondButtonCallback == NULL)
+	if (CurrentView->SecondButtonCallback == NULL
+			|| CurrentView->SecondButtonText == NULL)
 		WM_HideWindow(secondButton);
 	else {
 		WM_ShowWindow(secondButton);
 		BUTTON_SetText(secondButton, CurrentView->SecondButtonText);
 	}
-
 }
+
+void ChangeFirstButtonText(char *text) {
+	GUI_HWIN firstButton = WM_GetDialogItem(hWinToolbar, GUI_ID_BUTTON0);
+	BUTTON_SetText(firstButton, text);
+}
+
+void ChangeSecondButtonText(char *text) {
+	GUI_HWIN secondButton = WM_GetDialogItem(hWinToolbar, GUI_ID_BUTTON1);
+	BUTTON_SetText(secondButton, text);
+}
+
+
 

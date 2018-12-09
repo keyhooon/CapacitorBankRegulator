@@ -20,6 +20,7 @@ typedef struct {
 
 
 static void CallCancelCallback(void);
+static void CallAnswerCallback(void);
 static GUI_HWIN CallViewShow();
 static uint32_t CallViewHide(GUI_HWIN hwin);
 
@@ -30,7 +31,8 @@ extern GUI_CONST_STORAGE GUI_BITMAP * _abmcalling[];
 const View_Typedef CallView = {
 		CONTACT_CALL_VIEW_ID, "Contact Call", "Call",
 		(void *) NULL, CallViewShow, CallViewHide,
-		NULL, (const char*) "Cancel", NULL, CallCancelCallback, NULL, 0 };
+		(const char*) "Hang Up", (const char*) "Answer",
+		CallCancelCallback, CallAnswerCallback, NULL, 0 };
 
 static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
 		{
@@ -89,6 +91,10 @@ static void _cbCallView(WM_MESSAGE * pMsg) {
 static void CallCancelCallback(void) {
 	GSM_DISCONNECT_EXISTING_CONNECTION();
 }
+
+static void CallAnswerCallback(void) {
+	GSM_ANSWER_AN_INCOMING_CALL();
+}
 static GUI_HWIN CallViewShow() {
 	return GUI_CreateDialogBox(_aDialogCreate, GUI_COUNTOF(_aDialogCreate),
 			_cbCallView, NULL, 0, 2);
@@ -103,22 +109,33 @@ void OnRing(void){
 
 }
 
-void OnCallStateChanged(CallInfo_Typedef callInfo){
+void OnCallStateChanged(CallInfo_Typedef * callInfo) {
 	static GUI_HWIN hWin;
-	if (callInfo.state == Incoming || callInfo.state == Dialing)
-	{
-		hWin=ViewNavigator_GoToViewOf(&DefaultViewNavigator, &CallView);
-	} else if (callInfo.state == Disconnect) {
+	switch (callInfo->state) {
+	case Incoming:
+		hWin = ViewNavigator_GoToViewOf(&DefaultViewNavigator, &CallView);
+		break;
+	case Dialing:
+		ChangeSecondButtonText(0);
+		hWin = ViewNavigator_GoToViewOf(&DefaultViewNavigator, &CallView);
+		break;
+	case Alerting:
+		ChangeSecondButtonText(0);
+		break;
+	case Disconnect:
 		ViewNavigator_GoBackView(&DefaultViewNavigator);
 		hWin = GUI_HMEM_NULL;
+		break;
+	default:
+		break;
 	}
 	if (hWin) {
 		TEXT_SetText(WM_GetDialogItem(hWin, GUI_ID_TEXT0),
-				callStateTextList[callInfo.state]);
-		if (callInfo.Name == NULL)
-			TEXT_SetText(WM_GetDialogItem(hWin, GUI_ID_TEXT1), callInfo.number);
+				callStateTextList[callInfo->state]);
+		if (callInfo->Name == NULL)
+			TEXT_SetText(WM_GetDialogItem(hWin, GUI_ID_TEXT1),
+					callInfo->number);
 		else
-			TEXT_SetText(WM_GetDialogItem(hWin, GUI_ID_TEXT1), callInfo.Name);
+			TEXT_SetText(WM_GetDialogItem(hWin, GUI_ID_TEXT1), callInfo->Name);
 	}
-
 }
