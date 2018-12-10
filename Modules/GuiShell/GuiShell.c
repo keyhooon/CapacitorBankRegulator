@@ -5,6 +5,7 @@
  *      Author: HP
  */
 
+#include <Api/3GPP_TS2707.h>
 #include <GUI.h>
 #include <keypad.h>
 #include "Board.h"
@@ -12,7 +13,6 @@
 #include "cmsis_os.h"
 #include "ViewNavigator.h"
 
-#include "Api/3GPP_TS27.h"
 
 osThreadId guiTaskHandle;
 

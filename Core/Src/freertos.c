@@ -142,22 +142,7 @@ __weak void vApplicationMallocFailedHook(void)
 /* Init FreeRTOS */
 
 void MX_FREERTOS_Init(void) {
-  /* USER CODE BEGIN Init */
-  /* USER CODE END Init */
 
-  /* USER CODE BEGIN RTOS_MUTEX */
-  /* add mutexes, ... */
-  /* USER CODE END RTOS_MUTEX */
-
-  /* Create the semaphores(s) */
-  /* definition and creation of CalculateNeededSem */
-	osSemaphoreDef(CalculateNeededSem);
-	CalculateNeededSemHandle = osSemaphoreCreate(
-			osSemaphore(CalculateNeededSem), 1);
-
-  /* USER CODE BEGIN RTOS_SEMAPHORES */
-  /* add semaphores, ... */
-  /* USER CODE END RTOS_SEMAPHORES */
 
   /* Create the timer(s) */
   /* definition and creation of StatusTimer */
@@ -169,47 +154,6 @@ void MX_FREERTOS_Init(void) {
 	/* start timers, add new ones, ... */
 	osTimerStart(StatusTimerHandle, 100);
 	/* USER CODE END RTOS_TIMERS */
-
-	/* Create the thread(s) */
-	/* definition and creation of guiTask */
-
-
-	/* definition and creation of defaultTask */
-
-
-
-
-
-	/* definition and creation of CalculateTask */
-//	osThreadDef(CalculateTask, CalculationProc, osPriorityIdle, 0, 256);
-//	CalculateTaskHandle = osThreadCreate(osThread(CalculateTask), NULL);
-
-  /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ... */
-  /* USER CODE END RTOS_THREADS */
-
-  /* USER CODE BEGIN RTOS_QUEUES */
-  /* add queues, ... */
-  /* USER CODE END RTOS_QUEUES */
-}
-
-/* DefaultProc function */
-
-
-/* GuiProc function */
-
-/* CalculationProc function */
-void CalculationProc(void const * argument)
-{
-  /* USER CODE BEGIN CalculationProc */
-  /* Infinite loop */
-
-  for(;;)
-  {
-		osDelay(1000);
-
-  }
-  /* USER CODE END CalculationProc */
 }
 
 

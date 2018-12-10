@@ -6,8 +6,8 @@
  *      Author: HP
  */
 
-#ifndef GSMMODEM_API_3GPP_TS27_H_
-#define GSMMODEM_API_3GPP_TS27_H_
+#ifndef GSMMODEM_API_3GPP_TS2707_H_
+#define GSMMODEM_API_3GPP_TS2707_H_
 
 #include "Gsm.h"
 #include "stdlib.h"
@@ -85,8 +85,7 @@ extern const CommandType_TypeDef Supplementary_Services_Notification;
 #define GSM_Request_International_Mobile_Subscriber_Identity()
 #define GSM_List_Current_Calls_ME(value) 	{ \
 		char num[2] = {value + '0',0}; \
-		char *pNum[2] = {num,0}; \
-	Gsm_ExecuteCommand(List_Current_Calls_ME, Write, num); \
+		Gsm_ExecuteCommand(List_Current_Calls_ME, Write, num); \
 }
 
 #define GSM_Facility_Lock()
@@ -112,7 +111,7 @@ extern const CommandType_TypeDef Supplementary_Services_Notification;
 		Gsm_ExecuteCommand_Ex(Signal_Quality_Report, Execute, NULL, temp); \
 		strtok(temp, ":"); \
 		*(rssi) = atoi(strtok(0, ",")); \
-	}
+}
 #define GSM_Tone_Duration()
 #define GSM_DTMF_Tone_Generation()
 #define GSM_Multiplexer_Control()
@@ -130,15 +129,15 @@ extern const CommandType_TypeDef Supplementary_Services_Notification;
 #define GSM_Price_Per_Unit_and_Currency_Table()
 #define GSM_Call_Meter_Maximum_Even()
 #define GSM_Battery_Charge(chargeStatus, batteryConnectionLevel){ \
-	char temp[20]; \
-	Gsm_ExecuteCommand_Ex(Battery_Charge, Execute, NULL, temp); \
-	strtok(temp, ":"); \
-	*(chargeStatus) = atoi(strtok(0, ",")); \
-	*(batteryConnectionLevel) = atoi(strtok(0, ",")); \
+		char temp[20]; \
+		Gsm_ExecuteCommand_Ex(Battery_Charge, Execute, NULL, temp); \
+		strtok(temp, ":"); \
+		*(chargeStatus) = atoi(strtok(0, ",")); \
+		*(batteryConnectionLevel) = atoi(strtok(0, ",")); \
 }
 
 #define GSM_Unstructured_Supplementary_Service_Data()
 #define GSM_Supplementary_Services_Notification()
 
-#endif /* GSMMODEM_API_3GPP_TS27_H_ */
+#endif /* GSMMODEM_API_3GPP_TS2707_H_ */
 

@@ -1,22 +1,18 @@
 /*
- * Call.c
+ * Message.c
  *
- *  Created on: Nov 28, 2018
+ *  Created on: Dec 10, 2018
  *      Author: HP
  */
 
-#include <Api/3GPP_TS2707.h>
-#include "App/Call.h"
-#include "cmsis_os.h"
-#include "sglib.h"
-#include "Gsm.h"
-#include "Api/V25TER.h"
+
 
 void ClccReceivedCallback(char* ClccReceivedToken);
 void UnsolicitedResultCallback(Response_TypeDef response);
 void ClccReceivedHandler(char* ClccReceivedToken);
 
-const char *callStateTextList[7] = {"Active","Held","Dialing","Alerting", "Incoming","Waiting","Disconnect"};
+const char *callStateTextList[7] = { "Active", "Held", "Dialing", "Alerting",
+		"Incoming", "Waiting", "Disconnect" };
 
 //CommandExecuter_TypeDef *commandExecuter;
 
@@ -70,7 +66,7 @@ void UnsolicitedResultCallback(Response_TypeDef response) {
 	if (response.resultNumber == 2)
 		xTaskNotify(CallThreadId, NULL, eSetValueWithoutOverwrite);
 }
-__weak void OnRing(void){
+__weak void OnRing(void) {
 
 }
 __weak void OnCallStateChanged(CallInfo_Typedef * callInfo) {
