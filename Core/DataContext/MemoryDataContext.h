@@ -1,17 +1,16 @@
 /*
- * List_Heap.h
+ * DataContext.h
  *
- *  Created on: Oct 15, 2018
+ *  Created on: Dec 11, 2018
  *      Author: HP
  */
 
-#ifndef LIST_HEAP_H_
-#define LIST_HEAP_H_
-#include "sglib.h"
-#include "FreeRTOS.h"
-#include "string.h"
+#ifndef DATACONTEXT_MEMORYDATACONTEXT_H_
+#define DATACONTEXT_MEMORYDATACONTEXT_H_
 
-#define STRING_COMPARATOR(x, y) ((strcmp(x, y)))
+extern int hMemoryDataContextAllocator;
+
+void InitMemoryDataContext();
 
 typedef struct {
 	int (*Add)(void *);
@@ -24,13 +23,13 @@ typedef struct {
 	int (*GetCurrentItemIndex)(void);
 	void * (*GetCurrentItem)(void);
 } ListApiHandlers_typedef;
-#define DATA_ACCESS_LIST_PROTOTYPES(type) \
+
+#define DATA_CONTEXT_PROTOTYPES(type) \
 	typedef struct type##_List_Struct { \
 		struct type##_List_Struct *next_ptr; \
 		struct type##_List_Struct *prev_ptr; \
 		type##_Typedef current_item; \
 	} type##_List_Typedef; \
-	type##_List_Typedef * type##List; \
 	int Add##type(type##_Typedef *value); \
 	int Remove##type(void); \
 	int Get##type##ListLen(void); \
@@ -42,8 +41,7 @@ typedef struct {
 	void * GetCurrent##type##Item(void); \
 
 
-
-#define DATA_ACCESS_LIST_FUNCTIONS(type, comparator, display, displayDetail) \
+#define DATA_CONTEXT_FUNCTIONS(type, comparator, display, displayDetail) \
 	SGLIB_DEFINE_DL_LIST_PROTOTYPES(type##_List_Typedef, comparator, prev_ptr, next_ptr) \
 	SGLIB_DEFINE_DL_LIST_FUNCTIONS(type##_List_Typedef, comparator, prev_ptr, next_ptr) \
 	ListApiHandlers_typedef type##ListApiHandlers = { \
@@ -124,5 +122,4 @@ typedef struct {
 		return &(type##List->current_item);\
 	}\
 
-
-#endif /* LIST_HEAP_H_ */
+#endif /* DATACONTEXT_MEMORYDATACONTEXT_H_ */

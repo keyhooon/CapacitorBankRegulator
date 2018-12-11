@@ -36,7 +36,8 @@
 									<listOptionValue builtIn="false" value="../DataStructure"/>
 									<listOptionValue builtIn="false" value="../Core/Inc"/>
 									<listOptionValue builtIn="false" value="../Core/DataModel"/>
-									<listOptionValue builtIn="false" value="../Core/DataAccess"/>
+									<listOptionValue builtIn="false" value="../Core/DataManager"/>
+									<listOptionValue builtIn="false" value="../Core/DataContext"/>
 									<listOptionValue builtIn="false" value="../Core/ViewContainer"/>
 									<listOptionValue builtIn="false" value="../Middlewares/STemWin/inc"/>
 									<listOptionValue builtIn="false" value="../Middlewares/STemWin/Config"/>
@@ -126,7 +127,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="SmallWindow/C/ContactOptionDLG.c|SmallWindow/C/ContactListManualDialDLG.c|SmallWindow/C/ContactListDLG.c|ViewContainer/InfoView.c|ViewContainer/NotificationView.c|Src/tim.c|ViewContainer/EditView.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
+						<entry excluding="ViewContainer/InfoView.c|ViewContainer/NotificationView.c|SmallWindow/C/ContactListManualDialDLG.c|Src/tim.c|SmallWindow/C/ContactOptionDLG.c|SmallWindow/C/ContactListDLG.c|ViewContainer/EditView.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="DataStructure"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
 						<entry excluding="STemWin/Config/GUI_X.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
@@ -251,7 +252,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="SmallWindow/C/ContactOptionDLG.c|SmallWindow/C/ContactListManualDialDLG.c|SmallWindow/C/ContactListDLG.c|ViewContainer/InfoView.c|ViewContainer/NotificationView.c|Src/tim.c|ViewContainer/EditView.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
+						<entry excluding="ViewContainer/InfoView.c|ViewContainer/NotificationView.c|SmallWindow/C/ContactListManualDialDLG.c|Src/tim.c|SmallWindow/C/ContactOptionDLG.c|SmallWindow/C/ContactListDLG.c|ViewContainer/EditView.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="DataStructure"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
 						<entry excluding="STemWin/Config/GUI_X.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
