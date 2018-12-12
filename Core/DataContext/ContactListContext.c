@@ -8,11 +8,11 @@
 
 #include "ContactListContext.h"
 #include "string.h"
-#include "MemoryDataContext.h"
 #include "Contact.h"
 
-DATA_CONTEXT_FUNCTIONS(Contact, CONTACT_COMPARATOR, CONTACT_PREVIEW,
-		CONTACT_VIEW);
+extern int hMemoryDataContextAllocator;
+
+DATA_CONTEXT_FUNCTIONS(Contact, CONTACT, hMemoryDataContextAllocator);
 
 static void AddContactEx(char * Name, char * LastName, char * CallNumber);
 

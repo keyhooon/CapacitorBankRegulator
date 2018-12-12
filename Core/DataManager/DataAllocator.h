@@ -61,7 +61,7 @@ void *DataAllocatorAlloc(int hDataAllocator, size_t xWantedSize);
 
 void DataAllocatorFree(int hDataAllocator, void *pv);
 
-size_t GetSize(int hDataAllocator, void *pv);
+size_t DataAllocatorGetSize(int hDataAllocator, void *pv);
 
 size_t DataAllocatorGetFreeSize(int hDataAllocator);
 

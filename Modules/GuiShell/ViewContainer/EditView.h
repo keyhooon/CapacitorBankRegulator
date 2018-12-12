@@ -5,6 +5,7 @@
  *      Author: HP
  */
 
+#include "View.h"
 #ifndef VIEWCONTAINER_EDITVIEW_H_
 #define VIEWCONTAINER_EDITVIEW_H_
 

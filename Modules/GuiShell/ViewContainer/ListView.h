@@ -8,8 +8,7 @@
 #ifndef VIEWCONTAINER_LISTVIEW_H_
 #define VIEWCONTAINER_LISTVIEW_H_
 
-#include "../../../Core/DataManager/List_Heap.h"
-
+#include "MemoryDataContext.h"
 
 typedef struct {
 	GUI_BITMAP * Icon;

@@ -10,11 +10,13 @@
 #include "DataModel.h"
 #include "string.h"
 
-#define CONTACT_COMPARATOR(contact1, contact2) strcmp(contact1.Name, contact2.Name);
+#define CONTACT_COMPARATOR(contact1, contact2) 	strcmp(contact1.Name, contact2.Name);
 
-#define CONTACT_PREVIEW(display, contact) sprintf(display, "%.16s", contact.Name);
+#define CONTACT_PREVIEW(display, contact) 		sprintf(display, "%.16s", contact.Name);
 
-#define CONTACT_VIEW(display, contact) sprintf(display, "%.20s\r\n%.16s",contact.CallNumber, contact.Name);
+#define CONTACT_VIEW(display, contact) 			sprintf(display, "%.20s\r\n%.16s",contact.CallNumber, contact.Name);
+
+#define CONTACT_MODEL_DATA_ALLOCATOR			hModelInMemoryAllocator
 
 typedef struct {
 	char * Name;

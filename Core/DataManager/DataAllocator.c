@@ -40,27 +40,27 @@ void RemoveDataAllocator(int hDataAllocator) {
 	DataAllocatorsList[hDataAllocator].ucHeap = 0;
 }
 
-void *Alloc(int hDataAllocator, size_t xWantedSize) {
+void *DataAllocatorAlloc(int hDataAllocator, size_t xWantedSize) {
 	DataAllocator_Typedef *handle = &DataAllocatorsList[hDataAllocator];
 	return handle->Alloc(handle, xWantedSize);
 }
 
-void Free(int hDataAllocator, void *pv) {
+void DataAllocatorFree(int hDataAllocator, void *pv) {
 	DataAllocator_Typedef *handle = &DataAllocatorsList[hDataAllocator];
 	handle->Free(handle, pv);
 }
 
-size_t GetSize(int hDataAllocator, void *pv) {
+size_t DataAllocatorGetSize(int hDataAllocator, void *pv) {
 	DataAllocator_Typedef *handle = &DataAllocatorsList[hDataAllocator];
 	return handle->GetSize(handle, pv);
 }
 
-size_t GetFreeSize(int hDataAllocator) {
+size_t DataAllocatorGetFreeSize(int hDataAllocator) {
 	DataAllocator_Typedef *handle = &DataAllocatorsList[hDataAllocator];
 	return handle->GetFreeSize(handle);
 }
 
-size_t GetMinimumEverFreeHeapSize(int hDataAllocator) {
+size_t DataAllocatorGetMinimumEverFreeHeapSize(int hDataAllocator) {
 	DataAllocator_Typedef *handle = &DataAllocatorsList[hDataAllocator];
 	return handle->GetMinimumEverFreeHeapSize(handle);
 }
