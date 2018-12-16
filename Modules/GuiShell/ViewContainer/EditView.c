@@ -11,6 +11,8 @@
  **********************************************************************
  */
 #include "DIALOG.h"
+#include "WM.h"
+#include "ViewNavigator.h"
 #include "EditView.h"
 
 /*********************************************************************
@@ -20,123 +22,64 @@
  **********************************************************************
  */
 
-#define MY_WIDGET_ID_0 (GUI_ID_USER + 0)
-#define MY_WIDGET_ID_1 (GUI_ID_USER + 1)
-#define MY_WIDGET_ID_2 (GUI_ID_USER + 2)
-#define MY_WIDGET_ID_3 (GUI_ID_USER + 3)
 
 
-extern GUI_CONST_STORAGE GUI_BITMAP bmClock_16x16_black;
-extern GUI_CONST_STORAGE GUI_BITMAP _bmBatteryEmpty_27x14;
+void ProcessEditView(EditView_Parameters_Typedef * editView_parameters);
+static GUI_HWIN EditViewShow(void *);
+static uint8_t EditViewHide(GUI_HWIN hWin, void *);
+void EditViewOkCallback(void *);
+void EditViewBackCallback(void *);
+const View_Typedef ListEditView = {
+EDIT_VIEW_ID, "Edit", "Edit", (void *) NULL, EditViewShow, EditViewHide,
+		(const char*) "Cancel", (const char*) "OK", EditViewBackCallback,
+		EditViewOkCallback, NULL, 0 };
 
-extern GUI_CONST_STORAGE GUI_BITMAP * _apbmCharge[];
-
-/*********************************************************************
- *
- *       Static code
- *
- **********************************************************************
- */
-static void _cbView(WM_MESSAGE * pMsg);
-
-extern void ShowEditView(EditViewParam_Typedef Param);
-/*********************************************************************
- *
- *       _cbHeading
- *
- * Purpose:
- *   Callback function of heading window containing logo and battery symbol.
- */
-static void _cbView(WM_MESSAGE * pMsg) {
-	int xSize, ySize, xPos, yPos;
-	const GUI_BITMAP * pBm;
-	WM_HWIN hWin;
-	static int Index;
-	static int Antenna;
-
-	hWin = pMsg->hWin;
-	switch (pMsg->MsgId) {
-	case WM_CREATE:
-		//
-		// Create timer to be used to modify the battery symbol
-		//
-		WM_CreateTimer(hWin, 0, 1000, 0);
-
-		break;
-	case WM_TIMER:
-		//
-		// Modify battery symbol on timer message
-		//
-		Index++;
-		if (Index == 5) {
-			Index = 0;
-		}
-		Antenna++;
-		if (Antenna == 5) {
-			Antenna = 0;
-		}
-		WM_InvalidateWindow(hWin);
-		WM_RestartTimer(pMsg->Data.v, 0);
-		break;
-	case WM_PAINT:
-		//
-		// Get window dimension
-		//
-		xSize = WM_GetWindowSizeX(hWin);
-		ySize = WM_GetWindowSizeY(hWin);
-		//
-		// Draw logo, battery and clock
-		//
-		xPos = xSize;
-		GUI_SetColor(GUI_WHITE);
-		GUI_FillRect(0, 0, xSize - 1, ySize);
-
-		break;
-	default:
-		WM_DefaultProc(pMsg);
-	}
+static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = { //
+		{ WINDOW_CreateIndirect, "Main Menu", GUI_ID_USER, 0, 0, 128, 115, 0,
+				0x0, 0 }, //
+				{ TEXT_CreateIndirect, "Text", GUI_ID_TEXT0, 5, 20, 118, 20,
+						TEXT_CF_HCENTER | TEXT_CF_VCENTER, 0, 0 }, //
+				{ EDIT_CreateIndirect, "Edit", GUI_ID_EDIT0, 5, 60, 128, 20,
+						TEXT_CF_HCENTER | TEXT_CF_VCENTER, 0, 0 }, //
+		};
+static GUI_HWIN EditViewShow(void * parameters) {
+	EditView_Parameters_Typedef * editView_parameters =
+			(EditView_Parameters_Typedef *) parameters;
+	editView_parameters->currentFieldIndex = 0;
+	WM_HWIN hwin = GUI_CreateDialogBox(_aDialogCreate,
+			GUI_COUNTOF(_aDialogCreate), NULL, NULL, 0, 0);
+	ProcessEditView(editView_parameters);
+	return hwin;
+}
+static uint8_t EditViewHide(GUI_HWIN hWin, void * parameters) {
+	vPortFree(DefaultListView->EditArg);
+	return 1;
 }
 
-/*********************************************************************
- *
- *       Public code
- *
- **********************************************************************
- */
-/*********************************************************************
- *
- *       MainTask
- *
- * Purpose:
- *
- */
-void ShowEditView(View_Typedef *view) {
-	int xSize, ySize;
-
-
-	WM_HWIN hWin;     // Menu window moveable within viewport window
-	EditViewParam_Typedef* param = (EditViewParam_Typedef*) (view->param);
-	EditViewState_TypeDef* state =
-			(EditViewState_TypeDef*) (view->state->States);
-	//
-	// Get display dimension
-	//
-	xSize = LCD_GetXSize();
-	ySize = LCD_GetYSize();
-	//
-	// Limit desktop window to display size
-	//
-	WM_SetSize(WM_HBKWIN, xSize, ySize);
-	//
-	// Create windows
-	//
-	hWin = WM_CreateWindowAsChild(0, 22, xSize, 168, WM_HBKWIN,
-	WM_CF_SHOW, _cbView, sizeof(void *) * 2);
-	TEXT_CreateEx(25, 5, 178, 30, hWin, WM_CF_SHOW, TEXT_CF_VCENTER,
-	MY_WIDGET_ID_0, param->infoText);
-	EDIT_CreateEx(25, 35, 78, 30, hWin, WM_CF_SHOW, TEXT_CF_VCENTER,
-	MY_WIDGET_ID_1, state->value);
+void EditViewOkCallback(void * parameters) {
+	EditView_Parameters_Typedef * listView_parameters =
+			(EditView_Parameters_Typedef *) parameters;
+	listView_parameters->currentFieldIndex++;
+	if (listView_parameters->currentFieldIndex
+			== listView_parameters->fieldCount)
+		listView_parameters->FinishCallback();
 }
-void HideEditView(WM_HWIN hWin) {
+
+void EditViewBackCallback(void * parameters) {
+	EditView_Parameters_Typedef * listView_parameters =
+			(EditView_Parameters_Typedef *) parameters;
+	if (listView_parameters->currentFieldIndex-- == 0)
+		ViewNavigator_GoBackView(&DefaultViewNavigator);
+}
+void ProcessEditView(EditView_Parameters_Typedef * editView_parameters) {
+	WM_HWIN countainer_hwin = WM_GetFirstChild(
+			DefaultViewNavigator.view_container_hWin);
+	FieldAttribute_Typedef
+	TEXT_SetText(WM_GetDialogItem(countainer_hwin, GUI_ID_TEXT0),
+			editView_parameters->fieldAttribute[editView_parameters->currentFieldIndex].display);
+
+	EDIT_SetText(WM_GetDialogItem(countainer_hwin, GUI_ID_EDIT0),
+			(((char*) editView_parameters->editableModel)
+					+ editView_parameters->fieldAttribute[editView_parameters->currentFieldIndex].offsetInStruct));
 
 }

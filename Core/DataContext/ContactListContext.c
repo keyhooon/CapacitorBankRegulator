@@ -7,35 +7,30 @@
 
 
 #include "ContactListContext.h"
-#include "string.h"
-#include "Contact.h"
 
 extern int hMemoryDataContextAllocator;
 
 DATA_CONTEXT_FUNCTIONS(Contact, CONTACT, hMemoryDataContextAllocator);
 
-static void AddContactEx(char * Name, char * LastName, char * CallNumber);
+static void AddContactEx(char * Name, char * CallNumber);
 
 void SeedContact() {
-
-	AddContactEx((const char*) "keyhan", (const char*) "babazadeh",
+	AddContactEx((const char*) "keyhan babazadeh",
 			(const char*) "09124575442");
-	AddContactEx((const char*) "kian", (const char*) "babazadeh",
+	AddContactEx((const char*) "kian babazadeh",
 			(const char*) "09124463992");
-	AddContactEx((const char*) "roozbeh", (const char*) "babazadeh",
+	AddContactEx((const char*) "roozbeh babazadeh",
 			(const char*) "09127093902");
-	AddContactEx((const char*) "mohammad", (const char*) "babazadeh",
+	AddContactEx((const char*) "mohammad babazadeh",
 			(const char*) "09121015197");
-	AddContactEx((const char*) "kaveh", (const char*) "babazadeh",
-			(const char*) "-");
-	AddContactEx((const char*) "shima", (const char*) "shademan",
+	AddContactEx((const char*) "kaveh babazadeh",
+			(const char*) "09121143144");
+	AddContactEx((const char*) "shima shademan",
 			(const char*) "09354463261");
 }
 
 static void AddContactEx(char * Name, char * CallNumber) {
-	Contact_Typedef contact = { 0, pvPortMalloc(strlen(Name)), pvPortMalloc(
-			strlen(CallNumber)), };
-	strcpy(contact.Name, Name);
-	strcpy(contact.CallNumber, CallNumber);
-	AddContact(&contact);
+	Contact_Typedef *contact = CreateContact(Name, CallNumber);
+	AddContact(contact);
+	FreeContact(contact);
 }

@@ -8,7 +8,10 @@
 #ifndef DATAMANAGER_DATAALLOCATOR_H_
 #define DATAMANAGER_DATAALLOCATOR_H_
 
-#include <HeapDataAllocator.h>
+#include "FreeRTOS.h"
+#include "task.h"
+
+#define DATA_ALLOCATORS_LIST_SIZE		5
 
 /* Define the linked list structure.  This is used to link free blocks in order
  of their memory address. */
@@ -53,18 +56,20 @@ typedef struct DataAllocator_Struct {
 } DataAllocator_Typedef;
 
 
-int AddDataAllocator(uint32_t TotalHeapSize);
+int AddHeapDataAllocator(uint8_t * buffer);
 
-void RemoveDataAllocator(int hDataAllocator);
 
-void *DataAllocatorAlloc(int hDataAllocator, size_t xWantedSize);
 
-void DataAllocatorFree(int hDataAllocator, void *pv);
+void Remove_DataAllocator(int hDataAllocator);
 
-size_t DataAllocatorGetSize(int hDataAllocator, void *pv);
+void *DataAllocator_Alloc(int hDataAllocator, size_t xWantedSize);
 
-size_t DataAllocatorGetFreeSize(int hDataAllocator);
+void DataAllocator_Free(int hDataAllocator, void *pv);
 
-size_t DataAllocatorGetMinimumEverFreeSize(int hDataAllocator);
+size_t DataAllocator_GetSize(int hDataAllocator, void *pv);
+
+size_t DataAllocator_GetFreeSize(int hDataAllocator);
+
+size_t DataAllocator_GetMinimumEverFreeSize(int hDataAllocator);
 
 #endif /* DATAMANAGER_DATAALLOCATOR_H_ */

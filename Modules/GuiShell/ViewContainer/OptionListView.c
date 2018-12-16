@@ -1,51 +1,27 @@
 /*
- * ListView.c
+ * OptionListView.c
  *
- *  Created on: Oct 7, 2018
+ *  Created on: Dec 16, 2018
  *      Author: HP
  */
+
 
 #include "DIALOG.h"
 #include "WM.h"
 #include "ViewNavigator.h"
-#include "ListView.h"
-
-/*********************************************************************
- *
- *       Defines
- *
- **********************************************************************
- */
-
-/*********************************************************************
- *
- *       Static data
- *
- **********************************************************************
- */
+#include "OptionListView.h"
 
 
 
-char** DisplayArray;
+static GUI_HWIN OptionListViewShow(void *);
+static uint8_t OptionListViewHide(GUI_HWIN hWin, void *);
+void OptionListOkCallback(void *);
+const View_Typedef ListOptionView = {
+OPTION_VIEW_ID, "Option", "Opt", (void *) NULL, OptionListViewShow,
+		OptionListViewHide, (const char*) "Back", (const char*) "OK",
+		backCallback, OptionListOkCallback, NULL, 0 };
 
-extern GUI_CONST_STORAGE GUI_BITMAP bmItemIndexImage;
-
-
-
-static GUI_HWIN ListViewShow(void *);
-static uint8_t ListViewHide(GUI_HWIN hWin, void *);
-void ListBackCallback(void *);
-void ListOkCallback(void *);
-
-
-
-
-const View_Typedef ListView = {
-LIST_VIEW_ID, "List", "List", (void *) NULL, ListViewShow, ListViewHide,
-		(const char*) "Back", (const char*) "Select", ListBackCallback,
-		ListOkCallback };
-
-static int _OwnerListDraw(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo) {
+static int _OwnerOptionListDraw(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo) {
 	WM_HWIN hWin = pDrawItemInfo->hWin;
 	int Index = pDrawItemInfo->ItemIndex;
 
@@ -119,16 +95,20 @@ static int _OwnerListDraw(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo) {
 		//
 		// Draw bitmap
 		//
-		GUI_DrawBitmap(&bmItemIndexImage, IconRect.x0 + 1, IconRect.y0 + 1);
+		CustomFunction_Typedef ** t = DefaultListView->CustomFunctionList;
+		if ((*(t + Index))->Icon != NULL)
+			GUI_DrawBitmap((*(t + Index))->Icon, IconRect.x0 + 1,
+					IconRect.y0 + 1);
+
 		//
 		// Draw index
 		//
-		GUI_SetTextMode(GUI_TEXTMODE_TRANS);
-		char indexString[4];
-		itoa(Index, indexString, 10);
-		int indexStringDistX = GUI_GetStringDistX(indexString);
-		GUI_DispStringInRect(indexString, &IconRect,
-		GUI_TA_HCENTER | GUI_TA_VCENTER);
+//		GUI_SetTextMode(GUI_TEXTMODE_TRANS);
+//		char indexString[4];
+//		itoa(Index, indexString, 10);
+//		int indexStringDistX = GUI_GetStringDistX(indexString);
+//		GUI_DispStringInRect(indexString, &IconRect,
+//				GUI_TA_HCENTER | GUI_TA_VCENTER);
 		//
 		// Draw focus rectangle
 		//
@@ -151,53 +131,38 @@ static int _OwnerListDraw(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo) {
 	}
 	return 0;
 }
-
-void SetListSkin(LISTBOX_Handle list) {
+void SetOptionListSkin(LISTBOX_Handle list) {
 	LISTBOX_SetScrollbarWidth(list, 16);
 	LISTBOX_SetAutoScrollV(list, 1);
 	LISTBOX_SetItemSpacing(list, 10);
-	LISTBOX_SetOwnerDraw(list, _OwnerListDraw);
+	LISTBOX_SetOwnerDraw(list, _OwnerOptionListDraw);
 }
-
-static GUI_HWIN ListViewShow(void * parameters) {
-	ListView_Parameters_Typedef * listView_parameters =
-			(ListView_Parameters_Typedef *) parameters;
-	listView_parameters->DisplayArray =
-			listView_parameters->apiHandlers->GetDisplayArray();
+static GUI_HWIN OptionListViewShow(void) {
 	WM_HWIN hwin = WINDOW_CreateEx(0, 0, 128, 115, NULL, WM_CF_SHOW, 0x0,
-			GUI_ID_USER, NULL);
+	GUI_ID_USER, NULL);
+	CustomFunction_Typedef ** t = DefaultListView->CustomFunctionList;
+	uint32_t i = 0;
+	char *MenuDisplayText[10];
+
+	while (*t != NULL)
+		MenuDisplayText[i++] = (*t++)->display;
+	MenuDisplayText[i] = 0;
 	LISTBOX_Handle listbox_hwin = LISTBOX_CreateEx(0, 0, 128, 115, hwin,
-			WM_CF_SHOW, 0, GUI_ID_LISTBOX0, DisplayArray);
-	SetListSkin(listbox_hwin);
-	for (int i = 0; (*(listView_parameters->customFunction + i)) != NULL; i++)
-		LISTBOX_AddString(listbox_hwin,
-				(*(listView_parameters->customFunction + i))->display);
-	LISTBOX_SetSel(listbox_hwin,
-			listView_parameters->apiHandlers->GetSelectedIndex());
-	listView_parameters->hWin = listbox_hwin;
+	WM_CF_SHOW, 0, GUI_ID_LISTBOX1, MenuDisplayText);
+	DefaultListView->CurrentWidget = listbox_hwin;
+	SetOptionListSkin(listbox_hwin);
 	return hwin;
 }
-static uint8_t ListViewHide(GUI_HWIN hWin, void * parameters) {
-	ListView_Parameters_Typedef * listView_parameters =
-			(ListView_Parameters_Typedef *) parameters;
-	listView_parameters->apiHandlers->FreeDisplayArray(
-			listView_parameters->DisplayArray);
+
+static uint8_t OptionListViewHide(GUI_HWIN hWin) {
 	return 1;
 }
-void ListOkCallback(void * parameters) {
-	ListView_Parameters_Typedef * listView_parameters =
-			(ListView_Parameters_Typedef *) parameters;
-	uint32_t selItem = LISTBOX_GetSel(listView_parameters->hWin);
-	uint32_t count = listView_parameters->apiHandlers->GetCount();
-	if (selItem < count) {
-		listView_parameters->apiHandlers->SetSelectedIndex(selItem);
-		listView_parameters->SelectCallback(
-				listView_parameters->apiHandlers->GetSelectedItem());
-	} else
-		(*(listView_parameters->customFunction + (selItem - count)))->function();
-}
 
-void ListBackCallback(void * parameters) {
+void OptionListOkCallback(void) {
+	uint32_t sel = LISTBOX_GetSel(DefaultListView->CurrentWidget);
+	(*(DefaultListView->CustomFunctionList + sel))->function();
+}
+void backCallback(void) {
 	ViewNavigator_GoBackView(&DefaultViewNavigator);
 }
 

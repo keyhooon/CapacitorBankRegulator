@@ -23,20 +23,11 @@
 
 
 
-typedef struct {
-	uint8_t items[DEEPEST_CHAIN_VIEW_COUNT];
-	int8_t currentItemPos;
-} PositionListTypeDef;
+typedef struct Loaded_View_Struct Loaded_View_TypeDef;
 
-typedef struct {
-	WM_HWIN view_container_hWin;
-	View_Typedef * registered_view_list[MAX_VIEW_COUNT];
-	uint16_t register_view_num;
-	PositionListTypeDef view_route;
-	void (*currentViewChanged)(void);
-} ViewNavigatorTypedef;
+typedef struct View_Navigator_Struct View_Navigator_Typedef;
 
-ViewNavigatorTypedef DefaultViewNavigator;
+extern View_Navigator_Typedef DefaultViewNavigator;
 
 /* Exported constants --------------------------------------------------------*/
 /* Exported macros -----------------------------------------------------------*/
@@ -44,23 +35,24 @@ ViewNavigatorTypedef DefaultViewNavigator;
 void InitMenu(void);
 void StartUp(void);
 void SetGuiProfile(void);
-void ViewNavigator_Init(ViewNavigatorTypedef *viewNavigator,
+void ViewNavigator_Init(View_Navigator_Typedef *viewNavigator,
 		WM_HWIN containerhWin);
-uint8_t ViewNavigator_RegisterView(ViewNavigatorTypedef *viewNavigator,
+uint8_t ViewNavigator_RegisterView(View_Navigator_Typedef *viewNavigator,
 		View_Typedef *view);
-uint8_t ViewNavigator_UnregisterView(ViewNavigatorTypedef *viewNavigator,
+uint8_t ViewNavigator_UnregisterView(View_Navigator_Typedef *viewNavigator,
 		View_Typedef *view);
-uint8_t ViewNavigator_GetViewCount(ViewNavigatorTypedef *viewNavigator);
+uint8_t ViewNavigator_GetViewCount(View_Navigator_Typedef *viewNavigator);
 
-GUI_HWIN ViewNavigator_GoBackView(ViewNavigatorTypedef *viewNavigator);
-GUI_HWIN ViewNavigator_GoHomeView(ViewNavigatorTypedef *viewNavigator);
-GUI_HWIN ViewNavigator_GoToViewOf(ViewNavigatorTypedef *viewNavigator,
-		View_Typedef *view);
-GUI_HWIN ViewNavigator_GoToViewOfByID(ViewNavigatorTypedef *viewNavigator,
-		uint8_t viewId);
-View_Typedef * ViewNavigator_GetCurrentView(ViewNavigatorTypedef *viewNavigator);
+GUI_HWIN ViewNavigator_GoBackView(View_Navigator_Typedef *viewNavigator);
+GUI_HWIN ViewNavigator_GoHomeView(View_Navigator_Typedef *viewNavigator);
+GUI_HWIN ViewNavigator_GoToViewOf(View_Navigator_Typedef *viewNavigator,
+		View_Typedef * view, void * parameter);
+GUI_HWIN ViewNavigator_GoToViewOfByID(View_Navigator_Typedef *viewNavigator,
+		uint8_t viewId, void * parameter);
+View_Typedef * ViewNavigator_GetCurrentView(
+		View_Navigator_Typedef *viewNavigator);
 
-uint8_t ExistViewIDInRouteVerify(ViewNavigatorTypedef *viewNavigator,
+uint8_t ExistViewIDInRouteVerify(View_Navigator_Typedef *viewNavigator,
 		uint8_t viewId);
 #ifdef __cplusplus
 }

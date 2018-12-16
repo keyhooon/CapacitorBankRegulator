@@ -6,8 +6,7 @@
  */
 
 #include <HeapDataAllocator.h>
-#include "FreeRTOS.h"
-#include "task.h"
+
 
 /* Block sizes must not get too small. */
 #define heapMINIMUM_BLOCK_SIZE	( ( size_t ) ( xHeapStructSize << 1 ) )
@@ -16,6 +15,9 @@
 #define heapBITS_PER_BYTE		( ( size_t ) 8 )
 
 
+
+
+extern DataAllocator_Typedef DataAllocatorsList[DATA_ALLOCATORS_LIST_SIZE];
 /*-----------------------------------------------------------*/
 
 /*
@@ -25,14 +27,14 @@
  * adjacent to each other.
  */
 static void prvInsertBlockIntoFreeList(
-		struct DataAllocator_Struct * hDataAllocator,
+		DataAllocator_Typedef * hDataAllocator,
 		BlockLink_t *pxBlockToInsert);
 
 /*
  * Called automatically to setup the required heap structures the first time
  * pvPortMalloc() is called.
  */
-static void prvHeapInit(struct DataAllocator_Struct * hDataAllocator);
+static void prvHeapInit(DataAllocator_Typedef * hDataAllocator);
 
 /*-----------------------------------------------------------*/
 
@@ -45,7 +47,28 @@ static const size_t xHeapStructSize = (sizeof(BlockLink_t)
 
 /*-----------------------------------------------------------*/
 
-void *DataManagerHeapAlloc(struct DataAllocator_Struct * hDataAllocator,
+int AddHeapDataAllocator(uint8_t * buffer) {
+	for (int i = 0; i < DATA_ALLOCATORS_LIST_SIZE; i++)
+		if (DataAllocatorsList[i].ucHeap == 0) {
+			DataAllocatorsList[i] = (DataAllocator_Typedef ) { .ucHeap = buffer,
+							.xStart = 0U, .pxEnd = 0U, /* Create a couple of list links to mark the start and end of the list. */
+							.xFreeBytesRemaining = 0U,
+							.xMinimumEverFreeBytesRemaining = 0U, /* Keeps track of the number of free bytes remaining, but says nothing about fragmentation. */
+							.xBlockAllocatedBit = 0, /* Gets set to the top bit of an size_t type.  When this bit in the xBlockSize
+							 member of an BlockLink_t structure is set then the block belongs to the
+							 application.  When the bit is free the block is still part of the free heap
+							 space. */
+							.Alloc = Heap_DA_Alloc, /* */
+							.Free = Heap_DA_Free, /* */
+							.GetSize = Heap_DA_GetSize, /* */
+							.GetFreeSize = Heap_DA_GetFreeSize, /* */
+							.GetMinimumEverFreeHeapSize =
+									Heap_DA_GetMinimumEverFreeSize, };
+		}
+}
+/*-----------------------------------------------------------*/
+
+void *Heap_DA_Alloc(DataAllocator_Typedef * hDataAllocator,
 		size_t xWantedSize) {
 	BlockLink_t *pxBlock, *pxPreviousBlock, *pxNewBlockLink;
 	void *pvReturn = NULL;
@@ -160,7 +183,7 @@ void *DataManagerHeapAlloc(struct DataAllocator_Struct * hDataAllocator,
 }
 /*-----------------------------------------------------------*/
 
-void DataManagerHeapFree(struct DataAllocator_Struct * hDataAllocator, void *pv) {
+void Heap_DA_Free(DataAllocator_Typedef * hDataAllocator, void *pv) {
 	uint8_t *puc = (uint8_t *) pv;
 	BlockLink_t *pxLink;
 
@@ -197,7 +220,7 @@ void DataManagerHeapFree(struct DataAllocator_Struct * hDataAllocator, void *pv)
 	}
 }
 /*-----------------------------------------------------------*/
-size_t DataManagerGetSize(struct DataAllocator_Struct * hDataAllocator,
+size_t Heap_DA_GetSize(DataAllocator_Typedef * hDataAllocator,
 		void *pv) {
 	uint8_t *puc = (uint8_t *) pv;
 	BlockLink_t *pxLink;
@@ -225,23 +248,23 @@ size_t DataManagerGetSize(struct DataAllocator_Struct * hDataAllocator,
 }
 /*-----------------------------------------------------------*/
 
-size_t DataManagerGetFreeHeapSize(struct DataAllocator_Struct * hDataAllocator) {
+size_t Heap_DA_GetFreeSize(DataAllocator_Typedef * hDataAllocator) {
 	return hDataAllocator->xFreeBytesRemaining;
 }
 /*-----------------------------------------------------------*/
 
-size_t DataManagerGetMinimumEverFreeHeapSize(
-		struct DataAllocator_Struct * hDataAllocator) {
+size_t Heap_DA_GetMinimumEverFreeSize(
+		DataAllocator_Typedef * hDataAllocator) {
 	return hDataAllocator->xMinimumEverFreeBytesRemaining;
 }
 /*-----------------------------------------------------------*/
 
-void DataManagerHeapInitialiseBlocks(void) {
+void Heap_DA_InitialiseBlocks(void) {
 	/* This just exists to keep the linker quiet. */
 }
 /*-----------------------------------------------------------*/
 
-static void prvHeapInit(struct DataAllocator_Struct * hDataAllocator) {
+static void prvHeapInit(DataAllocator_Typedef * hDataAllocator) {
 	BlockLink_t *pxFirstFreeBlock;
 	uint8_t *pucAlignedHeap;
 	size_t uxAddress;
@@ -290,7 +313,7 @@ static void prvHeapInit(struct DataAllocator_Struct * hDataAllocator) {
 /*-----------------------------------------------------------*/
 
 static void prvInsertBlockIntoFreeList(
-		struct DataAllocator_Struct * hDataAllocator,
+		DataAllocator_Typedef * hDataAllocator,
 		BlockLink_t *pxBlockToInsert) {
 	BlockLink_t *pxIterator;
 	uint8_t *puc;

@@ -5,17 +5,23 @@
  *      Author: HP
  */
 
+#include "MemoryDataContext.h"
+#include "MemoryDataContext.h"
+#include "DataModel.h"
 #include "View.h"
+
+
 #ifndef VIEWCONTAINER_EDITVIEW_H_
 #define VIEWCONTAINER_EDITVIEW_H_
 
 typedef struct {
-	const char canBeNull;
-	const char * infoText;
-} EditViewParam_Typedef;
+	const FieldAttribute_Typedef * fieldAttribute;
+	void (*FinishCallback)(void *);
+	int currentFieldIndex;
+	int fieldCount;
+	void * editableModel;
+	int isNew;
+} EditView_Parameters_Typedef;
 
-typedef struct {
-	char * value;
-} EditViewState_TypeDef;
 
 #endif /* VIEWCONTAINER_EDITVIEW_H_ */

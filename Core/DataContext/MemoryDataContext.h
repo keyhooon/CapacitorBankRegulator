@@ -15,6 +15,7 @@ void InitMemoryDataContext();
 typedef struct {
 	int (*Add)(void *);
 	int (*Remove)(void *);
+	int (*Edit)(void *, void *);
 	int (*GetCount)(void);
 	void (*GetDisplay)(char *);
 	char ** (*GetDisplayArray)(void);
@@ -34,6 +35,7 @@ typedef struct {
 	} type##_List_Typedef; \
 	int Add##type(type##_Typedef *value); \
 	int Remove##type(type##_Typedef *value); \
+	int Edit##type(type##_Typedef *oldValue, type##_Typedef *newValue); \
 	int Get##type##Count(); \
 	void Get##type##Display(char *); \
 	char ** Get##type##DisplayArray(void); \
@@ -46,9 +48,10 @@ typedef struct {
 
 
 #define DATA_CONTEXT_FUNCTIONS(type, TYPE, hDataAllocator) \
-	ListApiHandlers_typedef type##ListApiHandlers = { \
+	const ListApiHandlers_typedef type##ListApiHandlers = { \
 			Add##type, \
 			Remove##type, \
+			Edit##type, \
 			Get##type##Count, \
 			Get##type##Display, \
 			Get##type##DisplayArray, \
@@ -62,18 +65,18 @@ typedef struct {
 	type##_List_Typedef * type##_List; \
 	type##_List_Typedef * Find##type##Item(type##_Typedef *value) { \
 		type##_List_Typedef * _dlp_ ;\
-		  for(_dlp_ = type##_List; _dlp_!=NULL && TYPE##_COMPARATOR(_dlp->value, (*value)) != 0; _dlp_= _dlp_->previous) ;\
+		  for(_dlp_ = type##_List; ((_dlp_)!=NULL) && (TYPE##_COMPARATOR(_dlp_->value, (*value)) != 0); _dlp_= _dlp_->previous) ;\
 		  if (_dlp_ == NULL) \
-			  for(_dlp_ = type##_List; _dlp_!=NULL && TYPE##_COMPARATOR(_dlp_->value, (*value)) != 0; _dlp_= _dlp_->next) ;\
+			  for(_dlp_ = type##_List; ((_dlp_)!=NULL) && (TYPE##_COMPARATOR(_dlp_->value, (*value)) != 0); _dlp_= _dlp_->next) ;\
 		  return _dlp_;\
 	}\
 	int Add##type(type##_Typedef *value) { \
 		type##_List_Typedef * _dlp_ = Find##type##Item(value); \
 		if (_dlp_ == NULL) \
 		{ \
-			size_t sz = DataAllocatorGetSize(TYPE##_MODEL_DATA_ALLOCATOR,value); \
-			size_t header_sz = (sizeof(type##_List_Typedef) << 1; \
-			type##_List_Typedef * elem = DataAllocatorAlloc(hDataAllocator, sz + header_sz)); \
+			size_t sz = DataAllocator_GetSize(TYPE##_MODEL_DATA_ALLOCATOR,value); \
+			size_t header_sz = sizeof(type##_List_Typedef) << 1; \
+			type##_List_Typedef * elem = DataAllocator_Alloc(hDataAllocator, sz + header_sz); \
 			memcpy(((char *)elem) + header_sz, value, sz ); \
 			if (type##_List == NULL) \
 			{ \
@@ -93,11 +96,20 @@ typedef struct {
 		type##_List_Typedef * _dlp_ = Find##type##Item(value); \
 		if (_dlp_ != NULL) \
 		{ \
-			DataAllocatorFree(hDataAllocator,_dlp_); \
+			DataAllocator_Free(hDataAllocator,_dlp_); \
 			return 0; \
 		} \
 		return -1;\
 	} \
+	int Edit##type(type##_Typedef *oldValue, type##_Typedef *newValue) { \
+		if (Remove##type(oldValue)){ \
+			if (Add##type(newValue))\
+				return 0;\
+			else\
+				Add##type(oldValue);\
+		}\
+		return -1;\
+	}\
 	int Get##type##Count() { \
 		int _r_ = 0;\
 		if ((type##_List)==NULL) \
@@ -150,15 +162,15 @@ typedef struct {
 		if (type##_List != NULL) \
 		{ \
 			size_t sz = DataAllocatorGetSize(hDataAllocator,type##_List); \
-			size_t header_sz = (sizeof(type##_List_Typedef) << 1; \
-			_dlp_ = DataAllocatorAlloc(TYPE##_MODEL_DATA_ALLOCATOR, sz - header_sz)); \
+			size_t header_sz = sizeof(type##_List_Typedef) << 1; \
+			_dlp_ = DataAllocator_Alloc(TYPE##_MODEL_DATA_ALLOCATOR, sz - header_sz); \
 			memcpy(_dlp_,((char *)type##_List) + header_sz, sz - header_sz ); \
 			return _dlp_; \
 		} \
 		return NULL; \
 	} \
 	void Free##type##Item(type##_Typedef * value) {\
-		DataAllocatorAlloc(TYPE##_MODEL_DATA_ALLOCATOR, value)); \
+		DataAllocator_Alloc(TYPE##_MODEL_DATA_ALLOCATOR, value); \
 	} \
 	int SetSelected##type##Index(int value){\
 		type##_List_Typedef *_dlp_; \

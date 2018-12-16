@@ -6,7 +6,7 @@
  */
 
 
-#include "ViewNavigator.h"
+#include "ViewContainer/ViewNavigator.h"
 #include "WM.h"
 #include "DIALOG.h"
 #include "Message.h"

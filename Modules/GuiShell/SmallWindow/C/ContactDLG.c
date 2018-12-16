@@ -21,11 +21,18 @@
 // USER START (Optionally insert additional includes)
 // USER END
 
-#include "ViewNavigator.h"
 #include "WM.h"
 #include "DIALOG.h"
+
+#include "ViewContainer/ViewNavigator.h"
+#include "MemoryDataContext.h"
+
 #include "Contact.h"
-#include "ListView.h"
+
+#include "ViewContainer/ListView.h"
+#include "ViewContainer/OptionListView.h"
+#include "ViewContainer/EditView.h"
+
 #include "Api/V25TER.h"
 
 
@@ -45,26 +52,81 @@
 #define ID_LISTBOX_0     (GUI_ID_USER + 0x11)
 
 extern GUI_CONST_STORAGE GUI_BITMAP bmphonecall;
-CustomFunction_Typedef * ContactFunctionList[5];
+extern GUI_CONST_STORAGE GUI_BITMAP bmpencil;
+extern GUI_CONST_STORAGE GUI_BITMAP bmloupe;
+extern GUI_CONST_STORAGE GUI_BITMAP bmdelete;
+
+
 
 void InitContactView(void);
-static void Call(void);
+static void CallFunctionCallback(void);
+static void EditFunctionCallback(void);
+static void ViewInfoFunctionCallBcak(void);
+static void DeleteFunctionCallback(void);
+static void AddFunctionCallback(void);
+
 static void EditContactProgress(void * arg, GUI_HWIN currentWidget);
 
 extern ListApiHandlers_typedef ContactListApiHandlers;
+
+
+
 extern View_Typedef ListView;
+extern View_Typedef EditView;
+extern View_Typedef OptionListView;
 
-static const CustomFunction_Typedef CallFunction = { &bmphonecall,
-		(const char*) "Call", Call };
 
-static void Call(void) {
-	Contact_Typedef *contact = ContactListApiHandlers.GetCurrentItem();
-	char num[20];
-	strcpy(num,contact->CallNumber);
-	strcat(num,";");
-	GSM_CALL_TO_DIAL_A_NUMBER(num);
 
-}
+static void ContactListSelectCallback(void *);
+const CustomFunction_Typedef AddFunction = { NULL, "Add New...",
+		AddFunctionCallback };
+const CustomFunction_Typedef * ContactListFunctionList[2] =
+		{ &AddFunction, NULL };
+ListView_Parameters_Typedef ListView_Parameters = { //
+		ContactListFunctionList, // custom function list
+				&ContactListApiHandlers,  // list api handler
+				ContactListSelectCallback, // list select callback
+				0, // not document
+				0 // not document
+		};
+
+
+
+
+static void ContactOptionSelectCallback(void *);
+const CustomFunction_Typedef CallFunction = { &bmphonecall,
+		(const char*) "Call", CallFunctionCallback };
+const CustomFunction_Typedef EditFunction = { &bmpencil, "Edit",
+		EditFunctionCallback };
+const CustomFunction_Typedef ViewInfoFunction = { &bmloupe, "View",
+		ViewInfoFunctionCallBcak };
+const CustomFunction_Typedef DeleteFunction = { &bmdelete, "Delete",
+		DeleteFunctionCallback };
+const CustomFunction_Typedef * ContactOptionFunctionList[5] = { &CallFunction,
+		&EditFunction, &ViewInfoFunction, &DeleteFunction, NULL };
+typedef struct {
+	CustomFunction_Typedef **customFunction;
+	void (*SelectCallback)(void *);
+	LISTBOX_Handle hWin;
+} OptionListView_Parameters_Typedef;
+OptionListView_Parameters_Typedef OptionListView_Parameters = { //
+		ContactOptionFunctionList, // custom function list
+				ContactOptionSelectCallback, // option select callback
+				0, // not document
+		};
+
+
+void (*FinishCallback)(void *);
+extern const FieldAttribute_Typedef ContactFieldsAttribute[CONTACT_FIELD_COUNT];
+EditView_Parameters_Typedef EditView_Parameters = { //
+		&ContactFieldsAttribute, //
+				FinishCallback, //
+				CONTACT_FIELD_COUNT, //
+				0, //
+				0, //
+				0, //
+		};
+
 
 typedef enum {
 	EditContactState_Name,
@@ -74,76 +136,40 @@ typedef enum {
 } EditContactState_Typedef;
 
 void InitContactView() {
-	ContactFunctionList[0] = &CallFunction;
-	ContactFunctionList[1] = &EditFunction;
-	ContactFunctionList[2] = &ViewInfoFunction;
-	ContactFunctionList[3] = &DeleteFunction;
-	ContactFunctionList[4] = NULL;
-	ListViewInit(&ContactListApiHandlers,
-			ContactFunctionList, sizeof(Contact_Typedef), EditContactProgress);
-	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &ListView);
+
+	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &ListView,
+			&ListView_Parameters);
 }
 
-static void EditContactProgress(void * arg, GUI_HWIN currentWidget) {
-	uint32_t len;
-	Contact_Typedef *contact = arg;
-	EditContactState_Typedef *state = arg + sizeof(Contact_Typedef);
-	if (*state == EditContactState_Name) {
-		GUI_HWIN textHwin = TEXT_CreateAsChild(5, 20, 118, 40, currentWidget,
-				GUI_ID_TEXT0, WM_CF_SHOW, "", TEXT_CF_TOP | TEXT_CF_HCENTER);
-		GUI_HWIN editHwin = EDIT_CreateAsChild(5, 65, 118, 40, currentWidget,
-				GUI_ID_EDIT0, WM_CF_SHOW, 15);
-		WM_SetFocus(editHwin);
-		EDIT_SetTextMode(editHwin);
-
-		TEXT_SetText(textHwin, "Name");
-		EDIT_SetText(editHwin, (contact)->Name);
-
-		*state = EditContactState_LastName;
-	} else if (*state == EditContactState_LastName) {
-		GUI_HWIN editHwin = WM_GetDialogItem(currentWidget, GUI_ID_EDIT0);
-		GUI_HWIN textHwin = WM_GetDialogItem(currentWidget, GUI_ID_TEXT0);
-		len = EDIT_GetNumChars(editHwin);
-		if (contact->Name != NULL)
-			vPortFree(contact->Name);
-		contact->Name = pvPortMalloc(len + 1);
-		EDIT_GetText(editHwin, (contact)->Name, len + 1);
-
-		TEXT_SetText(textHwin, "Last Name");
-		EDIT_SetText(editHwin, (contact)->LastName);
-
-		*state = EditContactState_CallNumber;
-	} else if (*state == EditContactState_CallNumber) {
-		GUI_HWIN editHwin = WM_GetDialogItem(currentWidget, GUI_ID_EDIT0);
-		GUI_HWIN textHwin = WM_GetDialogItem(currentWidget, GUI_ID_TEXT0);
-		len = EDIT_GetNumChars(editHwin);
-		if (contact->LastName != NULL)
-			vPortFree(contact->LastName);
-		contact->LastName = pvPortMalloc(len + 1);
-		EDIT_GetText(editHwin, (contact)->LastName, len + 1);
-
-		TEXT_SetText(textHwin, "Call Number");
-		EDIT_SetText(editHwin, (contact)->CallNumber);
-
-		*state = EditContactState_Finished;
-	} else if (*state == EditContactState_Finished) {
-		GUI_HWIN editHwin = WM_GetDialogItem(currentWidget, GUI_ID_EDIT0);
-		len = EDIT_GetNumChars(editHwin);
-		if (contact->CallNumber != NULL)
-			vPortFree(contact->CallNumber);
-		contact->CallNumber = pvPortMalloc(len + 1);
-		EDIT_GetText(editHwin, (contact)->CallNumber, len + 1);
-
-		memcpy(&ContactList->current_item, contact, sizeof(Contact_Typedef));
-		ViewNavigator_GoBackView(&DefaultViewNavigator);
-		ViewNavigator_GoBackView(&DefaultViewNavigator);
-		*state = EditContactState_Name;
-	}
+void EditFunctionCallback() {
+	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &ListEditView);
 }
 
+void ViewInfoFunctionCallBcak() {
+	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &ListInfoView);
+}
 
+void DeleteFunctionCallback() {
+	DefaultListView->ApiHandlers->Remove();
+	ViewNavigator_GoBackView(&DefaultViewNavigator);
+}
+void AddFunctionCallback() {
 
+}
+static void CallFunctionCallback(void) {
+	Contact_Typedef *contact = ContactListApiHandlers.GetSelectedItem();
+	char num[20];
+	strcpy(num, contact->CallNumber);
+	strcat(num, ";");
+	GSM_CALL_TO_DIAL_A_NUMBER(num);
+}
 
+void ContactListSelectCallback(void *) {
+
+}
+void FinishCallback(void *) {
+
+}
 // USER END
 
 /*************************** End of file ****************************/

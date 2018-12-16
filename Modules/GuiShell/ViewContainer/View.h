@@ -32,7 +32,11 @@ typedef enum {
 } ViewStatus_Typedef;
 
 
-
+typedef struct {
+	GUI_BITMAP * Icon;
+	char * display;
+	void (*function)(void);
+} CustomFunction_Typedef;
 
 
 typedef struct {
@@ -40,14 +44,12 @@ typedef struct {
 	const char *name;
 	const char *shortName;
 	GUI_CONST_STORAGE GUI_BITMAP *icon;
-	GUI_HWIN (*show)(void);
-	uint8_t (*hide)(GUI_HWIN hWin);
+	GUI_HWIN (*show)(void *);
+	uint8_t (*hide)(GUI_HWIN, void *);
 	const char* firstButtonText;
-	const char* SecondButtonText;
-	void (*firstButtonCallback)(void);
-	void (*SecondButtonCallback)(void);
-	const void * param;
-	void * state;
+	const char* secondButtonText;
+	void (*firstButtonCallback)(void *);
+	void (*secondButtonCallback)(void *);
 } View_Typedef;
 
 

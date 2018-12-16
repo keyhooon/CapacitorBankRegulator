@@ -9,22 +9,22 @@
 #define DATAMANAGER_HEAPDATAALLOCATOR_H_
 
 
+#include <DataAllocator.h>
 
-
-void *DataManagerHeapAlloc(struct DataAllocator_Struct * hDataAllocator,
+void *Heap_DA_Alloc(DataAllocator_Typedef * hDataAllocator,
 		size_t xWantedSize);
 
-void DataManagerHeapFree(struct DataAllocator_Struct * hDataAllocator, void *pv);
+void Heap_DA_Free(DataAllocator_Typedef * hDataAllocator, void *pv);
 
-size_t DataManagerGetSize(struct DataAllocator_Struct * hDataAllocator,
+size_t Heap_DA_GetSize(DataAllocator_Typedef * hDataAllocator,
 		void *pv);
 
-size_t DataManagerGetFreeHeapSize(struct DataAllocator_Struct * hDataAllocator);
+size_t Heap_DA_GetFreeSize(DataAllocator_Typedef * hDataAllocator);
 
-size_t DataManagerGetMinimumEverFreeHeapSize(
-		struct DataAllocator_Struct * hDataAllocator);
+size_t Heap_DA_GetMinimumEverFreeSize(
+		DataAllocator_Typedef * hDataAllocator);
 
-void DataManagerHeapInitialiseBlocks(void);
+void Heap_DA_InitialiseBlocks(void);
 
 
 #endif /* DATAMANAGER_HEAPDATAALLOCATOR_H_ */

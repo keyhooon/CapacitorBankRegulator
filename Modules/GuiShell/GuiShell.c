@@ -11,7 +11,7 @@
 #include "Board.h"
 #include "WM.h"
 #include "cmsis_os.h"
-#include "ViewNavigator.h"
+#include "ViewContainer/ViewNavigator.h"
 
 
 osThreadId guiTaskHandle;
@@ -70,13 +70,11 @@ void GUI_Main(void const * argument) {
 			if (event.value.signals == (1 << BUTTON_KEY1)) {
 				View_Typedef *view = ViewNavigator_GetCurrentView(
 						&DefaultViewNavigator);
-				if (view->firstButtonCallback)
-					view->firstButtonCallback();
+				ViewNavigator_FirstButton_Clicked(&DefaultViewNavigator);
 			} else if (event.value.signals == (1 << BUTTON_KEY2)) {
 				View_Typedef *view = ViewNavigator_GetCurrentView(
 						&DefaultViewNavigator);
-				if (view->SecondButtonCallback)
-					view->SecondButtonCallback();
+				ViewNavigator_SecondButton_Clicked(&DefaultViewNavigator);
 			}
 		osDelay(100);
 	}
@@ -304,7 +302,7 @@ void ShowSmallDesktopWindow(void) {
 
 	ViewNavigator_Init(&DefaultViewNavigator, hWin);
 	DefaultViewNavigator.currentViewChanged = CurrentMenuPageChanged;
-	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &DesktopView);
+	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &DesktopView, NULL);
 }
 
 static void CurrentMenuPageChanged(void) {
@@ -320,12 +318,12 @@ static void CurrentMenuPageChanged(void) {
 		WM_ShowWindow(firstButton);
 		BUTTON_SetText(firstButton, CurrentView->firstButtonText);
 	}
-	if (CurrentView->SecondButtonCallback == NULL
-			|| CurrentView->SecondButtonText == NULL)
+	if (CurrentView->secondButtonCallback == NULL
+			|| CurrentView->secondButtonText == NULL)
 		WM_HideWindow(secondButton);
 	else {
 		WM_ShowWindow(secondButton);
-		BUTTON_SetText(secondButton, CurrentView->SecondButtonText);
+		BUTTON_SetText(secondButton, CurrentView->secondButtonText);
 	}
 }
 

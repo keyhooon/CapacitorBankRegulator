@@ -9,8 +9,10 @@
 #define DATACONTEXT_CONTACTLISTCONTEXT_H_
 
 #include "MemoryDataContext.h"
+#include "Contact.h"
 
-DATA_CONTEXT_PROTOTYPES( Contact);
+
+DATA_CONTEXT_PROTOTYPES(Contact);
 
 void seedContact();
 

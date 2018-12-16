@@ -5,7 +5,12 @@
  *      Author: HP
  */
 
-
+#include <Api/3GPP_TS2707.h>
+#include "cmsis_os.h"
+#include "sglib.h"
+#include "Gsm.h"
+#include "Api/V25TER.h"
+#include "Message.h"
 
 void ClccReceivedCallback(char* ClccReceivedToken);
 void UnsolicitedResultCallback(Response_TypeDef response);

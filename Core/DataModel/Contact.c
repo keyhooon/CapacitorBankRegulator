@@ -10,7 +10,7 @@
 Contact_Typedef * CreateContact(char *name, char *callNumber) {
 	int nameLen = strlen(name);
 	int callNumberLen = strlen(callNumber);
-	Contact_Typedef *result = DataAllocatorAlloc(hModelInMemoryAllocator,
+	Contact_Typedef *result = DataAllocator_Alloc(hModelInMemoryAllocator,
 			sizeof(Contact_Typedef) + nameLen + callNumberLen + 2);
 	result->Name = ((char*) result + sizeof(Contact_Typedef));
 	strcpy(result->Name, name);
@@ -20,7 +20,7 @@ Contact_Typedef * CreateContact(char *name, char *callNumber) {
 	return result;
 }
 void FreeContact(Contact_Typedef * contact) {
-	DataAllocatorFree(contact);
+	DataAllocator_Free(contact);
 }
 
 

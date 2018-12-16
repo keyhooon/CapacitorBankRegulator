@@ -7,7 +7,7 @@
 
 #include "DataModel.h"
 
-uint8_t buffer[100];
+char buffer[100];
 
 int hModelInMemoryAllocator;
 void InitModelInMemoryAllocator() {
