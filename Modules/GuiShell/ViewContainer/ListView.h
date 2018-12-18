@@ -15,7 +15,7 @@
 typedef struct {
 	const CustomFunction_Typedef **customFunction;
 	const ListApiHandlers_typedef * apiHandlers;
-	void (*SelectCallback)(void *);
+	void (*SelectCallback)(void);
 	LISTBOX_Handle hWin;
 	char** DisplayArray;
 } ListView_Parameters_Typedef;

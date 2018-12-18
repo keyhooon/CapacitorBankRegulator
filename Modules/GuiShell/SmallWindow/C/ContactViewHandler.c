@@ -32,6 +32,7 @@
 #include "ViewContainer/ListView.h"
 #include "ViewContainer/OptionListView.h"
 #include "ViewContainer/EditView.h"
+#include "ViewContainer/InfoView.h"
 
 #include "Api/V25TER.h"
 
@@ -60,12 +61,13 @@ extern GUI_CONST_STORAGE GUI_BITMAP bmdelete;
 
 void InitContactView(void);
 static void CallFunctionCallback(void);
-static void EditFunctionCallback(void);
-static void ViewInfoFunctionCallBcak(void);
-static void DeleteFunctionCallback(void);
-static void AddFunctionCallback(void);
-
-static void EditContactProgress(void * arg, GUI_HWIN currentWidget);
+static void ContactEditFunctionCallback(void);
+static void ContactViewFunctionCallBcak(void);
+static void ContactDeleteFunctionCallback(void);
+static void ContactAddFunctionCallback(void);
+static void ContactEditFinishedCallback(void *);
+static void ContactEditCancelCallback(void *);
+static void ContactSelectCallback(void);
 
 extern ListApiHandlers_typedef ContactListApiHandlers;
 
@@ -74,18 +76,19 @@ extern ListApiHandlers_typedef ContactListApiHandlers;
 extern View_Typedef ListView;
 extern View_Typedef EditView;
 extern View_Typedef OptionListView;
+extern View_Typedef InfoView;
 
 
 
-static void ContactListSelectCallback(void *);
-const CustomFunction_Typedef AddFunction = { NULL, "Add New...",
-		AddFunctionCallback };
-const CustomFunction_Typedef * ContactListFunctionList[2] =
+
+static const CustomFunction_Typedef AddFunction = { NULL, "Add New...",
+		ContactAddFunctionCallback };
+static const CustomFunction_Typedef * ContactListFunctionList[2] =
 		{ &AddFunction, NULL };
-ListView_Parameters_Typedef ListView_Parameters = { //
+static ListView_Parameters_Typedef Contact_ListView_Parameters = { //
 		ContactListFunctionList, // custom function list
 				&ContactListApiHandlers,  // list api handler
-				ContactListSelectCallback, // list select callback
+				ContactSelectCallback, // list select callback
 				0, // not document
 				0 // not document
 		};
@@ -93,67 +96,68 @@ ListView_Parameters_Typedef ListView_Parameters = { //
 
 
 
-static void ContactOptionSelectCallback(void *);
-const CustomFunction_Typedef CallFunction = { &bmphonecall,
+
+static const CustomFunction_Typedef CallFunction = { &bmphonecall,
 		(const char*) "Call", CallFunctionCallback };
-const CustomFunction_Typedef EditFunction = { &bmpencil, "Edit",
-		EditFunctionCallback };
-const CustomFunction_Typedef ViewInfoFunction = { &bmloupe, "View",
-		ViewInfoFunctionCallBcak };
-const CustomFunction_Typedef DeleteFunction = { &bmdelete, "Delete",
-		DeleteFunctionCallback };
-const CustomFunction_Typedef * ContactOptionFunctionList[5] = { &CallFunction,
+static const CustomFunction_Typedef EditFunction = { &bmpencil, "Edit",
+		ContactEditFunctionCallback };
+static const CustomFunction_Typedef ViewInfoFunction = { &bmloupe, "View",
+		ContactViewFunctionCallBcak };
+static const CustomFunction_Typedef DeleteFunction = { &bmdelete, "Delete",
+		ContactDeleteFunctionCallback };
+static const CustomFunction_Typedef * ContactOptionFunctionList[5] = {
+		&CallFunction,
 		&EditFunction, &ViewInfoFunction, &DeleteFunction, NULL };
-typedef struct {
-	CustomFunction_Typedef **customFunction;
-	void (*SelectCallback)(void *);
-	LISTBOX_Handle hWin;
-} OptionListView_Parameters_Typedef;
-OptionListView_Parameters_Typedef OptionListView_Parameters = { //
+static OptionListView_Parameters_Typedef ContactOptionListView_Parameters = { //
 		ContactOptionFunctionList, // custom function list
-				ContactOptionSelectCallback, // option select callback
+				0, // option select callback
 				0, // not document
 		};
 
 
-void (*FinishCallback)(void *);
-extern const FieldAttribute_Typedef ContactFieldsAttribute[CONTACT_FIELD_COUNT];
-EditView_Parameters_Typedef EditView_Parameters = { //
+
+static EditView_Parameters_Typedef ContactEditView_Parameters = { //
 		&ContactFieldsAttribute, //
-				FinishCallback, //
-				CONTACT_FIELD_COUNT, //
+				ContactEditFinishedCallback, // Finished Edit Callback
+				ContactEditCancelCallback, // Canceled Edit Callback
+				CONTACT_FIELD_COUNT, // Number of contact model field
 				0, //
 				0, //
 				0, //
 		};
 
+static InfoView_Parameters_Typedef ContactInfoView_Parameters = { //
+		&ContactListApiHandlers // list api handler
+		};
 
-typedef enum {
-	EditContactState_Name,
-	EditContactState_LastName,
-	EditContactState_CallNumber,
-	EditContactState_Finished,
-} EditContactState_Typedef;
 
 void InitContactView() {
 
 	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &ListView,
-			&ListView_Parameters);
+			&Contact_ListView_Parameters);
 }
 
-void EditFunctionCallback() {
-	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &ListEditView);
+void ContactEditFunctionCallback() {
+	ContactEditView_Parameters.isNew = 0;
+	ContactEditView_Parameters.editableModel =
+			ContactListApiHandlers.GetSelectedItem();
+	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &EditView,
+			&ContactEditView_Parameters);
 }
 
-void ViewInfoFunctionCallBcak() {
-	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &ListInfoView);
+void ContactViewFunctionCallBcak() {
+	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &InfoView,
+			&ContactInfoView_Parameters);
 }
 
-void DeleteFunctionCallback() {
-	DefaultListView->ApiHandlers->Remove();
+void ContactDeleteFunctionCallback() {
+	ContactListApiHandlers.RemoveCurrent();
 	ViewNavigator_GoBackView(&DefaultViewNavigator);
 }
-void AddFunctionCallback() {
+void ContactAddFunctionCallback() {
+	ContactEditView_Parameters.isNew = 1;
+	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &EditView,
+			&ContactEditView_Parameters);
 
 }
 static void CallFunctionCallback(void) {
@@ -164,10 +168,30 @@ static void CallFunctionCallback(void) {
 	GSM_CALL_TO_DIAL_A_NUMBER(num);
 }
 
-void ContactListSelectCallback(void *) {
-
+void ContactSelectCallback(void) {
+	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &OptionListView,
+			&ContactOptionListView_Parameters);
 }
-void FinishCallback(void *) {
+void ContactEditFinishedCallback(void * parameters) {
+	EditView_Parameters_Typedef *param =
+			(EditView_Parameters_Typedef *) parameters;
+	Contact_Typedef *newContact = CreateContact(
+			((Contact_Typedef*) (param->buffer))->Name,
+			((Contact_Typedef*) (param->buffer))->CallNumber);
+	if (param->isNew == 1)
+		ContactListApiHandlers.Add(newContact);
+	else
+	{
+		ContactListApiHandlers.Edit(param->editableModel, newContact);
+		FreeContact(param->editableModel);
+	}
+	FreeContact(newContact);
+}
+void ContactEditCancelCallback(void *parameters) {
+	EditView_Parameters_Typedef *param =
+			(EditView_Parameters_Typedef *) parameters;
+	if (param->isNew == 0)
+		FreeContact(param->editableModel);
 
 }
 // USER END

@@ -15,5 +15,6 @@
 DATA_CONTEXT_PROTOTYPES(Contact);
 
 void seedContact();
+void AddContactEx(char * Name, char * CallNumber);
 
 #endif /* DATACONTEXT_CONTACTLISTCONTEXT_H_ */

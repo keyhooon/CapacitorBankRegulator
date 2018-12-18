@@ -15,6 +15,7 @@ void InitMemoryDataContext();
 typedef struct {
 	int (*Add)(void *);
 	int (*Remove)(void *);
+	int (*RemoveCurrent)(void);
 	int (*Edit)(void *, void *);
 	int (*GetCount)(void);
 	void (*GetDisplay)(char *);
@@ -35,6 +36,7 @@ typedef struct {
 	} type##_List_Typedef; \
 	int Add##type(type##_Typedef *value); \
 	int Remove##type(type##_Typedef *value); \
+	int RemoveCurrent##type(); \
 	int Edit##type(type##_Typedef *oldValue, type##_Typedef *newValue); \
 	int Get##type##Count(); \
 	void Get##type##Display(char *); \
@@ -51,6 +53,7 @@ typedef struct {
 	const ListApiHandlers_typedef type##ListApiHandlers = { \
 			Add##type, \
 			Remove##type, \
+			RemoveCurrent##type, \
 			Edit##type, \
 			Get##type##Count, \
 			Get##type##Display, \
@@ -96,10 +99,27 @@ typedef struct {
 		type##_List_Typedef * _dlp_ = Find##type##Item(value); \
 		if (_dlp_ != NULL) \
 		{ \
+			  if (_dlp_ == (type##_List)) {\
+				if ((_dlp_)->previous != NULL) type##_List = (_dlp_)->previous;\
+				else type##_List = (_dlp_)->next;\
+			  }\
+			  if ((_dlp_)->next != NULL) (_dlp_)->next->previous = (_dlp_)->previous;\
+			  if ((_dlp_)->previous != NULL) (_dlp_)->previous->next = (_dlp_)->next;\
 			DataAllocator_Free(hDataAllocator,_dlp_); \
 			return 0; \
 		} \
-		return -1;\
+		return -1; \
+	} \
+	int RemoveCurrent##type() { \
+		type##_List_Typedef * _dlp_ = type##_List; \
+		if (type##_List == NULL) \
+			return -1; \
+		if ((type##_List)->previous != NULL) type##_List = (type##_List)->previous;\
+		else type##_List = (type##_List)->next;\
+		if ((_dlp_)->next != NULL) (_dlp_)->next->previous = (_dlp_)->previous; \
+		if ((_dlp_)->previous != NULL) (_dlp_)->previous->next = (_dlp_)->next; \
+		DataAllocator_Free(hDataAllocator,_dlp_); \
+		return 0; \
 	} \
 	int Edit##type(type##_Typedef *oldValue, type##_Typedef *newValue) { \
 		if (Remove##type(oldValue)){ \
@@ -134,7 +154,7 @@ typedef struct {
 		type##_List_Typedef *_dlp_; \
 		for(_dlp_ = type##_List; _dlp_->previous !=NULL ; _dlp_= _dlp_->previous) ;\
 		for(; _dlp_!=NULL ; _dlp_= _dlp_->next) { \
-			display(temp, _dlp_->value) ;\
+			TYPE##_PREVIEW(temp, _dlp_->value) ;\
 		 	stringItem = pvPortMalloc(strlen(temp) + 1); \
 		 	strcpy(stringItem,temp); \
 			*(stringArray ++) = stringItem; \
@@ -161,7 +181,7 @@ typedef struct {
 		type##_Typedef *_dlp_ ; \
 		if (type##_List != NULL) \
 		{ \
-			size_t sz = DataAllocatorGetSize(hDataAllocator,type##_List); \
+			size_t sz = DataAllocator_GetSize(hDataAllocator,type##_List); \
 			size_t header_sz = sizeof(type##_List_Typedef) << 1; \
 			_dlp_ = DataAllocator_Alloc(TYPE##_MODEL_DATA_ALLOCATOR, sz - header_sz); \
 			memcpy(_dlp_,((char *)type##_List) + header_sz, sz - header_sz ); \

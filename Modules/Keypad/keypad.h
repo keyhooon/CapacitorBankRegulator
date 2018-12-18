@@ -11,9 +11,9 @@
 
 #include "main.h"
 
-void KEYPAD_Init(void);
-void KEYPAD_Main(void const * argument);
-void KEYPAD_EXTI_Callback(uint16_t GPIO_Pin);
+void Keypad_Init(void);
+void Keypad_Main(void const * argument);
+void Keypad_EXTI_Callback(uint16_t GPIO_Pin);
 
 typedef enum {
 	Command, KeyCode, Char,

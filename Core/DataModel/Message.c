@@ -5,51 +5,34 @@
  *      Author: HP
  */
 #include "Message.h"
-#include "string.h"
-#include "time.h"
-#include "../DataManager/List_Heap.h"
 
-#define MESSAGE_COMPARATOR(x, y) (x->current_item.Time - y->current_item.Time)
+const FieldAttribute_Typedef MessageFieldsAttribute[MESSAGE_FIELD_COUNT] = { //
+		{ stringField, (const char*) "Content", 0, 4, 256, 1 }, // Content Field
+				{ stringField, (const char*) "Number", 4, 4, 20, 1 }, // CallNumber Field
+				{ longField, (const char*) "Time", 8, 8, 0, 0 }, // CallNumber Field
+				{ bitField, (const char*) "Success", 20, 4, 0, 0 }, // CallNumber Field
+				{ bitField, (const char*) "Incoming", 20, 0, 0, 0 }, // CallNumber Field
+		};
+Message_Typedef * CreateMessage(char *content, char *callNumber, time_t _time,
+		uint32_t isSuccessfully, uint32_t isIncoming) {
+	int ContentLen = strlen(content);
+	int callNumberLen = strlen(callNumber);
+	Message_Typedef *result = DataAllocator_Alloc(hModelInMemoryAllocator,
+			sizeof(Message_Typedef) + ContentLen + callNumberLen + 2);
+	result->Content = ((char*) result + sizeof(Message_Typedef));
+	strcpy(result->Content, content);
 
-#define DISPLAY_MESSAGE(display, message) \
-		sprintf(display, "%.20s\r\n %.10s", message.Content, message.CallNumber);
+	result->CallNumber = result->Content + ContentLen + 1;
+	strcpy(result->CallNumber, callNumber);
 
-#define DISPLAY_MESSAGE_DETAIL(display, message) \
-		sprintf(display, "%s\r\n", message.Content);
+	result->Time = _time;
+	result->IsIncoming = isIncoming;
+	result->IsSuccessfully = isSuccessfully;
 
-DATA_ACCESS_LIST_FUNCTIONS(Message, MESSAGE_COMPARATOR, DISPLAY_MESSAGE,
-		DISPLAY_MESSAGE_DETAIL)
-
-static void AddMessageEx(char * Content, char * CallNumber, time_t Time,
-		uint32_t IsSuccessfully, uint32_t IsIncoming);
-
-void SeedMessage() {
-
-	AddMessageEx((const char*) "hi.", (const char*) "09124575442", 10000, 1, 1);
-	AddMessageEx((const char*) "good bye.", (const char*) "09124463992", 15000,
-			1, 0);
-	AddMessageEx((const char*) "how are you? pls call me.",
-			(const char*) "09127093902", 16000, 0, 0);
-	AddMessageEx((const char*) "im not hear.", (const char*) "09121015197", 100,
-			0, 0);
-	AddMessageEx((const char*) "do you want exception?", (const char*) "-",
-			18000, 0, 1);
-	AddMessageEx((const char*) "where is my wife?", (const char*) "09354463261",
-			19000,
-			1, 0);
+	return result;
+}
+void FreeMessage(Message_Typedef * message) {
+	DataAllocator_Free(message);
 }
 
-static void AddMessageEx(char * Content, char * CallNumber, time_t Time,
-		uint32_t IsSuccessfully, uint32_t IsIncoming) {
-	Message_Typedef message = { 0, Content, CallNumber, Time, IsSuccessfully,
-			IsIncoming };
-	message.Content = pvPortMalloc(strlen(Content));
-	strcpy(message.Content, Content);
-	message.CallNumber = pvPortMalloc(strlen(CallNumber));
-	strcpy(message.CallNumber, CallNumber);
-	message.Time = Time;
-	message.IsSuccessfully = IsSuccessfully;
-	message.IsIncoming = IsIncoming;
-	AddMessage(&message);
-}
 

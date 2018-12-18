@@ -12,7 +12,7 @@
  **********************************************************************
  */
 #include "DIALOG.h"
-#include "ViewNavigator.h"
+#include "ViewContainer/ViewNavigator.h"
 #include "Board.h"
 
 #include "cmsis_os.h"
@@ -105,6 +105,6 @@ static uint8_t hide(GUI_HWIN hWin) {
 
 }
 static void MenuCallback(void) {
-	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &MenuView);
+	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &MenuView, NULL);
 }
 

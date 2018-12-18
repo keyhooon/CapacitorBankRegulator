@@ -8,15 +8,24 @@
 #ifndef DATAMODEL_MESSAGE_H_
 #define DATAMODEL_MESSAGE_H_
 
-#include "main.h"
+#include "DataModel.h"
 #include "string.h"
 #include "time.h"
-#include "../DataManager/List_Heap.h"
+
+#define MESSAGE_COMPARATOR(message1, message2) 	(message1.Time > message2.Time ?-1 : (message1.Time == message2.Time? 0 : 1))
+
+#define MESSAGE_PREVIEW(display, message) 		sprintf(display, "%.16s", message.Content)
+
+#define MESSAGE_VIEW(display, message) 			sprintf(display, "%.20s\r\n%s",message.CallNumber, message.Content)
+
+#define MESSAGE_MODEL_DATA_ALLOCATOR			hModelInMemoryAllocator
+
+#define MESSAGE_FIELD_COUNT						5
+
 
 
 
 typedef struct {
-	int32_t Id;
 	char * Content;
 	char * CallNumber;
 	time_t Time;
@@ -25,7 +34,9 @@ typedef struct {
 	uint32_t Reserved1 :24;
 } Message_Typedef;
 
-DATA_ACCESS_LIST_PROTOTYPES(Message)
+extern const FieldAttribute_Typedef MessageFieldsAttribute[MESSAGE_FIELD_COUNT];
 
-void SeedMessage();
+Message_Typedef * CreateMessage(char *content, char *callNumber, time_t _time,
+		uint32_t isSuccessfully, uint32_t isIncoming);
+void FreeMessage(Message_Typedef * message);
 #endif /* DATAMODEL_MESSAGE_H_ */

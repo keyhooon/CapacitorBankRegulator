@@ -12,6 +12,8 @@
 #include "WM.h"
 #include "cmsis_os.h"
 #include "ViewContainer/ViewNavigator.h"
+#include "ContactListContext.h"
+#include "MessageListContext.h"
 
 
 osThreadId guiTaskHandle;

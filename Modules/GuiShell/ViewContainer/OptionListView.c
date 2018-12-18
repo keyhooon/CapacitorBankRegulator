@@ -15,8 +15,9 @@
 
 static GUI_HWIN OptionListViewShow(void *);
 static uint8_t OptionListViewHide(GUI_HWIN hWin, void *);
-void OptionListOkCallback(void *);
-const View_Typedef ListOptionView = {
+static void OptionListOkCallback(void *);
+static void backCallback(void *);
+const View_Typedef OptionListView = {
 OPTION_VIEW_ID, "Option", "Opt", (void *) NULL, OptionListViewShow,
 		OptionListViewHide, (const char*) "Back", (const char*) "OK",
 		backCallback, OptionListOkCallback, NULL, 0 };
@@ -71,9 +72,8 @@ static int _OwnerOptionListDraw(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo) {
 		FontDistY = GUI_GetFontDistY();
 
 		GUI_RECT IconRect = { pDrawItemInfo->x0 + 3, pDrawItemInfo->y0
-				+ FontDistY - bmItemIndexImage.YSize / 2, pDrawItemInfo->x0 + 7
-				+ bmItemIndexImage.XSize, pDrawItemInfo->y0 + FontDistY
-				+ bmItemIndexImage.YSize / 2 };
+				+ FontDistY - 8, pDrawItemInfo->x0 + 7 + 16, pDrawItemInfo->y0
+				+ FontDistY + 8 };
 		GUI_RECT TextRect = { IconRect.x1 + 3, pDrawItemInfo->y0,
 				pDrawItemInfo->x1, pDrawItemInfo->y0 + FontDistY * 2 };
 		//
@@ -95,7 +95,8 @@ static int _OwnerOptionListDraw(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo) {
 		//
 		// Draw bitmap
 		//
-		CustomFunction_Typedef ** t = DefaultListView->CustomFunctionList;
+		CustomFunction_Typedef ** t;
+		WM_GetUserData(hWin, t, sizeof(CustomFunction_Typedef **));
 		if ((*(t + Index))->Icon != NULL)
 			GUI_DrawBitmap((*(t + Index))->Icon, IconRect.x0 + 1,
 					IconRect.y0 + 1);
@@ -137,32 +138,42 @@ void SetOptionListSkin(LISTBOX_Handle list) {
 	LISTBOX_SetItemSpacing(list, 10);
 	LISTBOX_SetOwnerDraw(list, _OwnerOptionListDraw);
 }
-static GUI_HWIN OptionListViewShow(void) {
-	WM_HWIN hwin = WINDOW_CreateEx(0, 0, 128, 115, NULL, WM_CF_SHOW, 0x0,
-	GUI_ID_USER, NULL);
-	CustomFunction_Typedef ** t = DefaultListView->CustomFunctionList;
-	uint32_t i = 0;
-	char *MenuDisplayText[10];
 
-	while (*t != NULL)
-		MenuDisplayText[i++] = (*t++)->display;
-	MenuDisplayText[i] = 0;
-	LISTBOX_Handle listbox_hwin = LISTBOX_CreateEx(0, 0, 128, 115, hwin,
-	WM_CF_SHOW, 0, GUI_ID_LISTBOX1, MenuDisplayText);
-	DefaultListView->CurrentWidget = listbox_hwin;
-	SetOptionListSkin(listbox_hwin);
+static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = { //
+		{ WINDOW_CreateIndirect, "Option", GUI_ID_USER, 0, 0, 128, 115,
+				WM_CF_SHOW, 0x0, 0 }, //
+				{ LISTBOX_CreateIndirect, "OptionList", GUI_ID_LISTBOX0, 5, 5,
+						118, 105, 0, 0, sizeof(CustomFunction_Typedef **) }, //
+		};
+static GUI_HWIN OptionListViewShow(void * parameters) {
+	OptionListView_Parameters_Typedef * param =
+			(OptionListView_Parameters_Typedef *) parameters;
+	WM_HWIN hwin = GUI_CreateDialogBox(_aDialogCreate,
+			GUI_COUNTOF(_aDialogCreate), NULL, NULL, 0, 0);
+	GUI_HWIN hListWin = WM_GetDialogItem(hwin, GUI_ID_LISTBOX0);
+	WM_SetUserData(hListWin, param->customFunction,
+			sizeof(CustomFunction_Typedef **));
+
+	for (int i = 0; *(param->customFunction + i) == NULL; i++)
+		LISTBOX_AddString(hListWin,
+				(*(CustomFunction_Typedef **) (param->customFunction + i))->display);
+	SetOptionListSkin(hListWin);
 	return hwin;
 }
 
-static uint8_t OptionListViewHide(GUI_HWIN hWin) {
-	return 1;
+static uint8_t OptionListViewHide(GUI_HWIN hWin, void * parameters) {
+	return 0;
 }
 
-void OptionListOkCallback(void) {
-	uint32_t sel = LISTBOX_GetSel(DefaultListView->CurrentWidget);
-	(*(DefaultListView->CustomFunctionList + sel))->function();
+static void OptionListOkCallback(void * parameters) {
+	OptionListView_Parameters_Typedef * param =
+			(OptionListView_Parameters_Typedef *) parameters;
+	WM_HWIN countainer_hwin = WM_GetFirstChild(
+			DefaultViewNavigator.view_container_hWin);
+	GUI_HWIN hListWin = WM_GetDialogItem(countainer_hwin, GUI_ID_LISTBOX0);
+	(*(param->customFunction + LISTBOX_GetSel(hListWin)))->function();
 }
-void backCallback(void) {
+static void backCallback(void * parameters) {
 	ViewNavigator_GoBackView(&DefaultViewNavigator);
 }
 

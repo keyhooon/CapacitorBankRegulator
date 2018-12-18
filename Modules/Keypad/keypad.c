@@ -11,10 +11,10 @@
 #include "GUI.h"
 #include "cmsis_os.h"
 
-void KEYPAD_IO_Init(void);
+void Keypad_Io_Init(void);
 
-void KEYPAD_BUTTON_KeyCode_INIT(uint32_t i, uint32_t j, const char value);
-void KEYPAD_BUTTON_CHAR_INIT(uint32_t i, uint32_t j, const char * ch);
+void KeypadButtonKeyCode_Init(uint32_t i, uint32_t j, const char value);
+void KeypadButtonChar_Init(uint32_t i, uint32_t j, const char * ch);
 
 uint16_t KP_C_PINs[4] = { KP_C0_PIN, KP_C1_PIN, KP_C2_PIN, KP_C3_PIN };
 uint16_t KP_R_PINs[4] = { KP_R0_PIN, KP_R1_PIN, KP_R2_PIN, KP_R3_PIN };
@@ -39,7 +39,7 @@ int lastTimeKeyReleased = 0;
 int lastTimeKeyPressed;
 int holdKey;
 
-void KEYPAD_IO_Init(void) {
+void Keypad_Io_Init(void) {
 
 	GPIO_InitTypeDef GPIO_InitStruct;
 
@@ -83,7 +83,7 @@ void KEYPAD_IO_Init(void) {
 }
 
 
-void KEYPAD_EXTI_Callback(uint16_t GPIO_Pin) {
+void Keypad_EXTI_Callback(uint16_t GPIO_Pin) {
 	if (lastTimeKeyReleased + KeyPadProccessTime * 2 > HAL_GetTick())
 		return;
 	uint32_t find = 0;
@@ -129,9 +129,9 @@ void KEYPAD_EXTI_Callback(uint16_t GPIO_Pin) {
 	osSemaphoreRelease(keypadSemaphoreID);
 }
 
-void KEYPAD_Main(void const * argument) {
+void Keypad_Main(void const * argument) {
 
-	KEYPAD_IO_Init();
+	Keypad_Io_Init();
 	for (;;) {
 		if (KeyPressed) {
 			if ((holdKey == 0)) {
@@ -178,39 +178,39 @@ void KEYPAD_Main(void const * argument) {
 		}
 	}
 }
-void KEYPAD_Init(void) {
+void Keypad_Init(void) {
 
-	osThreadDef(keyboardTask, KEYPAD_Main, osPriorityNormal, 0, 256);
+	osThreadDef(keyboardTask, Keypad_Main, osPriorityNormal, 0, 256);
 	keyboardTaskHandle = osThreadCreate(osThread(keyboardTask), NULL);
 
 	osSemaphoreDef(Keypad);
 	keypadSemaphoreID = osSemaphoreCreate(osSemaphore(Keypad), 1);
 
-	KEYPAD_BUTTON_KeyCode_INIT(0, 0, GUI_KEY_UP);		// UP
-	KEYPAD_BUTTON_KeyCode_INIT(0, 1, GUI_KEY_DOWN);		// Down
-	KEYPAD_BUTTON_KeyCode_INIT(0, 2, GUI_KEY_RIGHT);	// Left
-	KEYPAD_BUTTON_KeyCode_INIT(0, 3, GUI_KEY_LEFT);		// Right
-	KEYPAD_BUTTON_CHAR_INIT(3, 0, "1");
-	KEYPAD_BUTTON_CHAR_INIT(2, 0, "2ABC");
-	KEYPAD_BUTTON_CHAR_INIT(1, 0, "3DEF");
-	KEYPAD_BUTTON_CHAR_INIT(3, 1, "4GHI");
-	KEYPAD_BUTTON_CHAR_INIT(2, 1, "5JKL");
-	KEYPAD_BUTTON_CHAR_INIT(1, 1, "6MNO");
-	KEYPAD_BUTTON_CHAR_INIT(3, 2, "7PQRS");
-	KEYPAD_BUTTON_CHAR_INIT(2, 2, "8TUV");
-	KEYPAD_BUTTON_CHAR_INIT(1, 2, "9WXYZ");
-	KEYPAD_BUTTON_KeyCode_INIT(3, 3, GUI_KEY_DELETE);	// DEL
-	KEYPAD_BUTTON_CHAR_INIT(2, 3, "0 ");
-	KEYPAD_BUTTON_KeyCode_INIT(1, 3, GUI_KEY_ENTER);	// ENTER
+	KeypadButtonKeyCode_Init(0, 0, GUI_KEY_UP);		// UP
+	KeypadButtonKeyCode_Init(0, 1, GUI_KEY_DOWN);		// Down
+	KeypadButtonKeyCode_Init(0, 2, GUI_KEY_RIGHT);	// Left
+	KeypadButtonKeyCode_Init(0, 3, GUI_KEY_LEFT);		// Right
+	KeypadButtonChar_Init(3, 0, "1");
+	KeypadButtonChar_Init(2, 0, "2ABC");
+	KeypadButtonChar_Init(1, 0, "3DEF");
+	KeypadButtonChar_Init(3, 1, "4GHI");
+	KeypadButtonChar_Init(2, 1, "5JKL");
+	KeypadButtonChar_Init(1, 1, "6MNO");
+	KeypadButtonChar_Init(3, 2, "7PQRS");
+	KeypadButtonChar_Init(2, 2, "8TUV");
+	KeypadButtonChar_Init(1, 2, "9WXYZ");
+	KeypadButtonKeyCode_Init(3, 3, GUI_KEY_DELETE);	// DEL
+	KeypadButtonChar_Init(2, 3, "0 ");
+	KeypadButtonKeyCode_Init(1, 3, GUI_KEY_ENTER);	// ENTER
 
 }
-void KEYPAD_BUTTON_KeyCode_INIT(uint32_t i, uint32_t j, const char value) {
+void KeypadButtonKeyCode_Init(uint32_t i, uint32_t j, const char value) {
 	KP_Btn[i][j].KeypadBtnType = KeyCode;
 	KP_Btn[i][j].Val.chars[0] = value;
 	KP_Btn[i][j].Val.chars[1] = (char) 0;
 
 }
-void KEYPAD_BUTTON_CHAR_INIT(uint32_t i, uint32_t j, const char * ch) {
+void KeypadButtonChar_Init(uint32_t i, uint32_t j, const char * ch) {
 	KP_Btn[i][j].KeypadBtnType = Char;
 	strcpy(KP_Btn[i][j].Val.chars, ch);
 }

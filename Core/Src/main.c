@@ -122,7 +122,7 @@ int main(void)
 
 	GuiShell_init();
 
-	KEYPAD_Init();
+	Keypad_Init();
   /* Start scheduler */
 	osKernelStart();
 

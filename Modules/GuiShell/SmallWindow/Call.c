@@ -5,7 +5,7 @@
  *      Author: keyhooon
  */
 
-#include "ViewNavigator.h"
+#include "viewcontainer/ViewNavigator.h"
 #include "Api/V25TER.h"
 #include "App/Call.h"
 #include "Contact.h"
@@ -35,11 +35,13 @@ const View_Typedef CallView = {
 		CallCancelCallback, CallAnswerCallback, NULL, 0 };
 
 static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = {
-		{
-		WINDOW_CreateIndirect, "Window", GUI_ID_USER, 0, 0, 128, 115, 0, 0x0,
-				0 }, { TEXT_CreateIndirect, "Text", GUI_ID_TEXT0, 5, 0, 118, 20,
-				0, 0x0, 0 }, { TEXT_CreateIndirect, "Text", GUI_ID_TEXT1, 5, 85,
-				118, 30, 0, 0x0, 0 }, };
+		{ WINDOW_CreateIndirect, "Window", GUI_ID_USER, 0, 0, 128, 115, 0,
+				0x0, 0 }, //
+				{ TEXT_CreateIndirect, "Text", GUI_ID_TEXT0, 5, 0, 118, 20, 0,
+						0x0, 0 }, //
+				{ TEXT_CreateIndirect, "Text", GUI_ID_TEXT1, 5, 85, 118, 30, 0,
+						0x0, 0 }, //
+		};
 
 static void _cbCallView(WM_MESSAGE * pMsg) {
 	static int time;
@@ -113,11 +115,13 @@ void OnCallStateChanged(CallInfo_Typedef * callInfo) {
 	static GUI_HWIN hWin;
 	switch (callInfo->state) {
 	case Incoming:
-		hWin = ViewNavigator_GoToViewOf(&DefaultViewNavigator, &CallView);
+		hWin = ViewNavigator_GoToViewOf(&DefaultViewNavigator, &CallView,
+				callInfo);
 		break;
 	case Dialing:
 		ChangeSecondButtonText(0);
-		hWin = ViewNavigator_GoToViewOf(&DefaultViewNavigator, &CallView);
+		hWin = ViewNavigator_GoToViewOf(&DefaultViewNavigator, &CallView,
+				callInfo);
 		break;
 	case Alerting:
 		ChangeSecondButtonText(0);

@@ -12,7 +12,7 @@ extern int hMemoryDataContextAllocator;
 
 DATA_CONTEXT_FUNCTIONS(Contact, CONTACT, hMemoryDataContextAllocator);
 
-static void AddContactEx(char * Name, char * CallNumber);
+
 
 void SeedContact() {
 	AddContactEx((const char*) "keyhan babazadeh",
@@ -29,7 +29,7 @@ void SeedContact() {
 			(const char*) "09354463261");
 }
 
-static void AddContactEx(char * Name, char * CallNumber) {
+void AddContactEx(char * Name, char * CallNumber) {
 	Contact_Typedef *contact = CreateContact(Name, CallNumber);
 	AddContact(contact);
 	FreeContact(contact);

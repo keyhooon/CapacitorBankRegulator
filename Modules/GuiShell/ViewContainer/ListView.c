@@ -191,8 +191,7 @@ void ListOkCallback(void * parameters) {
 	uint32_t count = listView_parameters->apiHandlers->GetCount();
 	if (selItem < count) {
 		listView_parameters->apiHandlers->SetSelectedIndex(selItem);
-		listView_parameters->SelectCallback(
-				listView_parameters->apiHandlers->GetSelectedItem());
+		listView_parameters->SelectCallback();
 	} else
 		(*(listView_parameters->customFunction + (selItem - count)))->function();
 }

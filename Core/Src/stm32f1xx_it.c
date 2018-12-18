@@ -205,22 +205,22 @@ void TIM3_IRQHandler(void)
 void EXTI15_10_IRQHandler(void) {
 	if (__HAL_GPIO_EXTI_GET_IT(KP_R0_PIN))
 	{
-		KEYPAD_EXTI_Callback(KP_R0_PIN);
+		Keypad_EXTI_Callback(KP_R0_PIN);
 		HAL_GPIO_EXTI_IRQHandler(KP_R0_PIN);
 	}
 	if (__HAL_GPIO_EXTI_GET_IT(KP_R1_PIN))
 	{
-		KEYPAD_EXTI_Callback(KP_R1_PIN);
+		Keypad_EXTI_Callback(KP_R1_PIN);
 		HAL_GPIO_EXTI_IRQHandler(KP_R1_PIN);
 	}
 	if (__HAL_GPIO_EXTI_GET_IT(KP_R2_PIN))
 	{
-		KEYPAD_EXTI_Callback(KP_R2_PIN);
+		Keypad_EXTI_Callback(KP_R2_PIN);
 		HAL_GPIO_EXTI_IRQHandler(KP_R2_PIN);
 	}
 	if (__HAL_GPIO_EXTI_GET_IT(KP_R3_PIN))
 	{
-		KEYPAD_EXTI_Callback(KP_R3_PIN);
+		Keypad_EXTI_Callback(KP_R3_PIN);
 		HAL_GPIO_EXTI_IRQHandler(KP_R3_PIN);
 	}
 }

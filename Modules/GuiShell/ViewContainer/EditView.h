@@ -15,13 +15,15 @@
 #define VIEWCONTAINER_EDITVIEW_H_
 
 typedef struct {
-	const FieldAttribute_Typedef * fieldAttribute;
+	const FieldAttribute_Typedef ** fieldAttribute;
 	void (*FinishCallback)(void *);
-	int currentFieldIndex;
+	void (*CancelCallback)(void *);
 	int fieldCount;
 	void * editableModel;
 	int isNew;
+	int currentFieldIndex;
+	void * buffer;
 } EditView_Parameters_Typedef;
 
-
+int CompressEditViewBuffer(EditView_Parameters_Typedef *);
 #endif /* VIEWCONTAINER_EDITVIEW_H_ */

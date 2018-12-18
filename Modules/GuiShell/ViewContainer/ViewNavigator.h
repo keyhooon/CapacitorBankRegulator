@@ -23,9 +23,24 @@
 
 
 
-typedef struct Loaded_View_Struct Loaded_View_TypeDef;
+typedef struct Loaded_View_Struct {
+	uint8_t index;
+	void * parameter;
+} Loaded_View_TypeDef;
 
-typedef struct View_Navigator_Struct View_Navigator_Typedef;
+typedef struct Registered_View_Struct {
+	View_Typedef * view;
+	void * setting;
+} Registered_View_TypeDef;
+
+
+typedef struct View_Navigator_Struct {
+	WM_HWIN view_container_hWin;
+	Registered_View_TypeDef registered_View_List[MAX_VIEW_COUNT];
+	Loaded_View_TypeDef loaded_View_List[DEEPEST_CHAIN_VIEW_COUNT];
+	uint8_t current_Loaded_View_Index;
+	void (*currentViewChanged)(void);
+} View_Navigator_Typedef;
 
 extern View_Navigator_Typedef DefaultViewNavigator;
 

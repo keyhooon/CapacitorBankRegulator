@@ -25,10 +25,7 @@ typedef struct {
 	char * CallNumber;
 } Contact_Typedef;
 
-const FieldAttribute_Typedef ContactFieldsAttribute[CONTACT_FIELD_COUNT] = { //
-		{ stringField, 0, 20, (const char*) "Name" }, // Name Field
-		{ stringField, 4, 20, (const char*) "Number" } // CallNumber Field
-};
+extern const FieldAttribute_Typedef ContactFieldsAttribute[CONTACT_FIELD_COUNT];
 
 Contact_Typedef * CreateContact(char *name, char *callNumber);
 void FreeContact(Contact_Typedef * contact);

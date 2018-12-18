@@ -13,3 +13,11 @@ int hModelInMemoryAllocator;
 void InitModelInMemoryAllocator() {
 	hModelInMemoryAllocator = AddHeapDataAllocator(buffer);
 }
+
+int CalculateDataModelSizeWithoutExtra(FieldAttribute_Typedef ** fieldAttribute,
+		int fieldCount) {
+	int result = 0;
+	for (int i = 0; i < fieldCount; i++)
+		result += fieldAttribute[i]->lengthInStruct;
+	return result;
+}

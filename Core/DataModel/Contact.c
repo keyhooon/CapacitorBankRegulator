@@ -7,6 +7,11 @@
 
 #include "Contact.h"
 
+const FieldAttribute_Typedef ContactFieldsAttribute[CONTACT_FIELD_COUNT] = { //
+		{ stringField, (const char*) "Name", 0, 4, 20, 1 }, // Name Field
+				{ stringField, (const char*) "Number", 4, 4, 20, 1 }, // CallNumber Field
+		};
+
 Contact_Typedef * CreateContact(char *name, char *callNumber) {
 	int nameLen = strlen(name);
 	int callNumberLen = strlen(callNumber);
