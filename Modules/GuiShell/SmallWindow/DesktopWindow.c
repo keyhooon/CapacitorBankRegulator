@@ -97,12 +97,12 @@ static GUI_HWIN show(void) {
 	int xSize, ySize;
 	xSize = LCD_GetXSize();
 	ySize = LCD_GetYSize();
-	WM_HWIN hWin = WM_CreateWindowAsChild(0, 0, xSize, ySize, WM_HBKWIN,
+	WM_HWIN hWin = WM_CreateWindowAsChild(0, 0, xSize, ySize, 0,
 	WM_CF_SHOW, _cbDesktop, 0);
 	return hWin;
 }
 static uint8_t hide(GUI_HWIN hWin) {
-
+	return 0;
 }
 static void MenuCallback(void) {
 	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &MenuView, NULL);

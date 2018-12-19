@@ -66,20 +66,14 @@
 /* Variables -----------------------------------------------------------------*/
 
 osThreadId CalculateTaskHandle;
-osTimerId StatusTimerHandle;
+
 osSemaphoreId CalculateNeededSemHandle;
 
 /* USER CODE BEGIN Variables */
-uint32_t ledTim[4];
-uint32_t ledTimStart[4] = { 1, 2, 3, 4 };
+
 /* USER CODE END Variables */
 
 /* Function prototypes -------------------------------------------------------*/
-
-void CalculationProc(void const * argument);
-void StatusShowCallback(void const * argument);
-
-extern BufferStream_TypeDef *BOARD_COMx_BUFFER_STREAM[COMn];
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -144,45 +138,6 @@ __weak void vApplicationMallocFailedHook(void)
 void MX_FREERTOS_Init(void) {
 
 
-  /* Create the timer(s) */
-  /* definition and creation of StatusTimer */
-	osTimerDef(StatusTimer, StatusShowCallback);
-	StatusTimerHandle = osTimerCreate(osTimer(StatusTimer), osTimerPeriodic,
-			NULL);
-
-	/* USER CODE BEGIN RTOS_TIMERS */
-	/* start timers, add new ones, ... */
-	osTimerStart(StatusTimerHandle, 100);
-	/* USER CODE END RTOS_TIMERS */
-}
-
-
-/* StatusShowCallback function */
-void StatusShowCallback(void const * argument)
-{
-  /* USER CODE BEGIN StatusShowCallback */
-	if (ledTim[0]-- == 0)
-	{
-		ledTim[0] = ledTimStart[0];
-		BSP_LED_Toggle(LED1);
-	}
-	if (ledTim[1]-- == 0)
-	{
-		ledTim[1] = ledTimStart[1];
-		BSP_LED_Toggle(LED2);
-	}
-	if (ledTim[2]-- == 0)
-	{
-		ledTim[2] = ledTimStart[2];
-		BSP_LED_Toggle(LED3);
-	}
-	if (ledTim[3]-- == 0)
-	{
-		ledTim[3] = ledTimStart[3];
-		BSP_LED_Toggle(LED4);
-	}
-
-  /* USER CODE END StatusShowCallback */
 }
 
 /* USER CODE BEGIN Application */

@@ -13,5 +13,5 @@ uint8_t buffer[1000];
 int hMemoryDataContextAllocator;
 
 void InitMemoryDataContext() {
-	hMemoryDataContextAllocator = AddHeapDataAllocator(buffer);
+	hMemoryDataContextAllocator = AddHeapDataAllocator(buffer, 1000);
 }

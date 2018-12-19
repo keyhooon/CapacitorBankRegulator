@@ -146,7 +146,7 @@ static GUI_HWIN show(void) {
 			_cbDialog, NULL, 0, 2);
 }
 static uint8_t hide(GUI_HWIN hWin) {
-	return 1;
+	return 0;
 }
 static void okCallback(void) {
 	switch (SelectedItem) {

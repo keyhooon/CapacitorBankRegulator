@@ -44,6 +44,9 @@ static void _cbToolbar(WM_MESSAGE * pMsg);
 
 
 void GuiShell_init() {
+	BSP_PB_Init(BUTTON_KEY1, BUTTON_MODE_EXTI);
+	BSP_PB_Init(BUTTON_KEY2, BUTTON_MODE_EXTI);
+
 	osThreadDef(guiTask, GUI_Main, osPriorityNormal, 0, 1000);
 	guiTaskHandle = osThreadCreate(osThread(guiTask), NULL);
 }
@@ -59,8 +62,11 @@ void GUI_Main(void const * argument) {
 //	GUI_SelectLayer(0);
 //	MainWindow();
 	GUI_SelectLayer(1);
-	ShowSmallDesktopWindow();
 
+	ShowSmallDesktopWindow();
+	ViewNavigator_Init(&DefaultViewNavigator, hWin);
+	DefaultViewNavigator.currentViewChanged = CurrentMenuPageChanged;
+	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &DesktopView, NULL);
 
   /* Infinite loop */
 	for (;;) {
@@ -301,10 +307,6 @@ void ShowSmallDesktopWindow(void) {
 	hWinToolbar = WM_CreateWindowAsChild(0, yPos, xSize, TOOLBAR_SIZE,
 	WM_HBKWIN,
 	WM_CF_SHOW, _cbToolbar, 0);
-
-	ViewNavigator_Init(&DefaultViewNavigator, hWin);
-	DefaultViewNavigator.currentViewChanged = CurrentMenuPageChanged;
-	ViewNavigator_GoToViewOf(&DefaultViewNavigator, &DesktopView, NULL);
 }
 
 static void CurrentMenuPageChanged(void) {

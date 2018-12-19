@@ -140,9 +140,11 @@ GUI_HWIN ViewNavigator_GoToViewOf(View_Navigator_Typedef *viewNavigator,
 		ViewNavigator_RegisterView(viewNavigator, view);
 		index = FindRegisterViewIndex(viewNavigator, view);
 	}
-	if ((viewNavigator->current_Loaded_View_Index < DEEPEST_CHAIN_VIEW_COUNT - 1)
+	if (((viewNavigator->current_Loaded_View_Index
+			< DEEPEST_CHAIN_VIEW_COUNT - 1)
 			&& PageHide(viewNavigator,
-					ViewNavigator_GetCurrentView(viewNavigator)) == 0) {
+					ViewNavigator_GetCurrentView(viewNavigator)) == 0)
+			|| viewNavigator->current_Loaded_View_Index == 0xff) {
 		viewNavigator->loaded_View_List[++viewNavigator->current_Loaded_View_Index].index =
 				index;
 		viewNavigator->loaded_View_List[viewNavigator->current_Loaded_View_Index].parameter =
@@ -168,10 +170,12 @@ GUI_HWIN ViewNavigator_GoToViewOfByID(View_Navigator_Typedef *viewNavigator,
 	uint8_t index = FindRegisterViewIndexByID(viewNavigator, viewId);
 	if (index == 255)
 		return GUI_HMEM_NULL;
-	if ((viewNavigator->current_Loaded_View_Index < DEEPEST_CHAIN_VIEW_COUNT - 1)
+	if (((viewNavigator->current_Loaded_View_Index
+			< DEEPEST_CHAIN_VIEW_COUNT - 1)
 			&& PageHide(viewNavigator,
 					ViewNavigator_GetCurrentView(viewNavigator))
-					== 0) {
+					== 0)
+			|| viewNavigator->current_Loaded_View_Index == 0xff) {
 		viewNavigator->loaded_View_List[++viewNavigator->current_Loaded_View_Index].index =
 				index;
 		viewNavigator->loaded_View_List[viewNavigator->current_Loaded_View_Index].parameter =

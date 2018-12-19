@@ -47,13 +47,19 @@ static const size_t xHeapStructSize = (sizeof(BlockLink_t)
 
 /*-----------------------------------------------------------*/
 
-int AddHeapDataAllocator(uint8_t * buffer) {
-	for (int i = 0; i < DATA_ALLOCATORS_LIST_SIZE; i++)
-		if (DataAllocatorsList[i].ucHeap == 0) {
-			DataAllocatorsList[i] = (DataAllocator_Typedef ) { .ucHeap = buffer,
+int AddHeapDataAllocator(uint8_t * buffer, size_t xTotalSize) {
+	int i;
+	for (i = 0; i < DATA_ALLOCATORS_LIST_SIZE; i++)
+		if (DataAllocatorsList[i].ucHeap == 0)
+			break;
+	if (i == DATA_ALLOCATORS_LIST_SIZE)
+		return 0;
+	DataAllocatorsList[i] =
+			(DataAllocator_Typedef ) { .ucHeap = buffer,
 							.xStart = 0U, .pxEnd = 0U, /* Create a couple of list links to mark the start and end of the list. */
 							.xFreeBytesRemaining = 0U,
 							.xMinimumEverFreeBytesRemaining = 0U, /* Keeps track of the number of free bytes remaining, but says nothing about fragmentation. */
+							.xTotalHeapSize = xTotalSize,
 							.xBlockAllocatedBit = 0, /* Gets set to the top bit of an size_t type.  When this bit in the xBlockSize
 							 member of an BlockLink_t structure is set then the block belongs to the
 							 application.  When the bit is free the block is still part of the free heap
@@ -64,7 +70,7 @@ int AddHeapDataAllocator(uint8_t * buffer) {
 							.GetFreeSize = Heap_DA_GetFreeSize, /* */
 							.GetMinimumEverFreeHeapSize =
 									Heap_DA_GetMinimumEverFreeSize, };
-		}
+	return 1;
 }
 /*-----------------------------------------------------------*/
 
@@ -240,7 +246,7 @@ size_t Heap_DA_GetSize(DataAllocator_Typedef * hDataAllocator,
 
 		if ((pxLink->xBlockSize & hDataAllocator->xBlockAllocatedBit) != 0) {
 			if (pxLink->pxNextFreeBlock == NULL) {
-				return pxLink->xBlockSize;
+				return pxLink->xBlockSize & !hDataAllocator->xBlockAllocatedBit;
 			}
 		}
 	}
@@ -268,7 +274,6 @@ static void prvHeapInit(DataAllocator_Typedef * hDataAllocator) {
 	BlockLink_t *pxFirstFreeBlock;
 	uint8_t *pucAlignedHeap;
 	size_t uxAddress;
-	size_t xTotalHeapSize = configTOTAL_HEAP_SIZE;
 
 	/* Ensure the heap starts on a correctly aligned boundary. */
 	uxAddress = (size_t) hDataAllocator->ucHeap;
@@ -276,7 +281,8 @@ static void prvHeapInit(DataAllocator_Typedef * hDataAllocator) {
 	if ((uxAddress & portBYTE_ALIGNMENT_MASK) != 0) {
 		uxAddress += ( portBYTE_ALIGNMENT - 1);
 		uxAddress &= ~((size_t) portBYTE_ALIGNMENT_MASK);
-		xTotalHeapSize -= uxAddress - (size_t) hDataAllocator->ucHeap;
+		hDataAllocator->xTotalHeapSize -= uxAddress
+				- (size_t) hDataAllocator->ucHeap;
 	}
 
 	pucAlignedHeap = (uint8_t *) uxAddress;
@@ -288,7 +294,7 @@ static void prvHeapInit(DataAllocator_Typedef * hDataAllocator) {
 
 	/* pxEnd is used to mark the end of the list of free blocks and is inserted
 	 at the end of the heap space. */
-	uxAddress = ((size_t) pucAlignedHeap) + xTotalHeapSize;
+	uxAddress = ((size_t) pucAlignedHeap) + hDataAllocator->xTotalHeapSize;
 	uxAddress -= xHeapStructSize;
 	uxAddress &= ~((size_t) portBYTE_ALIGNMENT_MASK);
 	hDataAllocator->pxEnd = (void *) uxAddress;

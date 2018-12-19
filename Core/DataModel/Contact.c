@@ -25,7 +25,7 @@ Contact_Typedef * CreateContact(char *name, char *callNumber) {
 	return result;
 }
 void FreeContact(Contact_Typedef * contact) {
-	DataAllocator_Free(contact);
+	DataAllocator_Free(hModelInMemoryAllocator, contact);
 }
 
 

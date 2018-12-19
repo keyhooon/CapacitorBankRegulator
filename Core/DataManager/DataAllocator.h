@@ -35,6 +35,8 @@ typedef struct DataAllocator_Struct {
 	size_t xFreeBytesRemaining;
 	size_t xMinimumEverFreeBytesRemaining;
 
+	size_t xTotalHeapSize;
+
 	/* Gets set to the top bit of an size_t type.  When this bit in the xBlockSize
 	 member of an BlockLink_t structure is set then the block belongs to the
 	 application.  When the bit is free the block is still part of the free heap
@@ -56,7 +58,7 @@ typedef struct DataAllocator_Struct {
 } DataAllocator_Typedef;
 
 
-int AddHeapDataAllocator(uint8_t * buffer);
+int AddHeapDataAllocator(uint8_t * buffer, size_t xTotalSize);
 
 
 

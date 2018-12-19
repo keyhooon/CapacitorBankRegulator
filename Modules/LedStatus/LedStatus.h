@@ -16,5 +16,5 @@
 
 #define StatusLed		LED3
 
-
+void LedStatus_Init(void);
 #endif /* LEDSTATUS_LEDSTATUS_H_ */

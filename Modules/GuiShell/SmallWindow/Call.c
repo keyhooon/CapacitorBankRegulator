@@ -102,7 +102,7 @@ static GUI_HWIN CallViewShow() {
 			_cbCallView, NULL, 0, 2);
 }
 static uint32_t CallViewHide(GUI_HWIN hwin) {
-	return 1;
+	return 0;
 }
 
 

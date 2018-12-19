@@ -56,6 +56,7 @@
 									<listOptionValue builtIn="false" value="../Modules/Keypad"/>
 									<listOptionValue builtIn="false" value="../Modules/GsmModem"/>
 									<listOptionValue builtIn="false" value="../Modules/GuiShell"/>
+									<listOptionValue builtIn="false" value="../Modules/LedStatus"/>
 								</option>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1508651757" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__weak=__attribute__((weak))"/>

@@ -47,20 +47,21 @@
   ******************************************************************************
   */
 /* Includes ------------------------------------------------------------------*/
-#include <keypad.h>
+
 #include "main.h"
 #include "stm32f1xx_hal.h"
 #include "cmsis_os.h"
 
-#include "usb_device.h"
 #include "gpio.h"
-#include "fsmc.h"
 
-/* USER CODE BEGIN Includes */
 #include "Board.h"
 #include "Board_lcd.h"
-#include "Contact.h"
-/* USER CODE END Includes */
+
+#include <Gsm.h>
+#include <keypad.h>
+#include <GUI.h>
+#include <LedStatus.h>
+
 
 /* Private variables ---------------------------------------------------------*/
 
@@ -75,6 +76,8 @@ void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
 static void BSP_Config(void);
+static void Module_Config(void);
+static void DataManagement_Config(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
@@ -118,11 +121,10 @@ int main(void)
   /* Call init function for freertos objects (in freertos.c) */
 	MX_FREERTOS_Init();
 
-	Gsm_Init();
+	Module_Config();
 
-	GuiShell_init();
+	DataManagement_Config();
 
-	Keypad_Init();
   /* Start scheduler */
 	osKernelStart();
 
@@ -203,23 +205,32 @@ void SystemClock_Config(void)
   HAL_NVIC_SetPriority(SysTick_IRQn, 15, 0);
 }
 
-/* USER CODE BEGIN 4 */
+
 void BSP_Config(void) {
 
 	/* Enable the CRC Module */
 	__HAL_RCC_CRC_CLK_ENABLE()
 	;
 
-	BSP_LED_Init(LED1);
-	BSP_LED_Init(LED2);
-	BSP_LED_Init(LED3);
-	BSP_LED_Init(LED4);
-
-	BSP_PB_Init(BUTTON_KEY1, BUTTON_MODE_EXTI);
-	BSP_PB_Init(BUTTON_KEY2, BUTTON_MODE_EXTI);
 }
-/* USER CODE END 4 */
 
+static void Module_Config(void) {
+
+//	Gsm_Init();
+
+	GuiShell_init();
+
+	Keypad_Init();
+
+	LedStatus_Init();
+}
+
+static void DataManagement_Config(void) {
+
+	InitModelInMemoryAllocator();
+
+	InitMemoryDataContext();
+}
 /**
   * @brief  Period elapsed callback in non blocking mode
   * @note   This function is called  when TIM3 interrupt took place, inside

@@ -11,7 +11,7 @@ char buffer[100];
 
 int hModelInMemoryAllocator;
 void InitModelInMemoryAllocator() {
-	hModelInMemoryAllocator = AddHeapDataAllocator(buffer);
+	hModelInMemoryAllocator = AddHeapDataAllocator(buffer, 100);
 }
 
 int CalculateDataModelSizeWithoutExtra(FieldAttribute_Typedef ** fieldAttribute,

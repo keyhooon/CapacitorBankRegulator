@@ -32,7 +32,7 @@ Message_Typedef * CreateMessage(char *content, char *callNumber, time_t _time,
 	return result;
 }
 void FreeMessage(Message_Typedef * message) {
-	DataAllocator_Free(message);
+	DataAllocator_Free(hModelInMemoryAllocator, message);
 }
 
 
