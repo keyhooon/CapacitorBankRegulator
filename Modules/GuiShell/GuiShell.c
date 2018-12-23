@@ -47,7 +47,7 @@ void GuiShell_init() {
 	BSP_PB_Init(BUTTON_KEY1, BUTTON_MODE_EXTI);
 	BSP_PB_Init(BUTTON_KEY2, BUTTON_MODE_EXTI);
 
-	osThreadDef(guiTask, GUI_Main, osPriorityNormal, 0, 1000);
+	osThreadDef(guiTask, GUI_Main, osPriorityNormal, 0, 1256);
 	guiTaskHandle = osThreadCreate(osThread(guiTask), NULL);
 }
 

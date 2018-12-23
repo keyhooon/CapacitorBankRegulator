@@ -56,8 +56,8 @@ static GUI_HWIN EditViewShow(void * parameters) {
 			editView_parameters->fieldAttribute,
 			editView_parameters->fieldCount);
 	for (int i = 0; i < editView_parameters->fieldCount; i++) {
-		FieldAttribute_Typedef *fieldAttribute =
-				editView_parameters->fieldAttribute[i];
+		FieldAttribute_Typedef * fieldAttribute =
+				editView_parameters->fieldAttribute + i;
 		if (fieldAttribute->type == stringField)
 		{
 			*(char**) (editView_parameters->buffer
@@ -106,7 +106,8 @@ void StoreValue(EditView_Parameters_Typedef * editView_parameters) {
 	WM_HWIN countainer_hwin = WM_GetFirstChild(
 			DefaultViewNavigator.view_container_hWin);
 	FieldAttribute_Typedef *fieldAttribute =
-			editView_parameters->fieldAttribute[editView_parameters->currentFieldIndex];
+			editView_parameters->fieldAttribute
+			+ editView_parameters->currentFieldIndex;
 	GUI_HWIN hEditWin = WM_GetDialogItem(countainer_hwin, GUI_ID_EDIT0);
 
 	if (fieldAttribute->type == stringField) {
@@ -125,8 +126,8 @@ void LoadValue(EditView_Parameters_Typedef * editView_parameters) {
 	WM_HWIN countainer_hwin = WM_GetFirstChild(
 			DefaultViewNavigator.view_container_hWin);
 	GUI_HWIN hEditWin = WM_GetDialogItem(countainer_hwin, GUI_ID_EDIT0);
-	FieldAttribute_Typedef *fieldAttribute =
-			editView_parameters->fieldAttribute[editView_parameters->currentFieldIndex];
+	FieldAttribute_Typedef *fieldAttribute = editView_parameters->fieldAttribute
+			+ editView_parameters->currentFieldIndex;
 
 
 	TEXT_SetText(WM_GetDialogItem(countainer_hwin, GUI_ID_TEXT0),
@@ -155,7 +156,7 @@ int CompressEditViewBuffer(EditView_Parameters_Typedef * editView_parameters) {
 	char* pField = editView_parameters->buffer + result;
 	for (int i = 0; i < editView_parameters->fieldCount; i++) {
 		FieldAttribute_Typedef *fieldAttribute =
-				editView_parameters->fieldAttribute[i];
+				editView_parameters->fieldAttribute + i;
 		if (fieldAttribute->type == stringField) {
 			char * str = *(char**) (editView_parameters->buffer
 					+ fieldAttribute->offsetInStruct);

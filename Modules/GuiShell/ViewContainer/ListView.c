@@ -26,7 +26,7 @@
 
 
 
-char** DisplayArray;
+
 
 extern GUI_CONST_STORAGE GUI_BITMAP bmItemIndexImage;
 
@@ -164,10 +164,10 @@ static GUI_HWIN ListViewShow(void * parameters) {
 			(ListView_Parameters_Typedef *) parameters;
 	listView_parameters->DisplayArray =
 			listView_parameters->apiHandlers->GetDisplayArray();
-	WM_HWIN hwin = WINDOW_CreateEx(0, 0, 128, 115, NULL, WM_CF_SHOW, 0x0,
+	WM_HWIN hwin = WINDOW_CreateEx(0, 0, 128, 105, NULL, WM_CF_SHOW, 0x0,
 			GUI_ID_USER, NULL);
-	LISTBOX_Handle listbox_hwin = LISTBOX_CreateEx(0, 0, 128, 115, hwin,
-			WM_CF_SHOW, 0, GUI_ID_LISTBOX0, DisplayArray);
+	LISTBOX_Handle listbox_hwin = LISTBOX_CreateEx(0, 0, 118, 105, hwin,
+	WM_CF_SHOW, 0, GUI_ID_LISTBOX0, listView_parameters->DisplayArray);
 	SetListSkin(listbox_hwin);
 	for (int i = 0; (*(listView_parameters->customFunction + i)) != NULL; i++)
 		LISTBOX_AddString(listbox_hwin,
@@ -182,7 +182,7 @@ static uint8_t ListViewHide(GUI_HWIN hWin, void * parameters) {
 			(ListView_Parameters_Typedef *) parameters;
 	listView_parameters->apiHandlers->FreeDisplayArray(
 			listView_parameters->DisplayArray);
-	return 1;
+	return 0;
 }
 void ListOkCallback(void * parameters) {
 	ListView_Parameters_Typedef * listView_parameters =

@@ -53,7 +53,7 @@ int AddHeapDataAllocator(uint8_t * buffer, size_t xTotalSize) {
 		if (DataAllocatorsList[i].ucHeap == 0)
 			break;
 	if (i == DATA_ALLOCATORS_LIST_SIZE)
-		return 0;
+		return -1;
 	DataAllocatorsList[i] =
 			(DataAllocator_Typedef ) { .ucHeap = buffer,
 							.xStart = 0U, .pxEnd = 0U, /* Create a couple of list links to mark the start and end of the list. */
@@ -70,7 +70,7 @@ int AddHeapDataAllocator(uint8_t * buffer, size_t xTotalSize) {
 							.GetFreeSize = Heap_DA_GetFreeSize, /* */
 							.GetMinimumEverFreeHeapSize =
 									Heap_DA_GetMinimumEverFreeSize, };
-	return 1;
+	return i;
 }
 /*-----------------------------------------------------------*/
 
@@ -246,7 +246,7 @@ size_t Heap_DA_GetSize(DataAllocator_Typedef * hDataAllocator,
 
 		if ((pxLink->xBlockSize & hDataAllocator->xBlockAllocatedBit) != 0) {
 			if (pxLink->pxNextFreeBlock == NULL) {
-				return pxLink->xBlockSize & !hDataAllocator->xBlockAllocatedBit;
+				return pxLink->xBlockSize & ~hDataAllocator->xBlockAllocatedBit;
 			}
 		}
 	}

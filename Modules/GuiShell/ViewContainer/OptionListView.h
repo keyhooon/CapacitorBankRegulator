@@ -13,8 +13,8 @@
 
 
 typedef struct {
-	CustomFunction_Typedef **customFunction;
-	void (*SelectCallback)(void *);
+	const CustomFunction_Typedef **customFunction;
+	const void (*SelectCallback)(void *);
 	LISTBOX_Handle hWin;
 } OptionListView_Parameters_Typedef;
 

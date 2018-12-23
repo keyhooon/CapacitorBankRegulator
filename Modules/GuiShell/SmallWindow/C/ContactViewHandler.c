@@ -81,7 +81,8 @@ extern View_Typedef InfoView;
 
 
 
-static const CustomFunction_Typedef AddFunction = { NULL, "Add New...",
+static const CustomFunction_Typedef AddFunction = { NULL,
+		(const char*) "Add New...",
 		ContactAddFunctionCallback };
 static const CustomFunction_Typedef * ContactListFunctionList[2] =
 		{ &AddFunction, NULL };
@@ -99,14 +100,16 @@ static ListView_Parameters_Typedef Contact_ListView_Parameters = { //
 
 static const CustomFunction_Typedef CallFunction = { &bmphonecall,
 		(const char*) "Call", CallFunctionCallback };
-static const CustomFunction_Typedef EditFunction = { &bmpencil, "Edit",
+static const CustomFunction_Typedef EditFunction = { &bmpencil,
+		(const char*) "Edit",
 		ContactEditFunctionCallback };
-static const CustomFunction_Typedef ViewInfoFunction = { &bmloupe, "View",
+static const CustomFunction_Typedef ViewInfoFunction = { &bmloupe,
+		(const char*) "View",
 		ContactViewFunctionCallBcak };
-static const CustomFunction_Typedef DeleteFunction = { &bmdelete, "Delete",
+static const CustomFunction_Typedef DeleteFunction = { &bmdelete,
+		(const char*) "Delete",
 		ContactDeleteFunctionCallback };
-static const CustomFunction_Typedef * ContactOptionFunctionList[5] = {
-		&CallFunction,
+const CustomFunction_Typedef * ContactOptionFunctionList[] = { &CallFunction,
 		&EditFunction, &ViewInfoFunction, &DeleteFunction, NULL };
 static OptionListView_Parameters_Typedef ContactOptionListView_Parameters = { //
 		ContactOptionFunctionList, // custom function list

@@ -78,7 +78,7 @@ typedef struct {
 		if (_dlp_ == NULL) \
 		{ \
 			size_t sz = DataAllocator_GetSize(TYPE##_MODEL_DATA_ALLOCATOR,value); \
-			size_t header_sz = sizeof(type##_List_Typedef) << 1; \
+			size_t header_sz = sizeof(type##_List_Typedef *) << 1; \
 			type##_List_Typedef * elem = DataAllocator_Alloc(hDataAllocator, sz + header_sz); \
 			memcpy(((char *)elem) + header_sz, value, sz ); \
 			if (type##_List == NULL) \
@@ -182,7 +182,7 @@ typedef struct {
 		if (type##_List != NULL) \
 		{ \
 			size_t sz = DataAllocator_GetSize(hDataAllocator,type##_List); \
-			size_t header_sz = sizeof(type##_List_Typedef) << 1; \
+			size_t header_sz = sizeof(type##_List_Typedef *) << 1; \
 			_dlp_ = DataAllocator_Alloc(TYPE##_MODEL_DATA_ALLOCATOR, sz - header_sz); \
 			memcpy(_dlp_,((char *)type##_List) + header_sz, sz - header_sz ); \
 			return _dlp_; \

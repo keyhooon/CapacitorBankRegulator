@@ -96,20 +96,10 @@ static int _OwnerOptionListDraw(const WIDGET_ITEM_DRAW_INFO * pDrawItemInfo) {
 		// Draw bitmap
 		//
 		CustomFunction_Typedef ** t;
-		WM_GetUserData(hWin, t, sizeof(CustomFunction_Typedef **));
+		LISTBOX_GetUserData(hWin, &t, sizeof(CustomFunction_Typedef **));
 		if ((*(t + Index))->Icon != NULL)
 			GUI_DrawBitmap((*(t + Index))->Icon, IconRect.x0 + 1,
 					IconRect.y0 + 1);
-
-		//
-		// Draw index
-		//
-//		GUI_SetTextMode(GUI_TEXTMODE_TRANS);
-//		char indexString[4];
-//		itoa(Index, indexString, 10);
-//		int indexStringDistX = GUI_GetStringDistX(indexString);
-//		GUI_DispStringInRect(indexString, &IconRect,
-//				GUI_TA_HCENTER | GUI_TA_VCENTER);
 		//
 		// Draw focus rectangle
 		//
@@ -151,12 +141,11 @@ static GUI_HWIN OptionListViewShow(void * parameters) {
 	WM_HWIN hwin = GUI_CreateDialogBox(_aDialogCreate,
 			GUI_COUNTOF(_aDialogCreate), NULL, NULL, 0, 0);
 	GUI_HWIN hListWin = WM_GetDialogItem(hwin, GUI_ID_LISTBOX0);
-	WM_SetUserData(hListWin, param->customFunction,
+	LISTBOX_SetUserData(hListWin, &(param->customFunction),
 			sizeof(CustomFunction_Typedef **));
 
-	for (int i = 0; *(param->customFunction + i) == NULL; i++)
-		LISTBOX_AddString(hListWin,
-				(*(CustomFunction_Typedef **) (param->customFunction + i))->display);
+	for (int i = 0; param->customFunction[i] != NULL; i++)
+		LISTBOX_AddString(hListWin, param->customFunction[i]->display);
 	SetOptionListSkin(hListWin);
 	return hwin;
 }

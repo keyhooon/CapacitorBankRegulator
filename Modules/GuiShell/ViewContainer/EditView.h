@@ -15,7 +15,7 @@
 #define VIEWCONTAINER_EDITVIEW_H_
 
 typedef struct {
-	const FieldAttribute_Typedef ** fieldAttribute;
+	const FieldAttribute_Typedef * fieldAttribute;
 	void (*FinishCallback)(void *);
 	void (*CancelCallback)(void *);
 	int fieldCount;

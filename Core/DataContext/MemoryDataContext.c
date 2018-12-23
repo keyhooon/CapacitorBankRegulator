@@ -9,9 +9,10 @@
 #include "DataAllocator.h"
 
 
-uint8_t buffer[1000];
+static uint8_t memoryDataContextBuffer[1000];
 int hMemoryDataContextAllocator;
 
 void InitMemoryDataContext() {
-	hMemoryDataContextAllocator = AddHeapDataAllocator(buffer, 1000);
+	hMemoryDataContextAllocator = AddHeapDataAllocator(memoryDataContextBuffer,
+			1000);
 }
