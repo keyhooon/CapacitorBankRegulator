@@ -164,9 +164,9 @@ static GUI_HWIN ListViewShow(void * parameters) {
 			(ListView_Parameters_Typedef *) parameters;
 	listView_parameters->DisplayArray =
 			listView_parameters->apiHandlers->GetDisplayArray();
-	WM_HWIN hwin = WINDOW_CreateEx(0, 0, 128, 105, NULL, WM_CF_SHOW, 0x0,
+	WM_HWIN hwin = WINDOW_CreateEx(0, 0, 128, 115, NULL, WM_CF_SHOW, 0x0,
 			GUI_ID_USER, NULL);
-	LISTBOX_Handle listbox_hwin = LISTBOX_CreateEx(0, 0, 118, 105, hwin,
+	LISTBOX_Handle listbox_hwin = LISTBOX_CreateEx(0, 0, 128, 115, hwin,
 	WM_CF_SHOW, 0, GUI_ID_LISTBOX0, listView_parameters->DisplayArray);
 	SetListSkin(listbox_hwin);
 	for (int i = 0; (*(listView_parameters->customFunction + i)) != NULL; i++)

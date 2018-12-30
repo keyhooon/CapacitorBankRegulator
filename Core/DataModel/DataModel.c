@@ -7,11 +7,11 @@
 
 #include "DataModel.h"
 
-static char modelInMemoryBuffer[100];
+static char modelInMemoryBuffer[200];
 
 int hModelInMemoryAllocator;
 void InitModelInMemoryAllocator() {
-	hModelInMemoryAllocator = AddHeapDataAllocator(modelInMemoryBuffer, 100);
+	hModelInMemoryAllocator = AddHeapDataAllocator(modelInMemoryBuffer, 200);
 }
 
 int CalculateDataModelSizeWithoutExtra(FieldAttribute_Typedef * fieldAttribute,
@@ -25,7 +25,11 @@ int CalculateDataModelMaxSizeWithExtra(FieldAttribute_Typedef * fieldAttribute,
 		int fieldCount) {
 	int result = 0;
 	for (int i = 0; i < fieldCount; i++)
+	{
 		result += fieldAttribute[i].lengthInStruct;
+		if (fieldAttribute[i].valueType == stringField)
+			result += fieldAttribute->maxLength + 1;
+	}
 	return result;
 }
 

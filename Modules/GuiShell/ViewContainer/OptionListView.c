@@ -132,8 +132,8 @@ void SetOptionListSkin(LISTBOX_Handle list) {
 static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = { //
 		{ WINDOW_CreateIndirect, "Option", GUI_ID_USER, 0, 0, 128, 115,
 				WM_CF_SHOW, 0x0, 0 }, //
-				{ LISTBOX_CreateIndirect, "OptionList", GUI_ID_LISTBOX0, 5, 5,
-						118, 105, 0, 0, sizeof(CustomFunction_Typedef **) }, //
+				{ LISTBOX_CreateIndirect, "OptionList", GUI_ID_LISTBOX0, 0, 0,
+						128, 115, 0, 0, sizeof(CustomFunction_Typedef **) }, //
 		};
 static GUI_HWIN OptionListViewShow(void * parameters) {
 	OptionListView_Parameters_Typedef * param =

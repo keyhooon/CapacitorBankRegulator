@@ -19,11 +19,11 @@ INFO_VIEW_ID, "View", "View", (void *) NULL, InfoViewShow, InfoViewHide,
 NULL, (const char*) "Back", NULL, InfoViewbackCallback, NULL, 0 };
 
 static GUI_HWIN InfoViewShow(void * parameters) {
-	WM_HWIN hwin = WINDOW_CreateEx(5, 5, 118, 115, NULL, WM_CF_SHOW, 0x0,
+	WM_HWIN hwin = WINDOW_CreateEx(0, 0, 128, 115, NULL, WM_CF_SHOW, 0x0,
 	GUI_ID_USER, NULL);
 	char temp[33];
 	((InfoView_Parameters_Typedef *) parameters)->apiHandlers->GetDisplay(temp);
-	TEXT_Handle text_hwin = TEXT_CreateEx(0, 0, 118, 115, hwin, WM_CF_SHOW, 0,
+	TEXT_Handle text_hwin = TEXT_CreateEx(0, 0, 128, 115, hwin, WM_CF_SHOW, 0,
 	GUI_ID_TEXT0, temp);
 	TEXT_SetFont(text_hwin, &GUI_Font8x10_ASCII);
 	TEXT_SetWrapMode(text_hwin, GUI_WRAPMODE_WORD);

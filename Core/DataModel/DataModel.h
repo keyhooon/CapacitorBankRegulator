@@ -15,7 +15,7 @@ typedef enum FieldType_Enum {
 } FieldType_Typedef;
 
 typedef struct {
-	int type :3;
+	int valueType :3;
 	int offsetInStruct :8;
 	int lengthInStruct :4;
 	int maxLength :16;

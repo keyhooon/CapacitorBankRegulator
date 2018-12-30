@@ -178,6 +178,7 @@ void ContactSelectCallback(void) {
 void ContactEditFinishedCallback(void * parameters) {
 	EditView_Parameters_Typedef *param =
 			(EditView_Parameters_Typedef *) parameters;
+
 	Contact_Typedef *newContact = CreateContact(
 			((Contact_Typedef*) (param->buffer))->Name,
 			((Contact_Typedef*) (param->buffer))->CallNumber);

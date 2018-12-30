@@ -21,8 +21,8 @@
  *
  **********************************************************************
  */
-void StoreValue(EditView_Parameters_Typedef * editView_parameters);
-void LoadValue(EditView_Parameters_Typedef * editView_parameters);
+void StoreValue(EditView_Parameters_Typedef * editView_parameters, WM_HWIN hwin);
+void LoadValue(EditView_Parameters_Typedef * editView_parameters, WM_HWIN hwin);
 
 
 
@@ -52,13 +52,17 @@ static GUI_HWIN EditViewShow(void * parameters) {
 	WM_HWIN hwin = GUI_CreateDialogBox(_aDialogCreate,
 			GUI_COUNTOF(_aDialogCreate), NULL, NULL, 0, 0);
 	editView_parameters->currentFieldIndex = 0;
+	editView_parameters->buffer = pvPortMalloc(
+			CalculateDataModelMaxSizeWithExtra(
+					editView_parameters->fieldAttribute,
+					editView_parameters->fieldCount));
 	int sz = CalculateDataModelSizeWithoutExtra(
 			editView_parameters->fieldAttribute,
 			editView_parameters->fieldCount);
 	for (int i = 0; i < editView_parameters->fieldCount; i++) {
 		FieldAttribute_Typedef * fieldAttribute =
 				editView_parameters->fieldAttribute + i;
-		if (fieldAttribute->type == stringField)
+		if (fieldAttribute->valueType == stringField)
 		{
 			*(char**) (editView_parameters->buffer
 					+ fieldAttribute->offsetInStruct) =
@@ -66,8 +70,8 @@ static GUI_HWIN EditViewShow(void * parameters) {
 			sz += fieldAttribute->maxLength + 1;
 		}
 	}
-	editView_parameters->buffer = pvPortMalloc(sz);
-	LoadValue(editView_parameters);
+
+	LoadValue(editView_parameters, hwin);
 	return hwin;
 }
 static uint8_t EditViewHide(GUI_HWIN hWin, void * parameters) {
@@ -78,7 +82,9 @@ static uint8_t EditViewHide(GUI_HWIN hWin, void * parameters) {
 void EditViewOkCallback(void * parameters) {
 	EditView_Parameters_Typedef * editView_parameters =
 			(EditView_Parameters_Typedef *) parameters;
-	StoreValue(editView_parameters);
+	WM_HWIN countainer_hwin = WM_GetFirstChild(
+			DefaultViewNavigator.view_container_hWin);
+	StoreValue(editView_parameters, countainer_hwin);
 	editView_parameters->currentFieldIndex++;
 	if (editView_parameters->currentFieldIndex
 			== editView_parameters->fieldCount)
@@ -87,7 +93,7 @@ void EditViewOkCallback(void * parameters) {
 		ViewNavigator_GoBackView(&DefaultViewNavigator);
 	}
 	else
-		LoadValue(editView_parameters);
+		LoadValue(editView_parameters, countainer_hwin);
 }
 
 void EditViewBackCallback(void * parameters) {
@@ -99,32 +105,35 @@ void EditViewBackCallback(void * parameters) {
 		ViewNavigator_GoBackView(&DefaultViewNavigator);
 	}
 	else
-		LoadValue(editView_parameters);
+	{
+		WM_HWIN countainer_hwin = WM_GetFirstChild(
+				DefaultViewNavigator.view_container_hWin);
+		LoadValue(editView_parameters, countainer_hwin);
+	}
 }
 
-void StoreValue(EditView_Parameters_Typedef * editView_parameters) {
-	WM_HWIN countainer_hwin = WM_GetFirstChild(
-			DefaultViewNavigator.view_container_hWin);
+void StoreValue(EditView_Parameters_Typedef * editView_parameters,
+		WM_HWIN countainer_hwin) {
 	FieldAttribute_Typedef *fieldAttribute =
 			editView_parameters->fieldAttribute
 			+ editView_parameters->currentFieldIndex;
 	GUI_HWIN hEditWin = WM_GetDialogItem(countainer_hwin, GUI_ID_EDIT0);
 
-	if (fieldAttribute->type == stringField) {
+	if (fieldAttribute->valueType == stringField) {
 		EDIT_GetText(hEditWin,
 				*(char**) (editView_parameters->buffer
 						+ fieldAttribute->offsetInStruct),
 				fieldAttribute->maxLength);
-	} else if (fieldAttribute->type == integerField) {
+	} else if (fieldAttribute->valueType == integerField) {
 		*(int*) (editView_parameters->buffer
 				+ fieldAttribute->offsetInStruct) =
 				EDIT_GetValue(hEditWin);
 	}
 }
 
-void LoadValue(EditView_Parameters_Typedef * editView_parameters) {
-	WM_HWIN countainer_hwin = WM_GetFirstChild(
-			DefaultViewNavigator.view_container_hWin);
+void LoadValue(EditView_Parameters_Typedef * editView_parameters,
+		WM_HWIN countainer_hwin) {
+
 	GUI_HWIN hEditWin = WM_GetDialogItem(countainer_hwin, GUI_ID_EDIT0);
 	FieldAttribute_Typedef *fieldAttribute = editView_parameters->fieldAttribute
 			+ editView_parameters->currentFieldIndex;
@@ -133,19 +142,19 @@ void LoadValue(EditView_Parameters_Typedef * editView_parameters) {
 	TEXT_SetText(WM_GetDialogItem(countainer_hwin, GUI_ID_TEXT0),
 			fieldAttribute->display);
 	EDIT_SetMaxLen(hEditWin, fieldAttribute->maxLength);
-	if (fieldAttribute->type == stringField) {
+	if (fieldAttribute->valueType == stringField) {
 		EDIT_SetTextMode(hEditWin);
 		if (!editView_parameters->isNew) {
 			EDIT_SetText(hEditWin,
-					(char *) *(((char *) editView_parameters->editableModel)
+					*(char **) ((char *) editView_parameters->editableModel
 							+ fieldAttribute->offsetInStruct));
 		}
-	} else if (fieldAttribute->type == integerField) {
+	} else if (fieldAttribute->valueType == integerField) {
 		EDIT_SetDecMode(hEditWin, 0, 0, fieldAttribute->maxLength, 0,
 		GUI_EDIT_NORMAL);
 		if (!editView_parameters->isNew) {
 			EDIT_SetValue(hEditWin,
-					(int) *(((char*) editView_parameters->editableModel)
+					*(int *) (((char *) editView_parameters->editableModel)
 							+ fieldAttribute->offsetInStruct));
 		}
 	}
@@ -157,7 +166,7 @@ int CompressEditViewBuffer(EditView_Parameters_Typedef * editView_parameters) {
 	for (int i = 0; i < editView_parameters->fieldCount; i++) {
 		FieldAttribute_Typedef *fieldAttribute =
 				editView_parameters->fieldAttribute + i;
-		if (fieldAttribute->type == stringField) {
+		if (fieldAttribute->valueType == stringField) {
 			char * str = *(char**) (editView_parameters->buffer
 					+ fieldAttribute->offsetInStruct);
 			int len = strlen(str) + 1;

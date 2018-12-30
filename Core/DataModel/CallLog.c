@@ -6,45 +6,30 @@
  */
 #include "CallLog.h"
 
-#define CALLLOG_COMPARATOR(x, y) SGLIB_NUMERIC_COMPARATOR(x->current_item.Time, y->current_item.Time)
+const FieldAttribute_Typedef CallLogFieldsAttribute[CALLLOG_FIELD_COUNT] = { //
+		{ stringField, 0, 4, 20, 0, (const char*) "Number" }, // CallNumber Field
+		{ longField, 4, 8, 0, 0, (const char*) "Date" }, // Date Field
+		{ bitField, 12, 4, 0, 0, (const char*) "Successfulity" }, // IsSuccessfully Field
+		{ bitField, 12, 0, 0, 0, (const char*) "In/Out" }, // IsIncoming Field
 
-#define DISPLAY_CALLLOG(display, callLog) \
-	struct tm *info; \
-	char buffer[40]; \
-	 info = localtime( &(callLog.Time) ); \
-	strftime(buffer,40,"%x - %I:%M%p", info); \
-		sprintf(display, "%s\r\n %.20s",callLog.CallNumber, buffer);
-
-#define DISPLAY_CALLLOG_DETAIL(display, callLog) \
-	struct tm *info; \
-	char buffer[40]; \
-	 info = localtime( &(callLog.Time) ); \
-	strftime(buffer,40,"%c", info); \
-		sprintf(display, "%s\r\n %s",callLog.CallNumber, buffer);
+};
 
 
+CallLog_Typedef * CreateCallLog(char *callNumber, time_t _time,
+		uint32_t isSuccessfully, uint32_t isIncoming) {
+	int callNumberLen = strlen(callNumber);
+	CallLog_Typedef *result = DataAllocator_Alloc(hModelInMemoryAllocator,
+			sizeof(CallLog_Typedef) + callNumberLen + 1);
 
-DATA_ACCESS_LIST_FUNCTIONS(CallLog, CALLLOG_COMPARATOR, DISPLAY_CALLLOG,
-		DISPLAY_CALLLOG_DETAIL)
+	result->CallNumber = ((char*) result + sizeof(CallLog_Typedef));
+	strcpy(result->CallNumber, callNumber);
 
+	result->Time = _time;
+	result->IsIncoming = isIncoming;
+	result->IsSuccessfully = isSuccessfully;
 
-static void AddCallLogEx(char * CallNumber, time_t Time,
-		uint32_t IsSuccessfully, uint32_t IsIncoming);
-
-
-void SeedCallLog() {
-	AddCallLogEx((const char*) "09124575442", 20000, 0, 1);
-	AddCallLogEx((const char*) "09124463992", 30000, 1, 0);
-	AddCallLogEx((const char*) "09127093902", 40000, 0, 0);
-	AddCallLogEx((const char*) "09121015197", 25000, 0, 1);
-	AddCallLogEx((const char*) "-", 35000, 1, 1);
-	AddCallLogEx((const char*) "09354463261", 28000, 1, 0);
+	return result;
 }
-
-static void AddCallLogEx(char * CallNumber, time_t Time,
-		uint32_t IsSuccessfully, uint32_t IsIncoming) {
-	CallLog_Typedef callLog = { 0, pvPortMalloc(strlen(CallNumber)), Time,
-			IsSuccessfully, IsIncoming };
-	strcpy(callLog.CallNumber, CallNumber);
-	AddCallLog(&callLog);
+void FreeCallLog(CallLog_Typedef * callLog) {
+	DataAllocator_Free(hModelInMemoryAllocator, callLog);
 }

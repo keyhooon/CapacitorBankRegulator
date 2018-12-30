@@ -9,9 +9,9 @@
 const FieldAttribute_Typedef MessageFieldsAttribute[MESSAGE_FIELD_COUNT] = { //
 		{ stringField, 0, 4, 256, 1, (const char*) "Content" }, // Content Field
 				{ stringField, 4, 4, 20, 1, (const char*) "Number" }, // CallNumber Field
-				{ longField, 8, 8, 0, 0, (const char*) "Time" }, // CallNumber Field
-				{ bitField, 20, 4, 0, 0, (const char*) "Success" }, // CallNumber Field
-				{ bitField, 20, 0, 0, 0, (const char*) "Incoming" }, // CallNumber Field
+				{ longField, 8, 8, 0, 0, (const char*) "Date" }, // Date Field
+				{ bitField, 20, 4, 0, 0, (const char*) "Successfulity" }, // IsSuccessfully Field
+				{ bitField, 20, 0, 0, 0, (const char*) "In/Out" }, // IsIncoming Field
 		};
 Message_Typedef * CreateMessage(char *content, char *callNumber, time_t _time,
 		uint32_t isSuccessfully, uint32_t isIncoming) {

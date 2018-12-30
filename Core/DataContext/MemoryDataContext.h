@@ -66,6 +66,15 @@ typedef struct {
 			GetSelected##type##Index, \
 	}; \
 	type##_List_Typedef * type##_List; \
+	void Copy##type##Item(char *to, char *from, size_t sz) { \
+		memcpy(to, from, sz); \
+		for (int i = 0; i < TYPE##_FIELD_COUNT; i++)\
+			if (type##FieldsAttribute[i].valueType == stringField)\
+			{ \
+				FieldAttribute_Typedef att = type##FieldsAttribute[i]; \
+				*(char **) (to + att.offsetInStruct) = to - from + *(char **) (from + att.offsetInStruct); \
+			} \
+	} \
 	type##_List_Typedef * Find##type##Item(type##_Typedef *value) { \
 		type##_List_Typedef * _dlp_ ;\
 		  for(_dlp_ = type##_List; ((_dlp_)!=NULL) && (TYPE##_COMPARATOR(_dlp_->value, (*value)) != 0); _dlp_= _dlp_->previous) ;\
@@ -80,7 +89,7 @@ typedef struct {
 			size_t sz = DataAllocator_GetSize(TYPE##_MODEL_DATA_ALLOCATOR,value); \
 			size_t header_sz = sizeof(type##_List_Typedef *) << 1; \
 			type##_List_Typedef * elem = DataAllocator_Alloc(hDataAllocator, sz + header_sz); \
-			memcpy(((char *)elem) + header_sz, value, sz ); \
+			Copy##type##Item(&(elem->value), value, sz); \
 			if (type##_List == NULL) \
 			{ \
 				  (type##_List) = (elem);\
@@ -91,6 +100,7 @@ typedef struct {
 			    (type##_List)->previous = (elem);\
 			    if ((elem)->previous != NULL) (elem)->previous->next = (elem);\
 			} \
+			type##_List = elem; \
 			return 0; \
 		} else\
 			return -1; \
@@ -122,13 +132,13 @@ typedef struct {
 		return 0; \
 	} \
 	int Edit##type(type##_Typedef *oldValue, type##_Typedef *newValue) { \
-		if (Remove##type(oldValue)){ \
-			if (Add##type(newValue))\
-				return 0;\
-			else\
-				Add##type(oldValue);\
+		if (Remove##type(oldValue)) \
+			return -1;\
+		if (Add##type(newValue)) {\
+			Add##type(oldValue);\
+			return -1;\
 		}\
-		return -1;\
+		return 0;\
 	}\
 	int Get##type##Count() { \
 		int _r_ = 0;\
@@ -163,11 +173,11 @@ typedef struct {
 		 return result; \
 	} \
 	void Free##type##DisplayArray(char ** stringArray){\
-		while(* stringArray) { \
-			vPortFree(* stringArray); \
-			stringArray ++; \
-		} \
-		vPortFree(stringArray); \
+		int i = 0; \
+		while (*(stringArray + i)) {\
+			vPortFree(*(stringArray + i++));\
+		}\
+		vPortFree(stringArray);\
 	} \
 	int SetSelected##type##Item(type##_Typedef *value) {\
 		type##_List_Typedef * _dlp_ = Find##type##Item(value);\
@@ -184,7 +194,7 @@ typedef struct {
 			size_t sz = DataAllocator_GetSize(hDataAllocator,type##_List); \
 			size_t header_sz = sizeof(type##_List_Typedef *) << 1; \
 			_dlp_ = DataAllocator_Alloc(TYPE##_MODEL_DATA_ALLOCATOR, sz - header_sz); \
-			memcpy(_dlp_,((char *)type##_List) + header_sz, sz - header_sz ); \
+			Copy##type##Item(_dlp_, ((char *) type##_List) + header_sz, sz - header_sz); \
 			return _dlp_; \
 		} \
 		return NULL; \
@@ -196,7 +206,11 @@ typedef struct {
 		type##_List_Typedef *_dlp_; \
 		for(_dlp_ = type##_List; _dlp_->previous != NULL; _dlp_= _dlp_->previous) ;\
 		for (int i = 0; i < value && _dlp_ != NULL ; i++, _dlp_ = _dlp_->next);\
-		return (_dlp_ == NULL); \
+		if (_dlp_ != NULL) { \
+			type##_List = _dlp_;\
+			return 0;\
+		}\
+		return -1;\
 	}\
 	int GetSelected##type##Index() {\
 		int i = -1; \
