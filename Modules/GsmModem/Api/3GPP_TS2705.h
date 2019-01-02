@@ -31,7 +31,10 @@ extern const CommandType_TypeDef SELECT_MESSAGE_SERVICE;
 
 
 #define GSM_DELETE_SMS_MESSAGE()
-#define GSM_SELECT_SMS_MESSAGE_FORMAT()
+#define GSM_SELECT_SMS_MESSAGE_FORMAT(value)	{ \
+		char num[2] = {value + '0',0}; \
+		Gsm_ExecuteCommand(SELECT_SMS_MESSAGE_FORMAT, Write, num); \
+}
 #define GSM_LIST_SMS_MESSAGE_FROM_PREFERRED_STORE()
 #define GSM_READ_SMS_MESSAGE()
 #define GSM_SEND_SMS_MESSAGE()

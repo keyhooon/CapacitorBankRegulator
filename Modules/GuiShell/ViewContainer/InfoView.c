@@ -23,7 +23,7 @@ static GUI_HWIN InfoViewShow(void * parameters) {
 	GUI_ID_USER, NULL);
 	char temp[33];
 	((InfoView_Parameters_Typedef *) parameters)->apiHandlers->GetDisplay(temp);
-	TEXT_Handle text_hwin = TEXT_CreateEx(0, 0, 128, 115, hwin, WM_CF_SHOW, 0,
+	TEXT_Handle text_hwin = TEXT_CreateEx(5, 5, 118, 105, hwin, WM_CF_SHOW, 0,
 	GUI_ID_TEXT0, temp);
 	TEXT_SetFont(text_hwin, &GUI_Font8x10_ASCII);
 	TEXT_SetWrapMode(text_hwin, GUI_WRAPMODE_WORD);

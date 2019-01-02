@@ -156,7 +156,9 @@ static void okCallback(void) {
 	case 1:
 		InitMessageView();
 		break;
-	break;
+	case 2:
+		InitCallLogView();
+		break;
 	default:
 		break;
 	}

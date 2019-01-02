@@ -14,6 +14,7 @@
 #include "ViewContainer/ViewNavigator.h"
 #include "ContactListContext.h"
 #include "MessageListContext.h"
+#include "CallLogListContext.h"
 
 
 osThreadId guiTaskHandle;
@@ -55,6 +56,7 @@ void GuiShell_init() {
 void GUI_Main(void const * argument) {
 	SeedContact();
 	SeedMessage();
+	SeedCallLog();
 	/* Init the STemWin GUI Library */
 	GUI_Init();
 	/* Activate the use of memory device feature */
@@ -123,11 +125,11 @@ static void _cbHeading(WM_MESSAGE * pMsg) {
 		break;
 	case WM_TIMER:
 
-//		GSM_Battery_Charge(&batteryChargeStatus, &battryLevel)
-//
-//		GSM_Signal_Quality_Report(&signalQuality)
+		GSM_Battery_Charge(&batteryChargeStatus, &battryLevel)
+
+		GSM_Signal_Quality_Report(&signalQuality)
 		WM_InvalidateWindow(hWin);
-		WM_RestartTimer(pMsg->Data.v, 10000);
+		WM_RestartTimer(pMsg->Data.v, 5000);
 		break;
 	case WM_PAINT:
 

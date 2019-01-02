@@ -5,76 +5,67 @@
  *      Author: HP
  */
 
-#include <Api/3GPP_TS2707.h>
+#include <Api/3GPP_TS2705.h>
 #include "cmsis_os.h"
 #include "sglib.h"
 #include "Gsm.h"
 #include "Api/V25TER.h"
 #include "Message.h"
 
-void ClccReceivedCallback(char* ClccReceivedToken);
-void UnsolicitedResultCallback(Response_TypeDef response);
-void ClccReceivedHandler(char* ClccReceivedToken);
+char* messageStorageType[5] = {
+SIM_MESSAGE_STORAGE, PHONE_MESSAGE_STORAGE, SM_MESSAGE_STORAGE_PREFERRED,
+		ME_MESSAGE_STORAGE_PREFERRED, SM_ME_MESSAGE_STORAGE };
 
-const char *callStateTextList[7] = { "Active", "Held", "Dialing", "Alerting",
-		"Incoming", "Waiting", "Disconnect" };
+void CmtiReceivedCallback(char* CmtiReceivedToken);
+void OnMessageReceived();
 
-//CommandExecuter_TypeDef *commandExecuter;
+osThreadId MessageThreadId;
 
-osThreadId CallThreadId;
-CallInfo_Typedef call;
-ResponseReceivedCallbackList_typedef ClccCallback = { "+CLCC",
-		ClccReceivedCallback, 0 };
+ResponseReceivedCallbackList_typedef CmtiCallback = { "+CMTI",
+		CmtiReceivedCallback, 0 };
 
-void Call_Main(void * arg);
+void Message_Main(void * arg);
 
-void Call_init(CommandExecuter_TypeDef *GsmCommandExecuter) {
-	osThreadDef(callTask, Call_Main, osPriorityNormal, 1, 256);
-	CallThreadId = osThreadCreate(osThread(callTask), GsmCommandExecuter);
+void Message_init(CommandExecuter_TypeDef *GsmCommandExecuter) {
+	osThreadDef(messageTask, Message_Main, osPriorityNormal, 1, 128);
+	MessageThreadId = osThreadCreate(osThread(messageTask), GsmCommandExecuter);
 }
-void Call_Main(void * arg) {
+void Message_Main(void * arg) {
 	CommandExecuter_TypeDef *GsmCommandExecuter = arg;
-	ClccCallback.next = GsmCommandExecuter->responseReceivedCallbacks;
-	GsmCommandExecuter->responseReceivedCallbacks = &ClccCallback;
-	GsmCommandExecuter->UnsolicitedResultCode = UnsolicitedResultCallback;
-	GSM_TA_RESPONSE_FORMAT(0);
-	GSM_SET_COMMAND_ECHO_MODE(0);
-	GSM_List_Current_Calls_ME(1);
+	CmtiCallback.next = GsmCommandExecuter->responseReceivedCallbacks;
+	GsmCommandExecuter->responseReceivedCallbacks = &CmtiCallback;
 
+	GSM_SELECT_SMS_MESSAGE_FORMAT(1);
 	while (1) {
 		osEvent event;
-		CallInfo_Typedef *call;
+		MessageInfo_Typedef messageInfo;
 		xTaskNotifyWait(0x00, /* Don't clear any notification bits on entry. */
 		0xffffffff, /* Reset the notification value to 0 on exit. */
-		&call, /* Notified value pass out in ulNotifiedValue. */
+		&messageInfo, /* Notified value pass out in ulNotifiedValue. */
 		portMAX_DELAY); /* Block indefinitely. */
-		if (call == NULL)
-			OnRing();
-		else {
-			OnCallStateChanged(call);
-		}
+		OnMessageReceived();
+
 	}
 
 }
 
-void ClccReceivedCallback(char* ClccReceivedToken) {
-	call.state = (ClccReceivedToken[11] - '0');
-	strtok(ClccReceivedToken, "\"");
-	strcpy(call.number, strtok(0, "\""));
-	strtok(0, "\"");
-	strcpy(call.Name, strtok(0, "\""));
-	xTaskNotify(CallThreadId, &call, eSetValueWithoutOverwrite);
+void CmtiReceivedCallback(char* CmtiReceivedToken) {
+	MessageInfo_Typedef messageInfo;
+	strtok(CmtiReceivedToken, "\"");
+	char* messageStorage = strtok(0, "\"");
+	for (int i = 0; i < 5; i++)
+		if (strcmp(messageStorageType[i], messageStorage) == 0) {
+			messageInfo.messageStorageindex = i;
+			break;
+		}
+	strtok(0, ",");
+	messageInfo.messageStorageindex = atoi(strtok(0, " "));
+	xTaskNotify(MessageThreadId, &messageInfo, eSetValueWithoutOverwrite);
 
 }
 
-void UnsolicitedResultCallback(Response_TypeDef response) {
-	if (response.resultNumber == 2)
-		xTaskNotify(CallThreadId, NULL, eSetValueWithoutOverwrite);
-}
-__weak void OnRing(void) {
 
-}
-__weak void OnCallStateChanged(CallInfo_Typedef * callInfo) {
+__weak void OnMessageReceived() {
 
 }
 

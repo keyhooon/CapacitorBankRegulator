@@ -216,7 +216,7 @@ void BSP_Config(void) {
 
 static void Module_Config(void) {
 
-//	Gsm_Init();
+	Gsm_Init();
 
 	GuiShell_init();
 
