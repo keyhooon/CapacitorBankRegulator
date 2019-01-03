@@ -6,23 +6,25 @@
  */
 
 #include <Api/3GPP_TS2705.h>
+#include <App/MessageHandler.h>
+#include "Message.h"
 #include "cmsis_os.h"
 #include "sglib.h"
 #include "Gsm.h"
 #include "Api/V25TER.h"
-#include "Message.h"
+#include "time.h"
 
 char* messageStorageType[5] = {
 SIM_MESSAGE_STORAGE, PHONE_MESSAGE_STORAGE, SM_MESSAGE_STORAGE_PREFERRED,
 		ME_MESSAGE_STORAGE_PREFERRED, SM_ME_MESSAGE_STORAGE };
 
-void CmtiReceivedCallback(char* CmtiReceivedToken);
+void CmtReceivedCallback(char* CmtReceivedToken);
 void OnMessageReceived();
 
 osThreadId MessageThreadId;
 
-ResponseReceivedCallbackList_typedef CmtiCallback = { "+CMTI",
-		CmtiReceivedCallback, 0 };
+ResponseReceivedCallbackList_typedef CmtCallback = { "+CMT",
+		CmtReceivedCallback, 0 };
 
 void Message_Main(void * arg);
 
@@ -32,10 +34,12 @@ void Message_init(CommandExecuter_TypeDef *GsmCommandExecuter) {
 }
 void Message_Main(void * arg) {
 	CommandExecuter_TypeDef *GsmCommandExecuter = arg;
-	CmtiCallback.next = GsmCommandExecuter->responseReceivedCallbacks;
-	GsmCommandExecuter->responseReceivedCallbacks = &CmtiCallback;
+	CmtCallback.next = GsmCommandExecuter->responseReceivedCallbacks;
+	GsmCommandExecuter->responseReceivedCallbacks = &CmtCallback;
 
 	GSM_SELECT_SMS_MESSAGE_FORMAT(1);
+	GSM_NEW_SMS_MESSAGE_INDICATION(2);
+
 	while (1) {
 		osEvent event;
 		MessageInfo_Typedef messageInfo;
@@ -49,19 +53,19 @@ void Message_Main(void * arg) {
 
 }
 
-void CmtiReceivedCallback(char* CmtiReceivedToken) {
-	MessageInfo_Typedef messageInfo;
-	strtok(CmtiReceivedToken, "\"");
-	char* messageStorage = strtok(0, "\"");
-	for (int i = 0; i < 5; i++)
-		if (strcmp(messageStorageType[i], messageStorage) == 0) {
-			messageInfo.messageStorageindex = i;
-			break;
-		}
-	strtok(0, ",");
-	messageInfo.messageStorageindex = atoi(strtok(0, " "));
-	xTaskNotify(MessageThreadId, &messageInfo, eSetValueWithoutOverwrite);
-
+void CmtReceivedCallback(char* CmtReceivedToken) {
+	Message_Typedef message;
+	struct tm tm;
+	time_t t;
+	strtok_r(CmtReceivedToken, "\"", &CmtReceivedToken);
+	char* callNumber = strtok_r(CmtReceivedToken, "\"", &CmtReceivedToken);
+	strtok_r(CmtReceivedToken, "\"", &CmtReceivedToken);
+	char* name = strtok_r(CmtReceivedToken, "\"", &CmtReceivedToken);
+	strtok_r(CmtReceivedToken, "\"", &CmtReceivedToken);
+	strptime(strtok_r(CmtReceivedToken, "\"", &CmtReceivedToken),
+			"%y/%m/%d,%H:%M:%S", &tm);
+	t = mktime(&tm);
+	AddMessageEx(CmtReceivedToken, callNumber, t, 1, 1);
 }
 
 

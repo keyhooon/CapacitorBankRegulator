@@ -5,8 +5,8 @@
  *      Author: HP
  */
 
-#ifndef GSMMODEM_APP_CALL_H_
-#define GSMMODEM_APP_CALL_H_
+#ifndef GSMMODEM_APP_CALLHANDLER_H_
+#define GSMMODEM_APP_CALLHANDLER_H_
 
 #include "Executer/AtCommandExecuter.h"
 
@@ -44,4 +44,4 @@ extern const char *callStateTextList[7];
 void OnCallStateChanged(CallInfo_Typedef *);
 void OnRing(void);
 void Call_init(CommandExecuter_TypeDef *GsmCommandExecuter);
-#endif /* GSMMODEM_APP_CALL_H_ */
+#endif /* GSMMODEM_APP_CALLHANDLER_H_ */

@@ -54,9 +54,6 @@ void GuiShell_init() {
 
 
 void GUI_Main(void const * argument) {
-	SeedContact();
-	SeedMessage();
-	SeedCallLog();
 	/* Init the STemWin GUI Library */
 	GUI_Init();
 	/* Activate the use of memory device feature */

@@ -128,7 +128,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="ViewContainer/InfoView.c|ViewContainer/NotificationView.c|SmallWindow/C/ContactListManualDialDLG.c|Src/tim.c|SmallWindow/C/ContactOptionDLG.c|SmallWindow/C/ContactListDLG.c|ViewContainer/EditView.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
+						<entry excluding="DataContext/MessageListSimContext.c|ViewContainer/InfoView.c|ViewContainer/NotificationView.c|SmallWindow/C/ContactListManualDialDLG.c|Src/tim.c|SmallWindow/C/ContactOptionDLG.c|SmallWindow/C/ContactListDLG.c|ViewContainer/EditView.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="DataStructure"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
 						<entry excluding="STemWin/Config/GUI_X.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
@@ -253,7 +253,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="ViewContainer/InfoView.c|ViewContainer/NotificationView.c|SmallWindow/C/ContactListManualDialDLG.c|Src/tim.c|SmallWindow/C/ContactOptionDLG.c|SmallWindow/C/ContactListDLG.c|ViewContainer/EditView.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
+						<entry excluding="DataContext/MessageListSimContext.c|ViewContainer/InfoView.c|ViewContainer/NotificationView.c|SmallWindow/C/ContactListManualDialDLG.c|Src/tim.c|SmallWindow/C/ContactOptionDLG.c|SmallWindow/C/ContactListDLG.c|ViewContainer/EditView.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="DataStructure"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
 						<entry excluding="STemWin/Config/GUI_X.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>

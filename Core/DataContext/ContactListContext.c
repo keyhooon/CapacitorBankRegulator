@@ -211,6 +211,7 @@ void SeedContact() {
 			(const char*) "09121143144");
 	AddContactEx((const char*) "shima shademan",
 			(const char*) "09354463261");
+	AddContactEx((const char*) "farzin farahani", (const char*) "09379916544");
 }
 
 void AddContactEx(char * Name, char * CallNumber) {

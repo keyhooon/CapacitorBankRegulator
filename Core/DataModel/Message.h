@@ -20,7 +20,7 @@
 
 #define MESSAGE_MODEL_DATA_ALLOCATOR			hModelInMemoryAllocator
 
-#define MESSAGE_FIELD_COUNT						5
+#define MESSAGE_FIELD_COUNT						6
 
 
 
@@ -31,7 +31,8 @@ typedef struct {
 	time_t Time;
 	uint32_t IsSuccessfully :1;
 	uint32_t IsIncoming :1;
-	uint32_t Reserved1 :24;
+	uint32_t IsRead :1;
+	uint32_t Reserved1 :29;
 } Message_Typedef;
 
 extern const FieldAttribute_Typedef MessageFieldsAttribute[MESSAGE_FIELD_COUNT];

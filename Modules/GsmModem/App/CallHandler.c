@@ -6,7 +6,7 @@
  */
 
 #include <Api/3GPP_TS2707.h>
-#include "App/Call.h"
+#include <App/CallHandler.h>
 #include "cmsis_os.h"
 #include "sglib.h"
 #include "Gsm.h"

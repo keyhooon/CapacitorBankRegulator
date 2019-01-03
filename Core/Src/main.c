@@ -119,11 +119,15 @@ int main(void)
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
+	DataManagement_Config();
+
+	SeedContact();
+	SeedMessage();
+	SeedCallLog();
+
 	MX_FREERTOS_Init();
 
 	Module_Config();
-
-	DataManagement_Config();
 
   /* Start scheduler */
 	osKernelStart();
