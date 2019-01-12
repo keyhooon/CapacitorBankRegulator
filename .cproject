@@ -33,12 +33,13 @@
 								<option defaultValue="gnu.c.optimization.level.none" id="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level.1426894358" name="Optimization Level" superClass="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" value="fr.ac6.managedbuild.gnu.c.optimization.level.debug" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.159713254" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.391949687" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="../Service"/>
 									<listOptionValue builtIn="false" value="../DataStructure"/>
 									<listOptionValue builtIn="false" value="../Core/Inc"/>
 									<listOptionValue builtIn="false" value="../Core/DataModel"/>
 									<listOptionValue builtIn="false" value="../Core/DataManager"/>
 									<listOptionValue builtIn="false" value="../Core/DataContext"/>
-									<listOptionValue builtIn="false" value="../Core/ViewContainer"/>
+									<listOptionValue builtIn="false" value="../Modules/GuiShell/"/>
 									<listOptionValue builtIn="false" value="../Middlewares/STemWin/inc"/>
 									<listOptionValue builtIn="false" value="../Middlewares/STemWin/Config"/>
 									<listOptionValue builtIn="false" value="../Drivers/BSP/Board"/>
@@ -55,8 +56,9 @@
 									<listOptionValue builtIn="false" value="../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS"/>
 									<listOptionValue builtIn="false" value="../Modules/Keypad"/>
 									<listOptionValue builtIn="false" value="../Modules/GsmModem"/>
-									<listOptionValue builtIn="false" value="../Modules/GuiShell"/>
+									<listOptionValue builtIn="false" value="../Modules/GuiShell/ViewContainer"/>
 									<listOptionValue builtIn="false" value="../Modules/LedStatus"/>
+									<listOptionValue builtIn="false" value="../Modules/App"/>
 								</option>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1508651757" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__weak=__attribute__((weak))"/>
@@ -128,11 +130,12 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="DataContext/MessageListSimContext.c|ViewContainer/InfoView.c|ViewContainer/NotificationView.c|SmallWindow/C/ContactListManualDialDLG.c|Src/tim.c|SmallWindow/C/ContactOptionDLG.c|SmallWindow/C/ContactListDLG.c|ViewContainer/EditView.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
+						<entry excluding="ViewContainer/InfoView.c|ViewContainer/NotificationView.c|SmallWindow/C/ContactListManualDialDLG.c|Src/tim.c|DataContext/MessageListSimContext.c|SmallWindow/C/ContactOptionDLG.c|SmallWindow/C/ContactListDLG.c|ViewContainer/EditView.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="DataStructure"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
 						<entry excluding="STemWin/Config/GUI_X.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Modules"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Service"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="USB_DEVICE"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="startup"/>
 					</sourceEntries>
@@ -253,11 +256,12 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="DataContext/MessageListSimContext.c|ViewContainer/InfoView.c|ViewContainer/NotificationView.c|SmallWindow/C/ContactListManualDialDLG.c|Src/tim.c|SmallWindow/C/ContactOptionDLG.c|SmallWindow/C/ContactListDLG.c|ViewContainer/EditView.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
+						<entry excluding="ViewContainer/InfoView.c|ViewContainer/NotificationView.c|SmallWindow/C/ContactListManualDialDLG.c|Src/tim.c|DataContext/MessageListSimContext.c|SmallWindow/C/ContactOptionDLG.c|SmallWindow/C/ContactListDLG.c|ViewContainer/EditView.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="DataStructure"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
 						<entry excluding="STemWin/Config/GUI_X.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Modules"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Service"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="USB_DEVICE"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="startup"/>
 					</sourceEntries>

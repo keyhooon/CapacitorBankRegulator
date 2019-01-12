@@ -9,7 +9,7 @@
 #define GSMMODEM_APP_CALLHANDLER_H_
 
 #include "Executer/AtCommandExecuter.h"
-
+#include "time.h"
 
 
 
@@ -36,6 +36,8 @@ typedef struct {
 	CallState_Typedef state;
 	char number[20];
 	char Name[16];
+	time_t start;
+	time_t end;
 } CallInfo_Typedef;
 
 

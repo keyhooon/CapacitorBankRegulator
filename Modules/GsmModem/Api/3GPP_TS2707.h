@@ -12,6 +12,7 @@
 #include "Gsm.h"
 #include "stdlib.h"
 #include "string.h"
+#include "time.h"
 
 extern const CommandType_TypeDef Accumulated_Call_Meter_Reset_or_Query;
 extern const CommandType_TypeDef Accumulated_Call_Meter_Maximum_Set_or_Query;
@@ -119,7 +120,11 @@ extern const CommandType_TypeDef Supplementary_Services_Notification;
 #define GSM_Preferred_Operator_List()
 #define GSM_Read_Operator_Names()
 #define GSM_Set_Phone_Functionality()
-#define GSM_Clock()
+#define GSM_Clock(time) {\
+		char temp[22]; \
+		Gsm_ExecuteCommand_Ex(Clock, Read, NULL, temp); \
+		strptime(temp,"%y/%m/%d,%T%z",time); \
+}
 #define GSM_Generic_SIM_Access()
 #define GSM_Alert_Sound_Mode()
 #define GSM_Alert_Sound_Select()

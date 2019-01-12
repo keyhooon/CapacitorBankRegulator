@@ -61,6 +61,7 @@
 #include <keypad.h>
 #include <GUI.h>
 #include <LedStatus.h>
+#include "MyApp.h"
 
 
 /* Private variables ---------------------------------------------------------*/
@@ -126,6 +127,8 @@ int main(void)
 	SeedCallLog();
 
 	MX_FREERTOS_Init();
+
+	DateService_Init();
 
 	Module_Config();
 
@@ -219,6 +222,8 @@ void BSP_Config(void) {
 }
 
 static void Module_Config(void) {
+
+	App_Init();
 
 	Gsm_Init();
 

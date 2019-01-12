@@ -65,10 +65,6 @@
 
 /* Variables -----------------------------------------------------------------*/
 
-osThreadId CalculateTaskHandle;
-
-osSemaphoreId CalculateNeededSemHandle;
-
 /* USER CODE BEGIN Variables */
 
 /* USER CODE END Variables */

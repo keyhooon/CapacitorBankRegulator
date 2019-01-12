@@ -75,7 +75,6 @@ void CommandExecuter_Task(void const * argument) {
 						;
 					if (p != NULL && p->ResponseReceivedCallback)
 						p->ResponseReceivedCallback(responseToken);
-
 				}
 
 				if (response.status == ResponseStatusOk) {
@@ -91,7 +90,6 @@ void CommandExecuter_Task(void const * argument) {
 				} else {
 					CommandTokenizer_FreeTokenList(response.Tokens);
 				}
-
 				if (event.value.v == 0)
 					response.Tokens.Items = NULL;
 				else

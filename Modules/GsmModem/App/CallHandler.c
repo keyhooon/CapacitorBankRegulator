@@ -21,7 +21,7 @@ const char *callStateTextList[7] = {"Active","Held","Dialing","Alerting", "Incom
 //CommandExecuter_TypeDef *commandExecuter;
 
 osThreadId CallThreadId;
-CallInfo_Typedef call;
+
 ResponseReceivedCallbackList_typedef ClccCallback = { "+CLCC",
 		ClccReceivedCallback, 0 };
 
@@ -50,19 +50,38 @@ void Call_Main(void * arg) {
 		if (call == NULL)
 			OnRing();
 		else {
+			switch (call->state) {
+			case Incoming:
+
+				break;
+			case Dialing:
+
+				break;
+			case Alerting:
+
+				break;
+			case Disconnect:
+
+				break;
+			default:
+
+				break;
+			}
 			OnCallStateChanged(call);
 		}
+		vPortFree(call);
 	}
 
 }
 
 void ClccReceivedCallback(char* ClccReceivedToken) {
-	call.state = (ClccReceivedToken[11] - '0');
+	CallInfo_Typedef *call = pvPortMalloc(sizeof(CallInfo_Typedef));
+	call->state = (ClccReceivedToken[11] - '0');
 	strtok(ClccReceivedToken, "\"");
-	strcpy(call.number, strtok(0, "\""));
+	strcpy(call->number, strtok(0, "\""));
 	strtok(0, "\"");
-	strcpy(call.Name, strtok(0, "\""));
-	xTaskNotify(CallThreadId, &call, eSetValueWithoutOverwrite);
+	strcpy(call->Name, strtok(0, "\""));
+	xTaskNotify(CallThreadId, call, eSetValueWithoutOverwrite);
 
 }
 
