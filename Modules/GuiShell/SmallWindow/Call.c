@@ -5,12 +5,12 @@
  *      Author: keyhooon
  */
 
-#include <App/CallHandler.h>
 #include "viewcontainer/ViewNavigator.h"
 #include "Api/V25TER.h"
 #include "Contact.h"
 #include "WM.h"
 #include <GUI.h>
+#include <Handler/CallHandler.h>
 
 typedef struct {
 	char Number[12];
@@ -136,10 +136,10 @@ void OnCallStateChanged(CallInfo_Typedef * callInfo) {
 	if (hWin) {
 		TEXT_SetText(WM_GetDialogItem(hWin, GUI_ID_TEXT0),
 				callStateTextList[callInfo->state]);
-		if (callInfo->Name == NULL)
+		if (callInfo->name == NULL)
 			TEXT_SetText(WM_GetDialogItem(hWin, GUI_ID_TEXT1),
 					callInfo->number);
 		else
-			TEXT_SetText(WM_GetDialogItem(hWin, GUI_ID_TEXT1), callInfo->Name);
+			TEXT_SetText(WM_GetDialogItem(hWin, GUI_ID_TEXT1), callInfo->name);
 	}
 }

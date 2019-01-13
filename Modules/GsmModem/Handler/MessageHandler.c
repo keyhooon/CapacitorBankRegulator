@@ -6,7 +6,7 @@
  */
 
 #include <Api/3GPP_TS2705.h>
-#include <App/MessageHandler.h>
+#include <Handler/MessageHandler.h>
 #include "Message.h"
 #include "cmsis_os.h"
 #include "sglib.h"

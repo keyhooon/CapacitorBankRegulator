@@ -5,8 +5,8 @@
  *      Author: HP
  */
 
-#ifndef GSMMODEM_APP_CALLHANDLER_H_
-#define GSMMODEM_APP_CALLHANDLER_H_
+#ifndef GSMMODEM_HANDLER_CALLHANDLER_H_
+#define GSMMODEM_HANDLER_CALLHANDLER_H_
 
 #include "Executer/AtCommandExecuter.h"
 #include "time.h"
@@ -35,9 +35,8 @@ typedef enum {
 typedef struct {
 	CallState_Typedef state;
 	char number[20];
-	char Name[16];
+	char name[16];
 	time_t start;
-	time_t end;
 } CallInfo_Typedef;
 
 
@@ -46,4 +45,4 @@ extern const char *callStateTextList[7];
 void OnCallStateChanged(CallInfo_Typedef *);
 void OnRing(void);
 void Call_init(CommandExecuter_TypeDef *GsmCommandExecuter);
-#endif /* GSMMODEM_APP_CALLHANDLER_H_ */
+#endif /* GSMMODEM_HANDLER_CALLHANDLER_H_ */

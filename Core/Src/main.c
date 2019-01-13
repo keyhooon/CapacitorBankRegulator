@@ -200,6 +200,8 @@ void SystemClock_Config(void)
     _Error_Handler(__FILE__, __LINE__);
   }
 
+	__HAL_RCC_RTC_ENABLE();
+
     /**Configure the Systick interrupt time
     */
   HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
@@ -223,8 +225,6 @@ void BSP_Config(void) {
 
 static void Module_Config(void) {
 
-	App_Init();
-
 	Gsm_Init();
 
 	GuiShell_init();
@@ -232,6 +232,8 @@ static void Module_Config(void) {
 	Keypad_Init();
 
 	LedStatus_Init();
+
+	App_Init();
 }
 
 static void DataManagement_Config(void) {

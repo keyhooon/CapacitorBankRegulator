@@ -36,7 +36,7 @@ void DateService_Config(struct tm _tm) {
 	/*##-1- Configure the Date #################################################*/
 	/* Set Date: Tuesday February 18th 2014 */
 	sdatestructure.Year = _tm.tm_year - 100;
-	sdatestructure.Month = _tm.tm_mon + 1;
+	sdatestructure.Month = _tm.tm_mon;
 	sdatestructure.Date = _tm.tm_mday;
 
 	if (HAL_RTC_SetDate(&RtcHandle, &sdatestructure, RTC_FORMAT_BIN)
@@ -68,15 +68,15 @@ void DateService_Config(struct tm _tm) {
  * @retval None
  */
 void DateService_Get(struct tm * _tm) {
-	RTC_DateTypeDef *sdatestructureget;
-	RTC_TimeTypeDef *stimestructureget;
+	RTC_DateTypeDef sdatestructure;
+	RTC_TimeTypeDef stimestructure;
 	/* Get the RTC current Time */
-	HAL_RTC_GetTime(&RtcHandle, stimestructureget, RTC_FORMAT_BIN);
+	HAL_RTC_GetTime(&RtcHandle, &stimestructure, RTC_FORMAT_BIN);
 	/* Get the RTC current Date */
-	HAL_RTC_GetDate(&RtcHandle, sdatestructureget, RTC_FORMAT_BIN);
-	_tm.tm_year = sdatestructure.Year + 30;
-	sdatestructure.Month = _tm.tm_mon + 1;
-	sdatestructure.Date = _tm.tm_mday;
+	HAL_RTC_GetDate(&RtcHandle, &sdatestructure, RTC_FORMAT_BIN);
+	_tm->tm_year = sdatestructure.Year + 100;
+	_tm->tm_mon = sdatestructure.Month;
+	_tm->tm_mday = sdatestructure.Date;
 
 	if (HAL_RTC_SetDate(&RtcHandle, &sdatestructure, RTC_FORMAT_BIN)
 			!= HAL_OK) {
@@ -86,7 +86,7 @@ void DateService_Get(struct tm * _tm) {
 
 	/*##-2- Configure the Time #################################################*/
 	/* Set Time: 02:00:00 */
-	stimestructure.Hours = _tm.tm_hour;
-	stimestructure.Minutes = _tm.tm_min;
-	stimestructure.Seconds = _tm.tm_sec;
+	_tm->tm_hour = stimestructure.Hours;
+	_tm->tm_min = stimestructure.Minutes;
+	_tm->tm_sec = stimestructure.Seconds;
 }

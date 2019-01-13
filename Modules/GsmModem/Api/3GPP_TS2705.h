@@ -42,7 +42,7 @@ extern const CommandType_TypeDef SELECT_MESSAGE_SERVICE;
 #define GSM_SEND_SMS_MESSAGE_FROM_STORAGE()
 #define GSM_NEW_SMS_MESSAGE_INDICATION(value)	{ \
 		char num[3] = {'2', value + '0',0}; \
-		Gsm_ExecuteCommand(SELECT_SMS_MESSAGE_FORMAT, Write, num); \
+		Gsm_ExecuteCommand(NEW_SMS_MESSAGE_INDICATION, Write, num); \
 }
 #define GSM_PREFERRED_SMS_MESSAGE_STORAGE()
 #define GSM_RESTORE_SMS_SETTINGS()

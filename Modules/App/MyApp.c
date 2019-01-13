@@ -14,16 +14,17 @@ osThreadId AppTaskHandle;
 
 void App_Main(void const * argument) {
 
-	if (DATE_SERVICE_ISVALID) {
+//	if (DATE_SERVICE_ISVALID) {
 		struct tm _tm;
 		GSM_Clock(&_tm);
 		DateService_Config(_tm);
-	} else {
-		/* Clear source Reset Flag */
-		__HAL_RCC_CLEAR_RESET_FLAGS();
-	}
+//	} else {
+//		/* Clear source Reset Flag */
+//		__HAL_RCC_CLEAR_RESET_FLAGS();
+//	}
 
 	for (;;) {
+		osDelay(100);
 	}
 }
 void App_Init(void) {

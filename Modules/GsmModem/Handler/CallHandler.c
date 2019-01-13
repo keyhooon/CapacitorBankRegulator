@@ -5,12 +5,15 @@
  *      Author: HP
  */
 
-#include <Api/3GPP_TS2707.h>
-#include <App/CallHandler.h>
-#include "cmsis_os.h"
-#include "sglib.h"
 #include "Gsm.h"
 #include "Api/V25TER.h"
+#include <Api/3GPP_TS2707.h>
+#include <Handler/CallHandler.h>
+#include "cmsis_os.h"
+
+#include "DateService.h"
+#include "CallLogListContext.h"
+
 
 void ClccReceivedCallback(char* ClccReceivedToken);
 void UnsolicitedResultCallback(Response_TypeDef response);
@@ -32,6 +35,7 @@ void Call_init(CommandExecuter_TypeDef *GsmCommandExecuter) {
 	CallThreadId = osThreadCreate(osThread(callTask), GsmCommandExecuter);
 }
 void Call_Main(void * arg) {
+	CallLog_Typedef *callLog;
 	CommandExecuter_TypeDef *GsmCommandExecuter = arg;
 	ClccCallback.next = GsmCommandExecuter->responseReceivedCallbacks;
 	GsmCommandExecuter->responseReceivedCallbacks = &ClccCallback;
@@ -42,47 +46,53 @@ void Call_Main(void * arg) {
 
 	while (1) {
 		osEvent event;
-		CallInfo_Typedef *call;
+		CallInfo_Typedef *callInfo;
 		xTaskNotifyWait(0x00, /* Don't clear any notification bits on entry. */
 		0xffffffff, /* Reset the notification value to 0 on exit. */
-		&call, /* Notified value pass out in ulNotifiedValue. */
+		&callInfo, /* Notified value pass out in ulNotifiedValue. */
 		portMAX_DELAY); /* Block indefinitely. */
-		if (call == NULL)
+		if (callInfo == NULL)
 			OnRing();
 		else {
-			switch (call->state) {
+			struct tm _tm;
+			switch (callInfo->state) {
+			case Active:
+				callLog->IsSuccessfully = 1;
+				break;
 			case Incoming:
-
+				DateService_Get(&_tm);
+				callLog = CreateCallLog(callInfo->number, mktime(&_tm), 0, 1);
 				break;
 			case Dialing:
 
 				break;
 			case Alerting:
-
+				DateService_Get(&_tm);
+				callLog = CreateCallLog(callInfo->number, mktime(&_tm), 0, 0);
 				break;
 			case Disconnect:
-
+				AddCallLog(callLog);
+				FreeCallLog(callLog);
 				break;
 			default:
 
 				break;
 			}
-			OnCallStateChanged(call);
+			OnCallStateChanged(callInfo);
 		}
-		vPortFree(call);
+		vPortFree(callInfo);
 	}
 
 }
 
 void ClccReceivedCallback(char* ClccReceivedToken) {
-	CallInfo_Typedef *call = pvPortMalloc(sizeof(CallInfo_Typedef));
-	call->state = (ClccReceivedToken[11] - '0');
+	CallInfo_Typedef *callInfo = pvPortMalloc(sizeof(CallInfo_Typedef));
+	callInfo->state = (ClccReceivedToken[11] - '0');
 	strtok(ClccReceivedToken, "\"");
-	strcpy(call->number, strtok(0, "\""));
+	strcpy(callInfo->number, strtok(0, "\""));
 	strtok(0, "\"");
-	strcpy(call->Name, strtok(0, "\""));
-	xTaskNotify(CallThreadId, call, eSetValueWithoutOverwrite);
-
+	strcpy(callInfo->name, strtok(0, "\""));
+	xTaskNotify(CallThreadId, callInfo, eSetValueWithoutOverwrite);
 }
 
 void UnsolicitedResultCallback(Response_TypeDef response) {

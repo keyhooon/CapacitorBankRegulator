@@ -121,9 +121,17 @@ extern const CommandType_TypeDef Supplementary_Services_Notification;
 #define GSM_Read_Operator_Names()
 #define GSM_Set_Phone_Functionality()
 #define GSM_Clock(time) {\
-		char temp[22]; \
+		char temp[25]; \
+		char * p; \
 		Gsm_ExecuteCommand_Ex(Clock, Read, NULL, temp); \
-		strptime(temp,"%y/%m/%d,%T%z",time); \
+		strtok(temp,"\""); \
+		p = strtok(0,"\""); \
+		(time)->tm_year = (p[0] - '0') * 10 + (p[1] - '0') + 100; \
+		(time)->tm_mon = (p[3] - '0') * 10 + (p[4] - '0'); \
+		(time)->tm_mday = (p[6] - '0') * 10 + (p[7] - '0'); \
+		(time)->tm_hour = (p[9] - '0') * 10 + (p[10] - '0'); \
+		(time)->tm_min = (p[12] - '0') * 10 + (p[13] - '0'); \
+		(time)->tm_sec = (p[15] - '0') * 10 + (p[16] - '0'); \
 }
 #define GSM_Generic_SIM_Access()
 #define GSM_Alert_Sound_Mode()

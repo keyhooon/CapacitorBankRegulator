@@ -33,6 +33,8 @@
 
 #define CALLLOG_FIELD_COUNT						4
 
+#define CALL_NUMBER_MAX_COUNT					20
+
 
 typedef struct {
 	char * CallNumber;
@@ -41,6 +43,14 @@ typedef struct {
 	uint32_t IsIncoming :1;
 	uint32_t Reserved1 :24;
 } CallLog_Typedef;
+
+typedef struct {
+	char CallNumber[CALL_NUMBER_MAX_COUNT];
+	time_t Time;
+	uint32_t IsSuccessfully :1;
+	uint32_t IsIncoming :1;
+	uint32_t Reserved1 :24;
+} CallLog_Fixed_Typedef;
 
 extern const FieldAttribute_Typedef CallLogFieldsAttribute[CALLLOG_FIELD_COUNT];
 

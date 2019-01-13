@@ -16,5 +16,6 @@ extern RTC_HandleTypeDef RtcHandle;
 
 void DateService_Init();
 void DateService_Config(struct tm _tm);
+void DateService_Get(struct tm * _tm);
 
 #endif /* DATESERVICE_H_ */
