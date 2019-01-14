@@ -33,7 +33,8 @@ extern const CommandType_TypeDef SELECT_MESSAGE_SERVICE;
 #define GSM_DELETE_SMS_MESSAGE()
 #define GSM_SELECT_SMS_MESSAGE_FORMAT(value)	{ \
 		char num[2] = {value + '0',0}; \
-		Gsm_ExecuteCommand(SELECT_SMS_MESSAGE_FORMAT, Write, num); \
+		char* nums[3] = { num, 0}; \
+		Gsm_ExecuteCommand(SELECT_SMS_MESSAGE_FORMAT, Write, nums); \
 }
 #define GSM_LIST_SMS_MESSAGE_FROM_PREFERRED_STORE()
 #define GSM_READ_SMS_MESSAGE()
@@ -41,8 +42,9 @@ extern const CommandType_TypeDef SELECT_MESSAGE_SERVICE;
 #define GSM_WRITE_SMS_TO_MEMORY()
 #define GSM_SEND_SMS_MESSAGE_FROM_STORAGE()
 #define GSM_NEW_SMS_MESSAGE_INDICATION(value)	{ \
-		char num[3] = {'2', value + '0',0}; \
-		Gsm_ExecuteCommand(NEW_SMS_MESSAGE_INDICATION, Write, num); \
+		char num[2] = {value + '0',0}; \
+		char* nums[3] = { "2", num,0}; \
+		Gsm_ExecuteCommand(NEW_SMS_MESSAGE_INDICATION, Write, nums); \
 }
 #define GSM_PREFERRED_SMS_MESSAGE_STORAGE()
 #define GSM_RESTORE_SMS_SETTINGS()

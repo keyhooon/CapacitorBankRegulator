@@ -86,6 +86,7 @@ extern const CommandType_TypeDef DISCONNECT_VOICE_CALL_ONLY;
 
 #define GSM_SET_MONITOR_SPEAKER_LOUDNESS( value) { \
 		char num[2] = {value + '0',0}; \
+		char* nums[3] = { num,0}; \
 	Gsm_ExecuteCommand_RetryUntillOk(SET_MONITOR_SPEAKER_LOUDNESS, integer, &num); \
 }
 #define GSM_SET_MONITOR_SPEAKER_MODE( value) { \

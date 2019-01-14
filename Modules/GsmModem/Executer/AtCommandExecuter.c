@@ -172,13 +172,13 @@ void GetCommandString(char* commandText,
 			break;
 		case Write:
 			commandText[index++] = '=';
-			index += strcpyl(&commandText[index], (char*) command.parameters);
-			(command.parameters)++;
-			while (*(char*) command.parameters) {
+			index += strcpyl(&commandText[index], *(char**) command.parameters);
+			command.parameters = ((char**) command.parameters) + 1;
+			while (*(char**) command.parameters) {
 				commandText[index++] = ',';
 				index += strcpyl(&commandText[index],
-						(char*) command.parameters);
-				(command.parameters)++;
+						*(char**) command.parameters);
+				command.parameters = ((char**) command.parameters) + 1;
 			}
 			break;
 		default:
