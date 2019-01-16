@@ -20,11 +20,12 @@ typedef struct {
 typedef struct {
 	BufferStream_TypeDef * bufferStream;
 	char * Separator;
-	char * Footer;
 } CommandTokenizer_TypeDef;
+
 
 CommandTokensList_TypeDef CommandTokenizer_tokenize(
 		CommandTokenizer_TypeDef Tokenizer, unsigned int *length);
 void CommandTokenizer_FreeTokenList(CommandTokensList_TypeDef commandTokenList);
-
+void CommandTokenizer_RemoveTokenFromList(
+		CommandTokensList_TypeDef commandTokenList, int index);
 #endif /* GSMMODEM_TOKENIZER_COMMANDTOKENIZER_H_ */

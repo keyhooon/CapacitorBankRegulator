@@ -18,7 +18,7 @@ char* messageStorageType[5] = {
 SIM_MESSAGE_STORAGE, PHONE_MESSAGE_STORAGE, SM_MESSAGE_STORAGE_PREFERRED,
 		ME_MESSAGE_STORAGE_PREFERRED, SM_ME_MESSAGE_STORAGE };
 
-void CmtReceivedCallback(char* CmtReceivedToken);
+void CmtReceivedCallback(char* CmtReceivedToken, char * Arg);
 void OnMessageReceived();
 
 osThreadId MessageThreadId;
@@ -53,8 +53,7 @@ void Message_Main(void * arg) {
 
 }
 
-void CmtReceivedCallback(char* CmtReceivedToken) {
-	Message_Typedef message;
+void CmtReceivedCallback(char* CmtReceivedToken, char * Arg) {
 	struct tm tm;
 	time_t t;
 	strtok_r(CmtReceivedToken, "\"", &CmtReceivedToken);
@@ -65,7 +64,7 @@ void CmtReceivedCallback(char* CmtReceivedToken) {
 	strptime(strtok_r(CmtReceivedToken, "\"", &CmtReceivedToken),
 			"%y/%m/%d,%H:%M:%S", &tm);
 	t = mktime(&tm);
-	AddMessageEx(CmtReceivedToken, callNumber, t, 1, 1);
+	AddMessageEx(Arg, callNumber, t, 1, 1);
 }
 
 

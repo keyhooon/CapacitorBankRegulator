@@ -38,7 +38,9 @@ extern const CommandType_TypeDef SELECT_MESSAGE_SERVICE;
 }
 #define GSM_LIST_SMS_MESSAGE_FROM_PREFERRED_STORE()
 #define GSM_READ_SMS_MESSAGE()
-#define GSM_SEND_SMS_MESSAGE()
+#define GSM_SEND_SMS_MESSAGE(content, callNumber) {\
+		char * nums[3] = { }\
+}
 #define GSM_WRITE_SMS_TO_MEMORY()
 #define GSM_SEND_SMS_MESSAGE_FROM_STORAGE()
 #define GSM_NEW_SMS_MESSAGE_INDICATION(value)	{ \

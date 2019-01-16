@@ -13,9 +13,6 @@ int strcpyl(char *dest, const char *src);
 void CommandExecuter_Task(void const * argument);
 void GetCommandString(char* commandText,
 		CommandExecuter_TypeDef *commandExecuter, Command_TypeDef command);
-void CommandExecuter_GetResponse_Async_Timeout(void *Arg);
-void CommandExecuter_GetResponse_Async_End(
-		CommandExecuter_TypeDef *commandExecuter);
 
 CommandExecuter_TypeDef * CommandExecuter_Init(void (*Write)(char *, uint32_t),
 		CommandTokenizer_TypeDef tokenizer, char * commandLineTermination) {
@@ -52,15 +49,17 @@ void CommandExecuter_DeInit(CommandExecuter_TypeDef *commandExecuter) {
 void CommandExecuter_Task(void const * argument) {
 	CommandExecuter_TypeDef * currentCommandExecuter = argument;
 	Response_TypeDef response;
+	int lengthToProcess = 0;
 	while (1) {
 		osEvent event = osMessageGet(currentCommandExecuter->messageId,
 		osWaitForever);
-
+		lengthToProcess += event.value.v;
 		if (event.status == osEventMessage) {
 			response = ResponseParse(currentCommandExecuter->commandTokenizer,
-					&event.value.v);
+					&lengthToProcess);
 			while (response.Tokens.Items != NULL)
 			{
+				// pass response.token.item string to function that registered to any of unsolicited code
 				for (int i = 0; *(response.Tokens.Items + i) != NULL; i++) {
 					char * responseToken = *(response.Tokens.Items + i);
 					char * responseDelim = strchr(responseToken, ':');
@@ -74,28 +73,38 @@ void CommandExecuter_Task(void const * argument) {
 											responseNameLen) != 0; p = p->next)
 						;
 					if (p != NULL && p->ResponseReceivedCallback)
-						p->ResponseReceivedCallback(responseToken);
+					{
+						char * arg = response.Tokens.Items[i + 1];
+						p->ResponseReceivedCallback(responseToken, arg);
+						// remove token from tokensList
+						CommandTokenizer_RemoveTokenFromList(response.Tokens,
+								i);
+					}
 				}
 
 				if (response.status == ResponseStatusOk) {
 					if (responseResultList[response.resultNumber].type == final)
 					{
+						// pass response to function that call at command
 						currentCommandExecuter->LastResponse = response;
 						osSemaphoreRelease(currentCommandExecuter->semaphoreId);
 					}
 					else if (currentCommandExecuter->UnsolicitedResultCode) {
+						// pass response to function that responsible to Unsilicited Result
 						currentCommandExecuter->UnsolicitedResultCode(response);
 						CommandTokenizer_FreeTokenList(response.Tokens);
 					}
 				} else {
+					// remove response if there isnt any result.
 					CommandTokenizer_FreeTokenList(response.Tokens);
 				}
-				if (event.value.v == 0)
+
+				if (lengthToProcess == 0)
 					response.Tokens.Items = NULL;
 				else
 					response = ResponseParse(
 							currentCommandExecuter->commandTokenizer,
-							&event.value.v);
+							&lengthToProcess);
 			}
 		}
 	}
@@ -120,6 +129,23 @@ Response_TypeDef CommandExecuter_Execute(
 	osRecursiveMutexRelease(commandExecuter->mutexId);
 	return result;
 }
+
+Response_TypeDef CommandExecuter_ExecuteWithData(
+		CommandExecuter_TypeDef *commandExecuter, Command_TypeDef command,
+		char * data) {
+	char commandString[40];
+	Response_TypeDef result;
+	osRecursiveMutexWait(commandExecuter->mutexId, osWaitForever);
+	GetCommandString(commandString, commandExecuter, command);
+	commandExecuter->Write(commandString, strlen(commandString));
+	int maxResponseTime = command.type.maximumResponseTime;
+	if (maxResponseTime == 0)
+		maxResponseTime = 1000;
+	result = CommandExecuter_GetResponse(commandExecuter, maxResponseTime);
+	osRecursiveMutexRelease(commandExecuter->mutexId);
+	return result;
+}
+
 
 Response_TypeDef CommandExecuter_GetResponse(
 		CommandExecuter_TypeDef *commandExecuter, int timeout) {

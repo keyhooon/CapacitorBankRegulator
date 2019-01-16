@@ -8,16 +8,18 @@
 #include <Tokenizer/BufferTokenizer.h>
 #include "string.h"
 
-
-bufToken_TypeDef BufTok(BufferStream_TypeDef * bufferStream, char * delimiter, int bufferStreamMaxLength){
+// maxLength variable gonna out from static attribute, and testing for error,
+// we assume idle occure in end of the packet, if in packetizing any byte remain
+// we raise error, if error occure, we must change code to maxLength parameter,
+// static.
+bufToken_TypeDef BufTok(BufferStream_TypeDef * bufferStream, int Length,
+		char * delimiter) {
 	bufToken_TypeDef tok = { 0, 0, 0 };
-	static int maxLength = 0;
-	maxLength += bufferStreamMaxLength;
 	int currentIndex = bufferStream->tail;
 
 	int delimiterFoundCount = 0;
 	int delimiterLength = strlen(delimiter);
-	for (int i = 0; i < maxLength; i++) {
+	for (int i = 0; i < Length; i++) {
 		if (*(bufferStream->buffer + currentIndex) == *(delimiter + delimiterFoundCount))
 			delimiterFoundCount++;
 		else if (*(bufferStream->buffer + currentIndex) == *(delimiter))
@@ -26,24 +28,25 @@ bufToken_TypeDef BufTok(BufferStream_TypeDef * bufferStream, char * delimiter, i
 			delimiterFoundCount = 0;
 		if (delimiterLength == delimiterFoundCount) {
 			*(bufferStream->buffer + currentIndex - delimiterLength + 1) = 0;
-			int length = currentIndex - bufferStream->tail - delimiterLength + 1;
-			if (length < 0) {
-				length += bufferStream->length;
+			int tokLength = currentIndex - bufferStream->tail - delimiterLength
+					+ 1;
+			if (tokLength < 0) {
+				tokLength += bufferStream->length;
 				tok.needTobeRealesed =  1;
-				tok.item = pvPortMalloc(length);
+				tok.item = pvPortMalloc(tokLength);
 				int e = bufferStream->length - bufferStream->tail;
 				memcpy(tok.item, bufferStream->buffer + bufferStream->tail, e);
-				memcpy(tok.item + e, bufferStream->buffer, length - e);
+				memcpy(tok.item + e, bufferStream->buffer, tokLength - e);
 			} else
 				tok.item = bufferStream->buffer + bufferStream->tail;
 			bufferStream->tail = currentIndex + 1;
-			tok.length = length;
-			maxLength -= length + delimiterLength;
+			tok.length = tokLength;
 			break;
 		}
 		if (currentIndex ++==bufferStream->length)
 			currentIndex = 0;
 	}
+
 	return tok;
 }
 

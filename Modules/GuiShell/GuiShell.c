@@ -245,12 +245,14 @@ static void _cbToolbar(WM_MESSAGE * pMsg) {
 		WM_CF_SHOW, 0,
 		GUI_ID_BUTTON0, 0);
 		BUTTON_SetText(hButton[0], "Back");
+		BUTTON_SetFont(hButton[0], &GUI_Font13HB_ASCII);
 
 		hButton[1] = BUTTON_CreateUser(xSize - 5 - BUTTON_WIDTH, 4,
 				BUTTON_WIDTH, BUTTON_HEIGHT, hWin,
 				WM_CF_SHOW, 0,
 				GUI_ID_BUTTON1, 0);
 		BUTTON_SetText(hButton[1], "Menu");
+		BUTTON_SetFont(hButton[1], &GUI_Font13HB_ASCII);
 		break;
 
 	case WM_PAINT:

@@ -15,7 +15,7 @@
 #include "CallLogListContext.h"
 
 
-void ClccReceivedCallback(char* ClccReceivedToken);
+void ClccReceivedCallback(char* ClccReceivedToken, char * Arg);
 void UnsolicitedResultCallback(Response_TypeDef response);
 void ClccReceivedHandler(char* ClccReceivedToken);
 
@@ -85,7 +85,7 @@ void Call_Main(void * arg) {
 
 }
 
-void ClccReceivedCallback(char* ClccReceivedToken) {
+void ClccReceivedCallback(char* ClccReceivedToken, char * Arg) {
 	CallInfo_Typedef *callInfo = pvPortMalloc(sizeof(CallInfo_Typedef));
 	callInfo->state = (ClccReceivedToken[11] - '0');
 	strtok(ClccReceivedToken, "\"");

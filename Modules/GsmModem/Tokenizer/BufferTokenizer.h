@@ -17,8 +17,8 @@ typedef struct {
 } bufToken_TypeDef;
 
 
-bufToken_TypeDef BufTok(BufferStream_TypeDef * bufferStream, char * delimiter,
-		int bufferStreamMaxLength);
+bufToken_TypeDef BufTok(BufferStream_TypeDef * bufferStream, int Length,
+		char * delimiter);
 
 
 

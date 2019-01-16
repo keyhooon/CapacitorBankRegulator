@@ -144,8 +144,9 @@ static void MessageEditFinishedCallback(void *parameters) {
 	EditView_Parameters_Typedef *param =
 			(EditView_Parameters_Typedef *) parameters;
 	Message_Typedef* buffer = (Message_Typedef*) (param->buffer);
+
 	AddMessageEx(buffer->Content, buffer->CallNumber, buffer->Time,
-			buffer->IsSuccessfully, buffer->IsIncoming);
+			1, 0);
 }
 static void MessageEditCancelCallback(void *parameters) {
 

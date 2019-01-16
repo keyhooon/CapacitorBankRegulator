@@ -41,9 +41,9 @@ EDIT_VIEW_ID, "Edit", "Edit", (void *) NULL, EditViewShow, EditViewHide,
 static const GUI_WIDGET_CREATE_INFO _aDialogCreate[] = { //
 		{ WINDOW_CreateIndirect, "Main Menu", GUI_ID_USER, 0, 0, 128, 115,
 				WM_CF_SHOW, 0x0, 0 }, //
-				{ TEXT_CreateIndirect, "Text", GUI_ID_TEXT0, 5, 20, 118, 20,
+				{ TEXT_CreateIndirect, "Text", GUI_ID_TEXT0, 5, 15, 118, 30,
 						TEXT_CF_HCENTER | TEXT_CF_VCENTER, 0, 0 }, //
-				{ EDIT_CreateIndirect, "Edit", GUI_ID_EDIT0, 5, 60, 128, 20,
+				{ EDIT_CreateIndirect, "Edit", GUI_ID_EDIT0, 5, 50, 118, 30,
 						TEXT_CF_HCENTER | TEXT_CF_VCENTER, 0, 0 }, //
 		};
 static GUI_HWIN EditViewShow(void * parameters) {
@@ -51,6 +51,11 @@ static GUI_HWIN EditViewShow(void * parameters) {
 			(EditView_Parameters_Typedef *) parameters;
 	WM_HWIN hwin = GUI_CreateDialogBox(_aDialogCreate,
 			GUI_COUNTOF(_aDialogCreate), NULL, NULL, 0, 0);
+	GUI_HWIN hEditWin = WM_GetDialogItem(hwin, GUI_ID_EDIT0);
+	GUI_HWIN hTextWin = WM_GetDialogItem(hwin, GUI_ID_TEXT0);
+	TEXT_SetFont(hTextWin, &GUI_Font16B_ASCII);
+	EDIT_SetFont(hEditWin, &GUI_Font13HB_ASCII);
+
 	editView_parameters->currentFieldIndex = 0;
 	editView_parameters->buffer = pvPortMalloc(
 			CalculateDataModelMaxSizeWithExtra(
@@ -86,6 +91,10 @@ void EditViewOkCallback(void * parameters) {
 			DefaultViewNavigator.view_container_hWin);
 	StoreValue(editView_parameters, countainer_hwin);
 	editView_parameters->currentFieldIndex++;
+	while (!editView_parameters->fieldAttribute[editView_parameters->currentFieldIndex].editable
+			&& editView_parameters->currentFieldIndex
+					!= editView_parameters->fieldCount)
+		editView_parameters->currentFieldIndex++;
 	if (editView_parameters->currentFieldIndex
 			== editView_parameters->fieldCount)
 	{
@@ -135,12 +144,13 @@ void LoadValue(EditView_Parameters_Typedef * editView_parameters,
 		WM_HWIN countainer_hwin) {
 
 	GUI_HWIN hEditWin = WM_GetDialogItem(countainer_hwin, GUI_ID_EDIT0);
+	GUI_HWIN hTextWin = WM_GetDialogItem(countainer_hwin, GUI_ID_TEXT0);
 	FieldAttribute_Typedef *fieldAttribute = editView_parameters->fieldAttribute
 			+ editView_parameters->currentFieldIndex;
 
 
-	TEXT_SetText(WM_GetDialogItem(countainer_hwin, GUI_ID_TEXT0),
-			fieldAttribute->display);
+	TEXT_SetText(hTextWin, fieldAttribute->display);
+
 	EDIT_SetMaxLen(hEditWin, fieldAttribute->maxLength);
 	if (fieldAttribute->valueType == stringField) {
 		EDIT_SetTextMode(hEditWin);

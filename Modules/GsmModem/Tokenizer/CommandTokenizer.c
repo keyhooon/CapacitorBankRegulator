@@ -14,8 +14,8 @@ CommandTokensList_TypeDef CommandTokenizer_tokenize(
 	bufToken_TypeDef currentBuffToken;
 	int tokenCount = 0;
 
-	currentBuffToken = BufTok(tokenizer.bufferStream, tokenizer.Separator,
-			*commandLength);
+	currentBuffToken = BufTok(tokenizer.bufferStream, *commandLength,
+			tokenizer.Separator);
 	while (currentBuffToken.item != 0) {
 		if (currentBuffToken.needTobeRealesed)
 			result.IndexNeedToBeReleased = tokenCount;
@@ -28,19 +28,9 @@ CommandTokensList_TypeDef CommandTokenizer_tokenize(
 			result.ResultIndex = tokenCount - 1;
 			break;
 		}
-		currentBuffToken = BufTok(tokenizer.bufferStream, tokenizer.Separator,
-				*commandLength);
+		currentBuffToken = BufTok(tokenizer.bufferStream, *commandLength,
+				tokenizer.Separator);
 	}
-//	currentBuffToken = BufTok(tokenizer.bufferStream, tokenizer.Footer,
-//			commandLength);
-//	if (currentBuffToken.item != 0) {
-//		if (currentBuffToken.needTobeRealesed)
-//			result.IndexNeedToBeReleased = tokenCount;
-//		result.ResultIndex = tokenCount;
-//		TokenizedItems[tokenCount++] = currentBuffToken.item;
-//		commandLength -= currentBuffToken.length
-//				+ strlen(tokenizer.Separator);
-//	}
 	if (tokenCount) {
 		TokenizedItems[tokenCount++] = 0;
 		result.Items = pvPortMalloc(sizeof(char *) * tokenCount);
@@ -61,4 +51,17 @@ void CommandTokenizer_FreeTokenList(CommandTokensList_TypeDef commandTokenList) 
 		vPortFree(commandTokenList.Items);
 		commandTokenList.Items = 0;
 	}
+}
+void CommandTokenizer_RemoveTokenFromList(
+		CommandTokensList_TypeDef commandTokenList, int index) {
+	if (commandTokenList.IndexNeedToBeReleased > index)
+		commandTokenList.IndexNeedToBeReleased--;
+	else if (commandTokenList.IndexNeedToBeReleased == index) {
+		vPortFree(commandTokenList.Items[index]);
+		commandTokenList.IndexNeedToBeReleased = -1;
+	}
+	if (commandTokenList.ResultIndex > index)
+		commandTokenList.ResultIndex--;
+	for (int j = index; *(commandTokenList.Items + j) != 0; j++)
+		commandTokenList.Items[j] = commandTokenList.Items[j + 1];
 }

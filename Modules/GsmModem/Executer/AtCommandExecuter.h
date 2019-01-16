@@ -14,7 +14,7 @@
 #
 typedef struct ResponseReceivedCallbackList_Struct {
 	const char* ResponseName;
-	void (*ResponseReceivedCallback)(char*);
+	void (*ResponseReceivedCallback)(char*, char *);
 	struct ResponseReceivedCallbackList_Struct * next;
 } ResponseReceivedCallbackList_typedef;
 
@@ -63,6 +63,9 @@ void CommandExecuter_HandleReceivedResponse(
 		CommandExecuter_TypeDef *commandExecuter, uint32_t Length);
 Response_TypeDef CommandExecuter_Execute(
 		CommandExecuter_TypeDef *commandExecuter, Command_TypeDef command);
+Response_TypeDef CommandExecuter_ExecuteWithData(
+		CommandExecuter_TypeDef *commandExecuter, Command_TypeDef command,
+		char * data);
 Response_TypeDef CommandExecuter_GetResponse(
 		CommandExecuter_TypeDef *commandExecuter, int timeout);
 void CommandExecuter_GetResponse_Async(CommandExecuter_TypeDef *commandExecuter,

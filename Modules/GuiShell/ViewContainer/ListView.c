@@ -167,11 +167,14 @@ static GUI_HWIN ListViewShow(void * parameters) {
 	WM_HWIN hwin = WINDOW_CreateEx(0, 0, 128, 115, NULL, WM_CF_SHOW, 0x0,
 			GUI_ID_USER, NULL);
 	LISTBOX_Handle listbox_hwin = LISTBOX_CreateEx(0, 0, 128, 115, hwin,
-	WM_CF_SHOW, 0, GUI_ID_LISTBOX0, listView_parameters->DisplayArray);
+	WM_CF_SHOW, 0, GUI_ID_LISTBOX0, 0 /*listView_parameters->DisplayArray*/);
 	SetListSkin(listbox_hwin);
 	for (int i = 0; (*(listView_parameters->customFunction + i)) != NULL; i++)
 		LISTBOX_AddString(listbox_hwin,
 				(*(listView_parameters->customFunction + i))->display);
+	for (int i = 0; (*(listView_parameters->DisplayArray + i)) != NULL; i++)
+		LISTBOX_AddString(listbox_hwin,
+				*(listView_parameters->DisplayArray + i));
 	LISTBOX_SetSel(listbox_hwin,
 			listView_parameters->apiHandlers->GetSelectedIndex());
 	listView_parameters->hWin = listbox_hwin;
@@ -189,11 +192,17 @@ void ListOkCallback(void * parameters) {
 			(ListView_Parameters_Typedef *) parameters;
 	uint32_t selItem = LISTBOX_GetSel(listView_parameters->hWin);
 	uint32_t count = listView_parameters->apiHandlers->GetCount();
-	if (selItem < count) {
-		listView_parameters->apiHandlers->SetSelectedIndex(selItem);
+	int FunctionCount = 0;
+	for (; (*(listView_parameters->customFunction + FunctionCount)) != NULL;
+			FunctionCount++)
+		;
+	if (selItem < FunctionCount) {
+		listView_parameters->customFunction[selItem]->function();
+	} else {
+		listView_parameters->apiHandlers->SetSelectedIndex(
+				selItem - FunctionCount);
 		listView_parameters->SelectCallback();
-	} else
-		(*(listView_parameters->customFunction + (selItem - count)))->function();
+	}
 }
 
 void ListBackCallback(void * parameters) {
