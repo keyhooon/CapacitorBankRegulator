@@ -49,4 +49,22 @@ bufToken_TypeDef BufTok(BufferStream_TypeDef * bufferStream, int Length,
 
 	return tok;
 }
+int CheckPattern(BufferStream_TypeDef * bufferStream, char * pattern) {
+	int delimiterFoundCount = 0;
+	int index = 0;
+	int delimiterLength;
+	for (delimiterLength = strlen(pattern);
+			delimiterLength > 0
+					&& *(bufferStream->buffer + index + bufferStream->tail)
+							== *(pattern + index);
+			delimiterLength--) {
+		delimiterFoundCount++;
+		*(bufferStream->buffer + index) = 0;
+	}
+	if (delimiterLength == 0) {
+		bufferStream->tail += delimiterFoundCount;
+		return 1;
+	}
+	return 0;
+}
 

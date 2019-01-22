@@ -15,11 +15,11 @@ typedef enum FieldType_Enum {
 } FieldType_Typedef;
 
 typedef struct {
-	int valueType :3;
-	int offsetInStruct :8;
-	int lengthInStruct :4;
-	int maxLength :16;
-	int editable :1;
+	unsigned int valueType :3;
+	unsigned int offsetInStruct :8;
+	unsigned int lengthInStruct :4;
+	unsigned int maxLength :16;
+	unsigned int editable :1;
 	char *display;
 } FieldAttribute_Typedef;
 

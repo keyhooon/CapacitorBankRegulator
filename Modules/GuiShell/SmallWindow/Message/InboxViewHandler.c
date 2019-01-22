@@ -144,7 +144,7 @@ static void MessageEditFinishedCallback(void *parameters) {
 	EditView_Parameters_Typedef *param =
 			(EditView_Parameters_Typedef *) parameters;
 	Message_Typedef* buffer = (Message_Typedef*) (param->buffer);
-
+	GSM_SEND_SMS_MESSAGE(buffer->Content, buffer->CallNumber);
 	AddMessageEx(buffer->Content, buffer->CallNumber, buffer->Time,
 			1, 0);
 }

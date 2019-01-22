@@ -20,6 +20,9 @@
 #define CONTACT_SHOW_VIEW_ID	0x212
 #define EDIT_VIEW_ID			0x030
 #define INFO_VIEW_ID			0x040
+#define EDITBOX_VIEW_ID			0x050
+
+
 
 
 

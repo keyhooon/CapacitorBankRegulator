@@ -20,6 +20,6 @@ typedef struct {
 bufToken_TypeDef BufTok(BufferStream_TypeDef * bufferStream, int Length,
 		char * delimiter);
 
-
+int CheckPattern(BufferStream_TypeDef * bufferStream, char * pattern);
 
 #endif /* GSMMODEM_TOKENIZER__BUFFERTOKENIZER_H_ */

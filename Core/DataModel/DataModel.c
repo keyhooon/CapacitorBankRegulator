@@ -28,7 +28,7 @@ int CalculateDataModelMaxSizeWithExtra(FieldAttribute_Typedef * fieldAttribute,
 	{
 		result += fieldAttribute[i].lengthInStruct;
 		if (fieldAttribute[i].valueType == stringField)
-			result += fieldAttribute->maxLength + 1;
+			result += fieldAttribute[i].maxLength + 1;
 	}
 	return result;
 }

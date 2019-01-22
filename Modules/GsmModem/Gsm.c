@@ -41,6 +41,15 @@ int Gsm_ExecuteCommand(CommandType_TypeDef type, CommandAction_TypeDef action,
 	CommandTokenizer_FreeTokenList(response.Tokens);
 	return response.resultNumber;
 }
+int Gsm_ExecuteCommand_WithData(CommandType_TypeDef type,
+		CommandAction_TypeDef action, void * parameters, char * data) {
+	Command_TypeDef command = { type, action, parameters };
+	Response_TypeDef response;
+	response = CommandExecuter_ExecuteWithData(GsmCommandExecuter, command,
+			data);
+	CommandTokenizer_FreeTokenList(response.Tokens);
+	return response.resultNumber;
+}
 int Gsm_ExecuteCommand_Ex(CommandType_TypeDef type,
 		CommandAction_TypeDef action, void * parameters, char* response) {
 	Command_TypeDef command = { type, action, parameters };

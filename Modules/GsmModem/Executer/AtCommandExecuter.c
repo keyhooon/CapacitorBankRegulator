@@ -8,6 +8,7 @@
 #include "AtCommandExecuter.h"
 #include "cmsis_os.h"
 #include "string.h"
+const char Ctrl_Z = 26;
 
 int strcpyl(char *dest, const char *src);
 void CommandExecuter_Task(void const * argument);
@@ -49,7 +50,7 @@ void CommandExecuter_DeInit(CommandExecuter_TypeDef *commandExecuter) {
 void CommandExecuter_Task(void const * argument) {
 	CommandExecuter_TypeDef * currentCommandExecuter = argument;
 	Response_TypeDef response;
-	int lengthToProcess = 0;
+	unsigned int lengthToProcess = 0;
 	while (1) {
 		osEvent event = osMessageGet(currentCommandExecuter->messageId,
 		osWaitForever);
@@ -81,7 +82,6 @@ void CommandExecuter_Task(void const * argument) {
 								i);
 					}
 				}
-
 				if (response.status == ResponseStatusOk) {
 					if (responseResultList[response.resultNumber].type == final)
 					{
@@ -105,6 +105,15 @@ void CommandExecuter_Task(void const * argument) {
 					response = ResponseParse(
 							currentCommandExecuter->commandTokenizer,
 							&lengthToProcess);
+			}
+			if (CheckPattern(
+					currentCommandExecuter->commandTokenizer.bufferStream,
+					"> "))
+			{
+				lengthToProcess -= 2;
+				response.status = ResponseStatusOk_WaitForData;
+				currentCommandExecuter->LastResponse = response;
+				osSemaphoreRelease(currentCommandExecuter->semaphoreId);
 			}
 		}
 	}
@@ -138,6 +147,13 @@ Response_TypeDef CommandExecuter_ExecuteWithData(
 	osRecursiveMutexWait(commandExecuter->mutexId, osWaitForever);
 	GetCommandString(commandString, commandExecuter, command);
 	commandExecuter->Write(commandString, strlen(commandString));
+	// TODO: if write set with dma, we cant write imediately after one write, and Executing has error.
+	if (CommandExecuter_GetResponse(commandExecuter, 1000).status
+			== ResponseStatusOk_WaitForData)
+	{
+		commandExecuter->Write(data, strlen(data));
+		commandExecuter->Write(&Ctrl_Z, 1);
+	}
 	int maxResponseTime = command.type.maximumResponseTime;
 	if (maxResponseTime == 0)
 		maxResponseTime = 1000;

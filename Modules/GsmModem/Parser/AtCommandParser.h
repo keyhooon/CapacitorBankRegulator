@@ -75,6 +75,7 @@ typedef enum {
 	ResponseStatusError_Timeout,
 	ResponseStatusError_ResultIsntThere,
 	ResponseStatusError_BadFormat,
+	ResponseStatusOk_WaitForData,
 } ResponseStatus_TypeDef;
 
 typedef struct {

@@ -39,7 +39,14 @@ extern const CommandType_TypeDef SELECT_MESSAGE_SERVICE;
 #define GSM_LIST_SMS_MESSAGE_FROM_PREFERRED_STORE()
 #define GSM_READ_SMS_MESSAGE()
 #define GSM_SEND_SMS_MESSAGE(content, callNumber) {\
-		char * nums[3] = { }\
+		char num[15]; \
+		int len = strlen(callNumber) ; \
+		num[0]='"'; \
+		strcpy(&num[1],callNumber); \
+		num[len + 1] = '"'; \
+		num[len + 2] = 0; \
+		char * nums[2] = {num, 0}; \
+		Gsm_ExecuteCommand_WithData(SEND_SMS_MESSAGE, Write, nums, content); \
 }
 #define GSM_WRITE_SMS_TO_MEMORY()
 #define GSM_SEND_SMS_MESSAGE_FROM_STORAGE()
